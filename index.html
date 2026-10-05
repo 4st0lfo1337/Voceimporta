@@ -40,10 +40,8 @@
             --window-taskbar-h-real: 44px;
             --window-z-base: 10100;
             --window-z-max: 10800;
-            /* Hero effects (controláveis pelo painel) */
             --hero-blur-mult: 1;
             --hero-glow-duration: 4s;
-            /* CRT z-index — fica abaixo das janelas/sidebar mas acima do conteúdo */
             --crt-z-base: 9600;
         }
 
@@ -79,7 +77,6 @@
         body.hero-glow-off .hero h1 { animation: none !important; }
         body.hero-aura-off .hero h1::before { display: none !important; }
 
-        /* Leitura calma: modo sem distrações e com contraste reduzido. */
         body.leitura-calma {
             color: #aaa69f;
             line-height: 2.2;
@@ -254,9 +251,7 @@
         }
 
         /* ===================================================================== */
-        /* CRT — agora ABAIXO das janelas (--crt-z-base) e da sidebar           */
-        /* Sidebar = 10000 | Windows = 10101+ | Sticky bar = 9990                */
-        /* CRT fica em ~9600, acima do conteúdo da página mas abaixo da UI      */
+        /* CRT OVERLAYS */
         /* ===================================================================== */
         .crt-overlay, .crt-flicker, .crt-noise { display: none; }
         @media (hover: hover) and (pointer: fine) and (min-width: 1025px) {
@@ -323,7 +318,7 @@
         }
 
         /* ===================================================================== */
-        /* DEBUG OVERLAY — MONITOR DE SISTEMA / HERO / CRT                      */
+        /* DEBUG OVERLAY */
         /* ===================================================================== */
         .debug-overlay {
             position: fixed;
@@ -488,7 +483,6 @@
         .crt-toggle-btn.crt-off .crt-toggle-indicator { background: #8a3a3a; box-shadow: inset 0 0 3px rgba(0,0,0,0.6), 0 0 4px rgba(180,60,60,0.4); }
         .crt-toggle-label { flex: 1; text-align: left; overflow: hidden; text-overflow: ellipsis; }
 
-        /* Bloco hero-fx-toggle — mesma tonalidade do crt-toggle (âmbar/marrom) */
         .hero-fx-toggle-btn { border-color: #5a4a3a #1a1008 #1a1008 #5a4a3a; color: #c8b090; }
         .hero-fx-toggle-btn:hover { background: #3a2a1a; color: #e8d5a3; }
         .hero-fx-toggle-btn:focus-visible { outline-color: #c8b090; }
@@ -500,7 +494,7 @@
         .calm-toggle-btn:focus-visible { outline-color: #c4c4b8; }
         .calm-toggle-indicator { background: #b8b8a0; box-shadow: inset 0 0 3px rgba(0,0,0,0.6), 0 0 5px rgba(200,200,170,0.5); }
         .calm-toggle-btn.calm-off .calm-toggle-indicator { background: #8a3a3a; box-shadow: inset 0 0 3px rgba(0,0,0,0.6), 0 0 4px rgba(180,60,60,0.4); }
-        
+
         /* ===================================================================== */
         /* ATALHO ESTILO WINDOWS */
         /* ===================================================================== */
@@ -772,7 +766,7 @@
         footer .links-footer a:hover { color: #c8b898; }
 
         /* ===================================================================== */
-        /* SEÇÃO DE FONTES — referências bibliográficas (ABNT)                   */
+        /* SEÇÃO DE FONTES */
         /* ===================================================================== */
         .secao-fontes { padding: 2.5rem 0 1rem; border-top: 1px solid #3a3028; }
         .secao-fontes .container { max-width: 900px; }
@@ -832,19 +826,7 @@
         .mapa-container iframe { width: 100%; height: 400px; border: 0; filter: grayscale(0.8) sepia(0.3); }
 
         /* ===================================================================== */
-        /* SEÇÃO COMO SE ACALMAR (RESPIRO) — com fade escuro→claro              */
-        /* ===================================================================== */
-        #respiro { background: linear-gradient(to bottom, #1a1510 0%, #e0d8c8 100%); }
-        #respiro .section-titulo h2 { color: #d0c8b8; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); }
-        #respiro .section-titulo p { color: #b0a898; }
-        .respiro-container { max-width: 600px; margin: 2rem auto; text-align: center; padding: 0 20px; }
-        .respiro-instrucoes { font-size: 1.1rem; color: #d0c8b8; margin-bottom: 0.5rem; text-align: center; }
-        .respiro-passo { color: #d0c8b8; text-decoration: underline; margin-bottom: 0.5rem; }
-        .respiro-passo strong { color: #d0c8b8; }
-        .respiro-grounding { margin-top: 1.5rem; color: #1a1510; font-weight: 600; }
-
-        /* ===================================================================== */
-        /* SEÇÃO COMPARTILHAR                                                    */
+        /* COMPARTILHAR */
         /* ===================================================================== */
         .compartilhar-container { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem; }
         .btn-compartilhar {
@@ -879,7 +861,7 @@
         }
 
         /* ===================================================================== */
-        /* BOTÃO DE AJUDA FLUTUANTE — ESTILO JANELA RETRÔ                        */
+        /* BOTÃO DE AJUDA FLUTUANTE */
         /* ===================================================================== */
         .botao-ajuda-flutuante {
             position: fixed; bottom: 30px; right: 30px; left: auto;
@@ -1015,7 +997,7 @@
         .os-window-body::-webkit-scrollbar-thumb { background: #3a3028; border: 1px solid #1a1008; }
         .os-window-body > section { padding: 1.5rem 1.4rem !important; content-visibility: visible !important; contain-intrinsic-size: auto !important; border: none !important; box-shadow: none !important; background: transparent !important; }
         .os-window-body > section.secao-clara { background: #d0c8b8 !important; color: #1a1510; border-radius: 0; }
-        .os-window-body > section#respiro { background: linear-gradient(to bottom, #1a1510 0%, #e0d8c8 100%) !important; }
+        .os-window-body > section.mensagem-com-fundo-gradiente { background: linear-gradient(to bottom, #1a1510 0%, #e0d8c8 100%) !important; }
         .os-window-body > section[style*="background: #1a1510"] { background: #1a1510 !important; }
         .os-window-body > section[style*="background: #1e1812"] { background: #1e1812 !important; }
         .os-window-body > section[style*="background: #0f0a08"] { background: #0f0a08 !important; }
@@ -1125,7 +1107,7 @@
         .snap-preview.visivel { display: block; }
 
         /* ===================================================================== */
-        /* TERMINAL DENTRO DE JANELA FLUTUANTE                                   */
+        /* TERMINAL DENTRO DE JANELA */
         /* ===================================================================== */
         .os-window-body.terminal-window-body-wrapper {
             display: flex;
@@ -1206,7 +1188,7 @@
         .terminal-input::placeholder { color: #5a4a3a; font-style: italic; }
 
         /* ===================================================================== */
-        /* JANELA DE AJUDA URGENTE — TEMA VERMELHO                               */
+        /* JANELA DE AJUDA URGENTE */
         /* ===================================================================== */
         .os-window.help-window {
             border-color: #8a3a2a #2a0503 #2a0503 #8a3a2a;
@@ -1340,7 +1322,7 @@
         }
 
         /* ===================================================================== */
-        /* PAINEL DE EFEITOS (aberto via comando `effects`)                     */
+        /* PAINEL DE EFEITOS */
         /* ===================================================================== */
         .os-window.effects-window {
             border-color: #5a7a4a #0a1505 #0a1505 #5a7a4a;
@@ -1409,7 +1391,6 @@
             font-size: 0.8rem;
         }
 
-        /* Toggle row */
         .fx-toggle {
             display: flex;
             align-items: center;
@@ -1467,7 +1448,6 @@
             font-style: italic;
         }
 
-        /* Slider row */
         .fx-slider-row {
             display: grid;
             grid-template-columns: 1fr auto;
@@ -1524,7 +1504,6 @@
         .fx-slider-row input[type="range"]:hover::-webkit-slider-thumb { background: #b8e090; }
         .fx-slider-row input[type="range"]:hover::-moz-range-thumb { background: #b8e090; }
 
-        /* Botões de ação */
         .fx-actions {
             display: flex;
             gap: 8px;
@@ -1626,7 +1605,7 @@
         @media (min-width: 1025px) { .window-taskbar-items { scrollbar-width: thin; } }
 
         /* ===================================================================== */
-        /* GLOSSÁRIO — TERMOS TÉCNICOS COM TOOLTIP                               */
+        /* GLOSSÁRIO */
         /* ===================================================================== */
         .glossario-termo {
             color: #d8c898;
@@ -1656,10 +1635,6 @@
             border-bottom-color: #2a1a00;
             background: rgba(120, 90, 40, 0.18);
         }
-        #respiro .glossario-termo {
-            color: #e8d5a3;
-            border-bottom-color: #c8b090;
-        }
         .hero .glossario-termo {
             color: #ffffff;
             border-bottom-color: #f0e0a8;
@@ -1677,7 +1652,6 @@
             background: rgba(120, 90, 40, 0.15);
         }
 
-        /* Tooltip global do glossário */
         .glossario-tooltip {
             position: fixed;
             z-index: 100000;
@@ -1753,9 +1727,7 @@
         }
 
         /* ===================================================================== */
-        /* SCROLLBAR RETRO — TEMA voceimporta                                     */
-        /* Bisel 3D estilo janela clássica + trilho "dither" + setas — igual em   */
-        /* toda a página e dentro de todas as janelas flutuantes                  */
+        /* SCROLLBAR RETRO */
         /* ===================================================================== */
         :root {
             --scrollbar-width: 16px;
@@ -1770,13 +1742,11 @@
             --scrollbar-seta-hover: var(--cor-amarelo);
         }
 
-        /* Firefox — scrollbar-color e scrollbar-width */
         html {
             scrollbar-color: var(--scrollbar-face) var(--scrollbar-track);
             scrollbar-width: auto;
         }
 
-        /* WebKit — Chrome, Safari, Edge */
         ::-webkit-scrollbar {
             width: var(--scrollbar-width);
             height: var(--scrollbar-width);
@@ -1837,7 +1807,6 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 10'%3E%3Cpath d='M3 2 L3 8 L7 5 Z' fill='%23c8b898'/%3E%3C/svg%3E");
         }
 
-        /* Mesmo estilo retro dentro das janelas flutuantes / listas internas, só que mais fina */
         .os-window-body::-webkit-scrollbar,
         .tree-container::-webkit-scrollbar,
         .terminal-body-windowed::-webkit-scrollbar,
@@ -1872,14 +1841,14 @@
             border-radius: 0;
         }
 
-        /* Sobrescreve estilos antigos de scrollbar que existiam no código */
         .tree-container,
         .os-window-body,
         .terminal-body-windowed,
         .glossario-tooltip { scrollbar-width: thin; scrollbar-color: var(--scrollbar-face) var(--scrollbar-track); }
         .window-taskbar-items { scrollbar-width: thin; scrollbar-color: var(--scrollbar-face) transparent; }
+
         /* ===================================================================== */
-        /* SIDEBAR REFORMULADA — EXPLORADOR DE ARQUIVOS RETRÔ                    */
+        /* SIDEBAR REFORMULADA — EXPLORADOR DE ARQUIVOS RETRÔ */
         /* ===================================================================== */
         .sidebar {
             width: 286px;
@@ -1950,15 +1919,6 @@
         }
         .tree-item:hover { color: #f3dcac; background: #302319; border-color: #614c38; }
         .tree-item.ativo {
-            color: #17100b;
-            background: #d0b17b;
-            border-color: #ebd5a6;
-            box-shadow: none;
-            text-shadow: none;
-        }
-        .tree-item.ativo::after { color: #4f3824; }
-        .tree-item.ativo .tree-icon { filter: grayscale(1) brightness(.55); }
-        .tree-item.ativo {
             background: #30251b;
             border-color: #806443;
             border-left: 3px solid #c8b090;
@@ -1998,6 +1958,364 @@
             .tree-row, .tree-item { min-height: 31px; }
         }
         @media (prefers-reduced-motion: reduce) { .tree-folder::after { transition: none; } }
+
+        /* ===================================================================== */
+        /* ESTILOS TEÓRICOS — MATERIALISMO HISTÓRICO E CONTEÚDO REFORMULADO     */
+        /* ===================================================================== */
+        .destaque-teorico {
+            background: #1a1510;
+            border-left: 4px solid var(--cor-amarelo);
+            padding: 1.2rem 1.5rem;
+            margin: 1.8rem 0;
+            border-radius: 2px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 20px rgba(80,50,30,0.15);
+            font-size: 0.95rem;
+            line-height: 1.9;
+            color: #c8b898;
+        }
+        .destaque-teorico::before {
+            content: '▸ fundamento teórico';
+            display: block;
+            font-size: 0.65rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: #a89060;
+            margin-bottom: 0.6rem;
+            font-weight: 700;
+        }
+        .destaque-teorico strong {
+            color: #e0cba0;
+        }
+        .referencia-inline {
+            font-size: 0.78rem;
+            color: #8a7a6a;
+            font-style: italic;
+            letter-spacing: 0.3px;
+        }
+        .secao-clara .destaque-teorico {
+            background: #d8d0c0;
+            border-left-color: #6a5a4a;
+            color: #2a2018;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+        .secao-clara .destaque-teorico::before { color: #5a4a3a; }
+        .secao-clara .destaque-teorico strong { color: #1a1510; }
+        .secao-clara .referencia-inline { color: #5a4a3a; }
+        .grid-teorico {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+        }
+        .card-teorico {
+            background: #1e1812;
+            border: 1px solid #3a3028;
+            border-radius: 2px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5), inset 0 0 15px rgba(60,40,25,0.15);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card-teorico:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+        }
+        .card-teorico h4 {
+            font-size: 1rem;
+            color: #c8b898;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid #3a3028;
+            padding-bottom: 0.5rem;
+        }
+        .card-teorico p {
+            font-size: 0.9rem;
+            color: #a09890;
+            line-height: 1.7;
+        }
+        .card-teorico .ref {
+            display: block;
+            margin-top: 0.6rem;
+            font-size: 0.72rem;
+            color: #7a6a5a;
+            font-style: italic;
+        }
+        .secao-clara .card-teorico {
+            background: #e0d8c8;
+            border-color: #9a8a7a;
+        }
+        .secao-clara .card-teorico h4 { color: #1a1510; border-bottom-color: #9a8a7a; }
+        .secao-clara .card-teorico p { color: #3a3028; }
+        .secao-clara .card-teorico .ref { color: #6a5a4a; }
+        .citacao-marx {
+            background: #0f0a08;
+            border-left: 5px solid #a89060;
+            padding: 1.5rem 2rem;
+            margin: 1.8rem 0;
+            border-radius: 2px;
+            font-style: italic;
+            color: #d0c8b8;
+            font-size: 1.05rem;
+            line-height: 1.9;
+            box-shadow: inset 0 0 40px rgba(30,20,10,0.6);
+            position: relative;
+        }
+        .citacao-marx::before {
+            content: '❝';
+            position: absolute;
+            top: 0.2rem;
+            left: 0.8rem;
+            font-size: 2.5rem;
+            color: #3a3028;
+            line-height: 1;
+            font-style: normal;
+        }
+        .citacao-marx cite {
+            display: block;
+            margin-top: 0.8rem;
+            font-size: 0.85rem;
+            font-style: normal;
+            color: #a09080;
+            text-align: right;
+            letter-spacing: 0.5px;
+        }
+        .secao-clara .citacao-marx {
+            background: #d0c8b8;
+            color: #1a1510;
+            border-left-color: #6a5a4a;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.1);
+        }
+        .secao-clara .citacao-marx::before { color: #9a8a7a; }
+        .secao-clara .citacao-marx cite { color: #5a4a3a; }
+        .badge-teorico {
+            display: inline-block;
+            background: #3a3028;
+            color: #c8b898;
+            font-size: 0.65rem;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 0.2rem 0.6rem;
+            border-radius: 2px;
+            margin-right: 0.4rem;
+            border: 1px solid #5a4a3a;
+            font-weight: 700;
+        }
+        .secao-clara .badge-teorico {
+            background: #c0b8a8;
+            color: #1a1510;
+            border-color: #9a8a7a;
+        }
+        .ods-info {
+            text-align: center;
+            font-size: 0.85rem;
+            color: #8a7a6a;
+            margin-top: 1.5rem;
+            letter-spacing: 1px;
+        }
+        .ods-info strong {
+            color: #c8b898;
+        }
+        .secao-clara .ods-info { color: #5a4a3a; }
+        .secao-clara .ods-info strong { color: #1a1510; }
+
+        /* Caixa de citação curta */
+        .caixa-citacao {
+            background: #1e1812;
+            border: 1px solid #3a3028;
+            border-left: 4px solid #c8b090;
+            padding: 1rem 1.4rem;
+            margin: 1.5rem 0;
+            border-radius: 2px;
+            font-style: italic;
+            color: #c8b898;
+            font-size: 0.98rem;
+            line-height: 1.8;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        .caixa-citacao cite {
+            display: block;
+            margin-top: 0.5rem;
+            font-size: 0.8rem;
+            font-style: normal;
+            color: #8a7a6a;
+            text-align: right;
+        }
+        .secao-clara .caixa-citacao {
+            background: #e0d8c8;
+            border-color: #9a8a7a;
+            border-left-color: #6a5a4a;
+            color: #2a2018;
+        }
+        .secao-clara .caixa-citacao cite { color: #5a4a3a; }
+
+        /* Caixa de dado/estatística destacada */
+        .caixa-dado {
+            background: #1a1510;
+            border: 1px solid #3a3028;
+            border-radius: 2px;
+            padding: 1.2rem 1.5rem;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 1.2rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .caixa-dado .dado-numero {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #c8b090;
+            line-height: 1;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+            flex: 0 0 auto;
+        }
+        .caixa-dado .dado-texto {
+            font-size: 0.9rem;
+            color: #b8b0a8;
+            line-height: 1.6;
+        }
+        .caixa-dado .dado-texto strong { color: #d0c8b8; }
+        .secao-clara .caixa-dado {
+            background: #e0d8c8;
+            border-color: #9a8a7a;
+        }
+        .secao-clara .caixa-dado .dado-numero { color: #1a1510; text-shadow: none; }
+        .secao-clara .caixa-dado .dado-texto { color: #3a3028; }
+        .secao-clara .caixa-dado .dado-texto strong { color: #1a1510; }
+        @media (max-width: 600px) {
+            .caixa-dado { flex-direction: column; text-align: center; gap: 0.5rem; }
+        }
+
+        /* ===================================================================== */
+        /* MENSAGEM DE CONFORTO FINAL */
+        /* ===================================================================== */
+        .mensagem-conforto {
+            background: linear-gradient(135deg, #1a1510 0%, #0f0a08 100%);
+            border-top: 2px solid #3a3028;
+            border-bottom: 2px solid #3a3028;
+            padding: 3.5rem 0;
+            text-align: center;
+            box-shadow: inset 0 0 80px rgba(30, 20, 10, 0.6);
+        }
+        .mensagem-conforto.mensagem-com-fundo-gradiente {
+            background: linear-gradient(to bottom, #1a1510 0%, #e0d8c8 100%);
+        }
+        .mensagem-conforto .container {
+            max-width: 750px;
+        }
+        .mensagem-conforto h2 {
+            font-size: clamp(1.4rem, 3vw, 1.9rem);
+            color: #e0cba0;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 1.5rem;
+            text-shadow: 0 0 20px rgba(200, 160, 100, 0.3), 2px 2px 4px rgba(0,0,0,0.7);
+        }
+        .mensagem-conforto p {
+            font-size: 1.1rem;
+            color: #c8b898;
+            line-height: 2;
+            margin-bottom: 1.2rem;
+            font-style: italic;
+        }
+        .mensagem-conforto .destaque-conforto {
+            font-size: 1.3rem;
+            color: #e8d5a3;
+            font-weight: 700;
+            font-style: normal;
+            margin-top: 1.8rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid #3a3028;
+            text-shadow: 0 0 15px rgba(200, 160, 100, 0.4);
+            line-height: 1.8;
+        }
+        .mensagem-conforto .destaque-conforto span {
+            display: block;
+            font-size: 0.95rem;
+            color: #a09080;
+            font-weight: 400;
+            margin-top: 0.8rem;
+            font-style: italic;
+        }
+        .secao-clara.mensagem-conforto {
+            background: linear-gradient(135deg, #e0d8c8 0%, #d0c8b8 100%);
+            border-top-color: #9a8a7a;
+            border-bottom-color: #9a8a7a;
+            box-shadow: inset 0 0 80px rgba(0,0,0,0.1);
+        }
+        .secao-clara.mensagem-conforto h2 {
+            color: #1a1510;
+            text-shadow: none;
+        }
+        .secao-clara.mensagem-conforto p {
+            color: #2a2018;
+        }
+        .secao-clara.mensagem-conforto .destaque-conforto {
+            color: #1a1510;
+            border-top-color: #9a8a7a;
+            text-shadow: none;
+        }
+        .secao-clara.mensagem-conforto .destaque-conforto span {
+            color: #5a4a3a;
+        }
+
+        /* ===================================================================== */
+        /* LEITURA ORGANIZADA — tipografia, "ler mais", tabela e equipe          */
+        /* ===================================================================== */
+        section { padding: 4.5rem 0; }
+        .section-titulo { margin-bottom: 2.2rem; }
+        .section-titulo::after { content: ''; display: block; width: 56px; height: 2px; margin: 1.1rem auto 0; background: #6a5a4a; }
+        .secao-clara .section-titulo::after { background: #9a8a7a; }
+        .texto-corrido { max-width: 760px; text-align: left; font-size: 1.02rem; line-height: 1.95; margin: 0 auto 1.8rem; }
+        .texto-corrido p + p { margin-top: 1.3rem; }
+        .destaque-teorico, .caixa-citacao, .citacao-marx, .caixa-dado { max-width: 820px; margin-left: auto; margin-right: auto; }
+
+        .ler-mais { max-width: 900px; margin: 2rem auto 0; border: 1px solid #3a3028; background: rgba(15,10,8,0.35); border-radius: 2px; }
+        .ler-mais > summary { list-style: none; cursor: pointer; display: flex; align-items: center; flex-wrap: wrap; gap: 0.5rem 0.8rem; padding: 0.95rem 1.2rem; font-size: 0.82rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #c8b898; user-select: none; }
+        .ler-mais > summary::-webkit-details-marker { display: none; }
+        .ler-mais > summary:hover { background: #252018; color: #e8d5a3; }
+        .ler-mais > summary:focus-visible { outline: 1px dotted #c8b090; outline-offset: -4px; }
+        .lm-seta { display: inline-block; transition: transform 0.15s ease; color: #a89060; }
+        .ler-mais[open] > summary .lm-seta { transform: rotate(90deg); }
+        .lm-titulo { flex: 1 1 auto; }
+        .lm-aberto { display: none; }
+        .ler-mais[open] > summary .lm-aberto { display: inline; }
+        .ler-mais[open] > summary .lm-fechado { display: none; }
+        .lm-info { font-size: 0.7rem; font-weight: 400; letter-spacing: 0.5px; text-transform: none; color: #8a7a6a; }
+        .lm-corpo { padding: 1.8rem 1.4rem 0.8rem; border-top: 1px solid #3a3028; }
+        .lm-corpo > :last-child { margin-bottom: 0.8rem; }
+        .secao-clara .ler-mais { border-color: #9a8a7a; background: rgba(255,255,255,0.25); }
+        .secao-clara .ler-mais > summary { color: #1a1510; }
+        .secao-clara .ler-mais > summary:hover { background: #c0b8a8; }
+        .secao-clara .lm-corpo { border-top-color: #9a8a7a; }
+        .secao-clara .lm-info { color: #5a4a3a; }
+
+        .tabela-dados-wrap { max-width: 900px; margin: 0 auto 1rem; overflow-x: auto; border: 1px solid #3a3028; background: #1a1510; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .tabela-dados { width: 100%; min-width: 620px; border-collapse: collapse; font-size: 0.9rem; line-height: 1.5; }
+        .tabela-dados caption { caption-side: top; text-align: left; padding: 1rem 1.2rem 0.5rem; font-size: 0.85rem; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #d0c8b8; }
+        .tabela-dados thead th { padding: 0.7rem 1.2rem; text-align: left; font-size: 0.7rem; letter-spacing: 2px; text-transform: uppercase; color: #a89060; background: #0f0a08; border-bottom: 1px solid #4a3a2a; }
+        .tabela-dados tbody th, .tabela-dados td { padding: 1.1rem 1.2rem; text-align: left; vertical-align: top; border-bottom: 1px solid #2a2018; }
+        .tabela-dados tbody tr:last-child > * { border-bottom: 0; }
+        .tabela-dados tbody th { width: 34%; font-weight: 700; color: #d0c8b8; }
+        .tabela-dados tbody th small { display: block; margin-top: 0.3rem; font-size: 0.74rem; font-weight: 400; color: #8a7a6a; }
+        .tabela-dados .valor { display: block; font-size: 1.5rem; font-weight: 800; line-height: 1.2; color: #a09890; }
+        .tabela-dados td.maior .valor { color: #e0cba0; text-shadow: 0 0 10px rgba(200,160,100,0.25); }
+        .tabela-dados .barra { display: block; height: 6px; width: var(--v, 100%); margin-top: 0.55rem; background: #4a3a2a; }
+        .tabela-dados td.maior .barra { background: linear-gradient(90deg, #6a5a4a, #c8b090); }
+        .tabela-dados .diferenca { font-size: 0.82rem; font-weight: 700; color: #c8b898; }
+        .tabela-nota { max-width: 900px; margin: 0 auto 2.4rem; font-size: 0.78rem; line-height: 1.7; color: #8a7a6a; }
+        .tabela-nota strong { color: #c8b898; }
+
+        .equipe-lista { counter-reset: membro; }
+        .membro-card { justify-content: flex-start; gap: 1.1rem; }
+        .membro-card::before { counter-increment: membro; content: counter(membro, decimal-leading-zero); flex: 0 0 auto; font-size: 0.8rem; font-weight: 700; letter-spacing: 1px; color: #8a7a6a; }
+        .secao-clara .membro-card::before { color: #6a5a4a; }
+
+        @media (max-width: 768px) {
+            section { padding: 3.2rem 0; }
+            .texto-corrido { font-size: 1rem; line-height: 1.85; }
+            .membro-card { flex-direction: row; align-items: center; }
+            .lm-corpo { padding: 1.4rem 1rem 0.6rem; }
+        }
     </style>
 </head>
 <body>
@@ -2025,7 +2343,7 @@
     <!-- Tooltip de glossário -->
     <div class="glossario-tooltip" id="glossarioTooltip" role="tooltip" aria-hidden="true"></div>
 
-    <!-- DEBUG OVERLAY — ativado pelo comando: debug -->
+    <!-- DEBUG OVERLAY -->
     <div class="debug-overlay" id="debugOverlay" role="status" aria-live="polite">
         <div class="debug-section">runtime / viewport</div>
         <div class="debug-row"><span class="debug-key">fps</span><span class="debug-val" id="dbgFPS">—</span></div>
@@ -2094,8 +2412,10 @@
                             <ul class="tree-children">
                                 <li class="tree-node"><a href="#sobre" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">o-que-e.html</span></a></li>
                                 <li class="tree-node"><a href="#tabu" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">quebrando-o-tabu.html</span></a></li>
+                                <li class="tree-node"><a href="#materialismo" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">materialismo.html</span></a></li>
                                 <li class="tree-node"><a href="#sintomas" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">sintomas.html</span></a></li>
                                 <li class="tree-node"><a href="#gravidade" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">gravidade.html</span></a></li>
+                                <li class="tree-node"><a href="#genero" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">genero-e-saude-mental.html</span></a></li>
                             </ul>
                         </li>
                         <li class="tree-node tree-group">
@@ -2108,7 +2428,7 @@
                         </li>
                         <li class="tree-node tree-group">
                             <div class="tree-row tree-folder" role="button" tabindex="0" aria-expanded="true"><span class="tree-icon" aria-hidden="true">📂︎</span><span class="tree-label">ferramentas</span></div>
-                            <ul class="tree-children"><li class="tree-node"><a href="#autoavaliacao" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">autoavaliacao.html</span></a></li><li class="tree-node"><a href="#respiro" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">respiro.html</span></a></li></ul>
+                            <ul class="tree-children"><li class="tree-node"><a href="#autoavaliacao" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">autoavaliacao.html</span></a></li></ul>
                         </li>
                         <li class="tree-node tree-group">
                             <div class="tree-row tree-folder" role="button" tabindex="0" aria-expanded="true"><span class="tree-icon" aria-hidden="true">📂︎</span><span class="tree-label">recursos</span></div>
@@ -2116,7 +2436,7 @@
                         </li>
                         <li class="tree-node tree-group">
                             <div class="tree-row tree-folder" role="button" tabindex="0" aria-expanded="true"><span class="tree-icon" aria-hidden="true">📂︎</span><span class="tree-label">projeto</span></div>
-                            <ul class="tree-children"><li class="tree-node"><a href="#equipe" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">equipe.html</span></a></li><li class="tree-node"><a href="#contato" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">contato.html</span></a></li></ul>
+                            <ul class="tree-children"><li class="tree-node"><a href="#equipe" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">equipe.html</span></a></li><li class="tree-node"><a href="#contato" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">contato.html</span></a></li><li class="tree-node"><a href="#fontes" class="tree-item"><span class="tree-icon" aria-hidden="true">📄︎</span><span class="tree-label">fontes.html</span></a></li></ul>
                         </li>
                     </ul>
                 </li>
@@ -2143,7 +2463,7 @@
     <!-- MAIN CONTENT -->
     <div class="main-content" id="mainContent">
 
-        <!-- BOTÃO DE AJUDA — ESTILO JANELA RETRÔ -->
+        <!-- BOTÃO DE AJUDA -->
         <div class="botao-ajuda-flutuante">
             <button id="btnAjudaAgora" type="button" aria-label="Preciso de ajuda agora">
                 <span class="btn-ajuda-txt">Preciso de ajuda agora</span>
@@ -2171,6 +2491,15 @@
                     <p>A depressão pode afetar qualquer pessoa. Não importa a idade, a personalidade ou o quanto a vida parece estar "dando certo" por fora. E não, ela não é preguiça, frescura ou falta de força de vontade. O que uma pessoa sente é real e merece ser levado a sério.</p>
                     <p>E existe algo importante que você precisa saber: <strong>depressão tem tratamento.</strong> Psicólogos, psiquiatras e outros profissionais podem ajudar, e cada pessoa pode encontrar um caminho diferente para se sentir melhor.</p>
                 </div>
+
+                <div class="destaque-teorico">
+                    <strong>Uma doença como qualquer outra.</strong> A depressão é reconhecida pela <span class="glossario-termo" data-glossario="Organização Mundial da Saúde — agência da ONU responsável por diretrizes globais de saúde." tabindex="0" role="button" aria-label="OMS: Organização Mundial da Saúde — agência da ONU responsável por diretrizes globais de saúde.">OMS</span> como um transtorno mental que afeta milhões de pessoas no mundo. Não se trata de fraqueza, preguiça ou falta de força de vontade — é uma condição de saúde que exige acolhimento, informação e tratamento adequado <span class="referencia-inline">(ORGANIZAÇÃO MUNDIAL DA SAÚDE, 2025)</span>.
+                </div>
+
+                <div class="caixa-dado">
+                    <span class="dado-numero">11</span>
+                    <span class="dado-texto"><strong>milhões de brasileiros</strong> convivem com depressão, segundo dados do Ministério da Saúde e do IBGE. A doença não escolhe idade, classe social ou perfil.</span>
+                </div>
             </div>
         </section>
 
@@ -2183,8 +2512,75 @@
                 <div class="section-titulo"><h2>depressão não é frescura</h2></div>
                 <div class="texto-corrido">
                     <p>Um dos maiores obstáculos para quem sofre de depressão é o preconceito. Muitas pessoas ainda acreditam que é "frescura", "drama" ou que basta "se animar". Esse tipo de pensamento só aumenta o sofrimento de quem já carrega um fardo pesado, impedindo que a pessoa procure ajuda e se sinta acolhida.</p>
-                    <p>A depressão é uma doença como qualquer outra. Assim como ninguém escolhe ter diabetes ou pressão alta, ninguém escolhe ter depressão. Os sintomas são reais, causam dor emocional intensa e podem levar a consequências graves se não forem tratados. Reconhecer a depressão como doença é o primeiro passo para combater o estigma e construir uma sociedade mais empática.</p>
+                    <p>A depressão é uma doença como qualquer outra. Assim como ninguém escolhe ter diabetes ou pressão alta, ninguém escolhe ter depressão. Os sintomas são reais, causam dor emocional intensa e podem levar a consequências graves se não forem tratados. Reconhecer a depressão como doença é o primeiro passo para combater o <span class="glossario-termo" data-glossario="Marca social negativa associada a uma condição, que leva ao preconceito, à exclusão e ao silêncio de quem sofre." tabindex="0" role="button" aria-label="estigma: Marca social negativa associada a uma condição, que leva ao preconceito, à exclusão e ao silêncio de quem sofre.">estigma</span> e construir uma sociedade mais empática.</p>
                     <p>Se você convive com alguém que está passando por isso, evite frases como "isso é frescura", "olha pelo lado bom" ou "tem gente em situação pior". Em vez disso, ofereça escuta, compreensão e incentive a busca por um profissional de saúde. Acolhimento salva vidas.</p>
+                </div>
+
+                <div class="destaque-teorico">
+                    <strong>A naturalização cumpre uma função ideológica.</strong> Ao tratar o sofrimento como uma questão de "hormônios" ou de "fase difícil", as explicações dominantes desviam a atenção das condições materiais que o produzem. O materialismo histórico, ao contrário, busca compreender as particularidades humanas além das aparências, desvelando a totalidade do desenvolvimento humano <span class="referencia-inline">(PASQUALINI, 2014; COSTA, 2022)</span>.
+                </div>
+
+                <div class="caixa-citacao">
+                    "A adolescência não é uma categoria universal e a-histórica. As formas concretas de viver a adolescência variam conforme as condições materiais de existência, as relações de classe e as configurações históricas específicas."
+                    <cite>— PASQUALINI, 2014</cite>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO MATERIALISMO HISTÓRICO -->
+        <section id="materialismo" style="background: #1e1812;">
+            <div class="container">
+                <div class="section-titulo">
+                    <h2>Materialismo histórico e saúde mental</h2>
+                    <p>Uma leitura crítica da depressão como fenômeno socialmente determinado.</p>
+                </div>
+                <div class="texto-corrido">
+                    <p>Para compreender o aumento da depressão entre adolescentes, este projeto adota o referencial do <strong>Materialismo Histórico</strong>, formulado por Karl Marx e Friedrich Engels. Esse método parte do princípio de que a produção da vida material é a base fundamental de toda a organização social. Nas palavras de Marx, <em>"o modo de produção da vida material condiciona o processo de vida social, política e intelectual em geral"</em> <span class="referencia-inline">(MARX, 1859, p. 3)</span>.</p>
+                    <p>Isso significa que as formas de pensar, sentir e adoecer não são fenômenos autônomos ou puramente subjetivos, mas estão historicamente condicionados pelas relações sociais de produção e pelas condições materiais de existência <span class="referencia-inline">(MARX, 1859; MARX, 2013/1867)</span>.</p>
+                </div>
+
+                <div class="destaque-teorico">
+                    <strong>Por que isso importa?</strong> Aplicado ao campo da saúde mental, o materialismo histórico permite compreender que o sofrimento psíquico não é um fenômeno natural ou a-histórico, mas sim uma expressão concreta de como os seres humanos se produzem e são produzidos nas relações sociais capitalistas <span class="referencia-inline">(COSTA, 2022)</span>.
+                </div>
+
+                <div class="citacao-marx">
+                    "O capital não tem a mínima consideração pela saúde e pela duração da vida do trabalhador, a menos que seja forçado pela sociedade a ter essa consideração."
+                    <cite>— MARX, 2013/1867, p. 342</cite>
+                </div>
+
+                <div class="texto-corrido">
+                    <p>Essa passagem evidencia que as condições de vida impostas pelo modo de produção capitalista produzem, dialeticamente, não apenas riqueza material, mas também sofrimento, degradação física e mental <span class="referencia-inline">(MARX, 2013/1867; COSTA, 2022)</span>.</p>
+                </div>
+
+                <div class="grid-teorico">
+                    <div class="card-teorico">
+                        <h4>Psicologia Histórico-Cultural</h4>
+                        <p>Fundamentada no materialismo histórico-dialético, compreende que <em>"a direção e o conteúdo do desenvolvimento humano em cada período da vida serão determinados pelas condições materiais de cada sujeito"</em>.</p>
+                        <span class="ref">(PASQUALINI, 2014; SHUARE, 2017)</span>
+                    </div>
+                    <div class="card-teorico">
+                        <h4>Crítica à naturalização</h4>
+                        <p>Supera noções biologizantes que naturalizam as "crises emocionais" e "rebeldias" como características inatas da adolescência, demonstrando que são produtos das condições histórico-sociais.</p>
+                        <span class="ref">(PASQUALINI, 2014; VIGOTSKI, 1996)</span>
+                    </div>
+                    <div class="card-teorico">
+                        <h4>Adolescência como construção social</h4>
+                        <p>A adolescência não é uma categoria universal e a-histórica. As formas concretas de vivenciá-la variam conforme as condições materiais de existência e as configurações históricas específicas.</p>
+                        <span class="ref">(PASQUALINI, 2014; VIGOTSKI, 1996)</span>
+                    </div>
+                </div>
+
+                <div class="texto-corrido">
+                    <p>Em uma sociedade marcada pela desigualdade social, pela precarização do trabalho e pela mercantilização de todos os aspectos da vida, a adolescência se constitui como um período de particular vulnerabilidade ao sofrimento psíquico — <strong>não por características intrínsecas da faixa etária, mas pelas condições sociais em que os jovens são obrigados a se desenvolver</strong> <span class="referencia-inline">(MARX, 2013/1867; COSTA, 2022; PASQUALINI, 2014)</span>.</p>
+                </div>
+
+                <div class="destaque-teorico">
+                    <strong>A pandemia como amplificador.</strong> A pandemia de COVID-19 não criou as contradições do capitalismo, mas as exacerbou e as tornou visíveis. Ela agravou fatores como isolamento social, uso intensivo de redes sociais e restrições de serviços de saúde mental, contribuindo para o aumento de casos graves que demandaram internações <span class="referencia-inline">(ORGANIZAÇÃO MUNDIAL DA SAÚDE, 2025)</span>.
+                </div>
+
+                <div class="caixa-citacao">
+                    "A pandemia atuou como um amplificador dos desfechos de saúde mental dos adolescentes, aprofundando desigualdades sociais historicamente enraizadas."
+                    <cite>— GENEROSO; BORGES; CABRAL, 2025</cite>
                 </div>
             </div>
         </section>
@@ -2193,12 +2589,38 @@
             <div class="container">
                 <div class="section-titulo"><h2>Depressão em números no Brasil</h2><p>Dados que reforçam a importância de falar sobre o assunto.</p></div>
                 <div class="stats-grid">
-                    <div class="stat-item"><span class="stat-numero">11</span><span class="stat-rotulo">milhões de brasileiros sofrem de depressão</span></div>
-                    <div class="stat-item"><span class="stat-numero">5%</span><span class="stat-rotulo">da população adulta é afetada</span></div>
                     <div class="stat-item"><span class="stat-numero">1º</span><span class="stat-rotulo">país mais ansioso da América Latina</span></div>
-                    <div class="stat-item"><span class="stat-numero">38%</span><span class="stat-rotulo">de aumento de casos entre jovens</span></div>
+                    <div class="stat-item"><span class="stat-numero">11</span><span class="stat-rotulo">milhões de brasileiros sofrem de depressão</span></div>
                 </div>
-                <p style="text-align:center; margin-top:1.5rem; font-size:0.85rem; color:#a09080;">Fontes: Organização Mundial da Saúde (OMS), Ministério da Saúde e IBGE. Dados consultados em setembro de 2026.</p>
+                <p style="text-align:center; margin-top:1.5rem; font-size:0.85rem; color:#a09080;">Fontes: OMS (2025); Ministério da Saúde; IBGE. Dados consultados em setembro de 2026.</p>
+            </div>
+        </section>
+
+        <!-- SEÇÃO PANDEMIA — EMBASADA TEORICAMENTE -->
+        <section id="pandemia" class="estatisticas" style="background: #0f0a08;">
+            <div class="container">
+                <div class="section-titulo"><h2>Saúde mental durante a pandemia</h2><p>A pandemia ampliou desafios que já afetavam a saúde mental de crianças, adolescentes e adultos.</p></div>
+
+                <div class="texto-corrido">
+                    <p>A pandemia de COVID-19 não pode ser compreendida apenas como um fenômeno biológico ou sanitário. Do ponto de vista do <strong>materialismo histórico</strong>, ela representou uma <strong>ruptura profunda nas condições materiais e nas relações sociais</strong> que estruturam a vida cotidiana <span class="referencia-inline">(GENEROSO; BORGES; CABRAL, 2025; COSTA, 2022)</span>. As medidas de isolamento social, o fechamento das escolas, a interrupção da convivência presencial e as mudanças na rotina familiar não foram eventos neutros: elas reconfiguraram de maneira drástica as bases materiais sobre as quais se constrói o desenvolvimento humano <span class="referencia-inline">(GENEROSO; BORGES; CABRAL, 2025; ORGANIZAÇÃO MUNDIAL DA SAÚDE, 2025)</span>.</p>
+                    <p>Para os adolescentes, essas transformações foram particularmente intensas. A escola, que para além de sua função pedagógica constitui um espaço fundamental de socialização e de constituição da identidade, foi subitamente interrompida <span class="referencia-inline">(GENEROSO; BORGES; CABRAL, 2025)</span>. A convivência com pares, que desempenha papel central na formação da subjetividade adolescente, foi drasticamente reduzida ou mediada por telas <span class="referencia-inline">(ALONZO et al., 2021; SALEEM; YOUNG; YOUSUF, 2024)</span>. A rotina familiar, por sua vez, foi tensionada pelo confinamento prolongado, muitas vezes em espaços físicos reduzidos e sem condições adequadas de privacidade e estudo <span class="referencia-inline">(GENEROSO; BORGES; CABRAL, 2025)</span>.</p>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-item"><span class="stat-numero">25,2%</span><span class="stat-rotulo">de crianças e adolescentes brasileiros apresentaram sintomas depressivos durante a pandemia (antes: 12,9%)</span></div>
+                    <div class="stat-item"><span class="stat-numero">72,5%</span><span class="stat-rotulo">relataram níveis moderados a altos de estresse percebido durante a pandemia</span></div>
+                </div>
+
+                <div class="destaque-teorico">
+                    <strong>A dimensão econômica da ruptura.</strong> O desemprego ou a redução da renda dos responsáveis, o aumento da insegurança econômica e a sobrecarga doméstica produziram um ambiente de instabilidade material que se reflete diretamente na saúde mental dos jovens <span class="referencia-inline">(GENEROSO; BORGES; CABRAL, 2025; AHMED et al., 2024)</span>. A insegurança econômica relacionada à COVID-19 foi significativamente associada a estresse, solidão e sintomas depressivos, com associações indiretas significativas entre insegurança financeira e depressão por meio tanto da solidão quanto do estresse <span class="referencia-inline">(AHMED et al., 2024)</span>. Esses achados demonstram que as condições materiais de vida durante a pandemia não foram meros cenários de fundo, mas sim <strong>determinantes ativos do sofrimento psíquico</strong> <span class="referencia-inline">(MARX, 2013/1867; COSTA, 2022)</span>.
+                </div>
+
+                <div class="caixa-citacao">
+                    "A pandemia atuou como um amplificador dos desfechos de saúde mental dos adolescentes, aprofundando desigualdades sociais historicamente enraizadas."
+                    <cite>— GENEROSO; BORGES; CABRAL, 2025</cite>
+                </div>
+
+                <p style="text-align:center; margin-top:1.5rem; font-size:0.85rem; color:#a09080;">Fontes: GENEROSO; BORGES; CABRAL (2025); AHMED et al. (2024); OMS (2025).</p>
             </div>
         </section>
 
@@ -2206,9 +2628,18 @@
             <div class="container">
                 <div class="section-titulo"><h2>Sinais e sintomas</h2><p>Reconhecer os sintomas é o primeiro passo para buscar ajuda.</p></div>
                 <div class="texto-corrido">
-                    <p>Os sintomas da depressão variam de pessoa para pessoa, mas os mais comuns incluem tristeza profunda e persistente, perda de interesse ou prazer em atividades que antes eram agradáveis, alterações no apetite (comer demais ou de menos), insônia ou sono excessivo, fadiga constante, sentimentos de culpa, inutilidade ou desesperança, dificuldade de concentração, irritabilidade e, em casos mais graves, pensamentos de morte ou ideação suicida.</p>
+                    <p>Os sintomas da depressão variam de pessoa para pessoa, mas os mais comuns incluem tristeza profunda e persistente, perda de interesse ou prazer em atividades que antes eram agradáveis, alterações no apetite (comer demais ou de menos), insônia ou sono excessivo, fadiga constante, sentimentos de culpa, inutilidade ou desesperança, dificuldade de concentração, irritabilidade e, em casos mais graves, pensamentos de morte ou <span class="glossario-termo" data-glossario="Pensamentos persistentes sobre a morte, sobre não querer mais viver ou sobre se machucar. É um sinal de alerta que exige ajuda imediata." tabindex="0" role="button" aria-label="ideação suicida: Pensamentos persistentes sobre a morte, sobre não querer mais viver ou sobre se machucar. É um sinal de alerta que exige ajuda imediata.">ideação suicida</span>.</p>
                     <p>É comum que a pessoa se isole, evite contato social e sinta que nada faz sentido. Esses sintomas não são frescura nem fraqueza: são manifestações de uma doença que precisa de tratamento adequado. Se você se identificou com vários desses sinais por mais de duas semanas, procure um médico ou psicólogo. Não espere a situação piorar.</p>
                     <p>Lembre-se: pedir ajuda é um ato de coragem, não de vergonha. Você merece ser ouvido e cuidado.</p>
+                </div>
+
+                <div class="destaque-teorico">
+                    <strong>Uma doença silenciosa.</strong> A depressão não aparece em exames de sangue, não deixa marcas visíveis. Quem sofre aprende a esconder a dor atrás de um sorriso. Por isso, é tão importante olhar com atenção para quem está por perto — e para si mesmo.
+                </div>
+
+                <div class="caixa-dado">
+                    <span class="dado-numero">2</span>
+                    <span class="dado-texto"><strong>semanas</strong> é o período mínimo de persistência dos sintomas para que se considere a possibilidade de um quadro depressivo. Se você se identificou com vários sinais por mais de duas semanas, procure ajuda profissional.</span>
                 </div>
             </div>
         </section>
@@ -2236,6 +2667,94 @@
                     <p>Uma pessoa pode ter poucos sintomas, mas que causam grande sofrimento; outra pode apresentar vários sintomas que não a impedem de trabalhar. Não existe uma "régua" exata ou pontuação que defina sozinha a gravidade. Apenas um profissional de saúde mental pode fazer essa avaliação, levando em conta o histórico, o contexto social e os fatores biológicos de cada um.</p>
                     <p>O objetivo de entender essa variação é justamente evitar comparações e julgamentos. Seja qual for a intensidade, o sofrimento é real e merece acolhimento. Buscar ajuda cedo faz diferença, independentemente de onde a pessoa esteja nesse espectro.</p>
                 </div>
+
+                <div class="destaque-teorico">
+                    <strong>Gravidade não é destino.</strong> A classificação da depressão em leve, moderada ou grave serve para orientar o tratamento, não para rotular a pessoa. O sofrimento psíquico é uma experiência única e subjetiva, que não se resume a uma escala numérica <span class="referencia-inline">(COSTA, 2022; PASQUALINI, 2014)</span>.
+                </div>
+
+                <div class="caixa-citacao">
+                    "Não existe uma régua exata ou pontuação que defina sozinha a gravidade. Apenas um profissional de saúde mental pode fazer essa avaliação, levando em conta o histórico, o contexto social e os fatores biológicos de cada um."
+                    <cite>— Adaptado de diretrizes clínicas</cite>
+                </div>
+            </div>
+        </section>
+
+        <!-- NOVA SEÇÃO: DEPRESSÃO E SUICÍDIO — DIFERENÇAS DE GÊNERO -->
+        <section id="genero" style="background: #1e1812;">
+            <div class="container">
+                <div class="section-titulo">
+                    <h2>Depressão e suicídio: diferenças entre homens e mulheres</h2>
+                    <p>Os números revelam um contraste importante que precisa ser compreendido à luz das determinações sociais.</p>
+                </div>
+
+                <div class="tabela-dados-wrap">
+                    <table class="tabela-dados">
+                        <caption>Depressão × suicídio no Brasil, por sexo</caption>
+                        <thead>
+                            <tr><th scope="col">Indicador</th><th scope="col">Mulheres</th><th scope="col">Homens</th><th scope="col">Diferença</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <th scope="row">Adultos com diagnóstico de depressão<small>Brasil, 2019 · % dos adultos (18+) com diagnóstico informado</small></th>
+                                <td class="maior"><span class="valor">14,7%</span><span class="barra" style="--v:100%"></span></td>
+                                <td><span class="valor">5,1%</span><span class="barra" style="--v:35%"></span></td>
+                                <td class="diferenca">Mulheres ≈ 2,9× mais</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Participação nas mortes por suicídio<small>Brasil, 2021 · 15.507 óbitos no total</small></th>
+                                <td><span class="valor">22,2%</span><span class="barra" style="--v:29%"></span></td>
+                                <td class="maior"><span class="valor">77,8%</span><span class="barra" style="--v:100%"></span></td>
+                                <td class="diferenca">Homens ≈ 3,5× mais</td>
+                            </tr>
+                            <tr>
+                                <th scope="row">Risco de morrer por suicídio<small>Brasil, 2019 · mulheres como referência</small></th>
+                                <td><span class="valor">1×</span><span class="barra" style="--v:26%"></span></td>
+                                <td class="maior"><span class="valor">3,8×</span><span class="barra" style="--v:100%"></span></td>
+                                <td class="diferenca">Homens 3,8× mais</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="tabela-nota"><strong>Como ler:</strong> as mulheres são mais diagnosticadas com depressão, mas os homens morrem mais por suicídio. Os números do primeiro indicador são de diagnóstico informado à pesquisa, e não de todos os casos existentes: parte dos homens pode ter depressão sem nunca ter sido diagnosticada. As barras são proporcionais dentro de cada linha. Fontes: IBGE, Pesquisa Nacional de Saúde 2019; Ministério da Saúde, Boletim Epidemiológico (óbitos de 2021); SES-RS, Informe Epidemiológico 07/2023 (dados do Ministério da Saúde, 2019).</p>
+
+                <div class="texto-corrido">
+                    <p>No Brasil e no mundo, os dados epidemiológicos mostram um padrão consistente: <strong>as mulheres são diagnosticadas com depressão em uma proporção significativamente maior do que os homens</strong>. Segundo a Pesquisa Nacional de Saúde do IBGE (2019), 14,7% das mulheres adultas informaram ter diagnóstico de depressão, contra 5,1% dos homens. No entanto, quando se analisam os números de <strong>suicídio</strong>, o cenário se inverte: <strong>os homens morrem por suicídio cerca de quatro vezes mais do que as mulheres</strong>.</p>
+                    <p>Esse contraste exige uma leitura que não se contente com explicações biológicas simplistas. A <strong>construção social de gênero</strong> desempenha um papel central. Desde cedo, homens são socializados para não demonstrar fragilidade, para "aguentar tudo calado" e para resolver seus problemas sozinhos. Essa <span class="glossario-termo" data-glossario="Conjunto de expectativas e normas sociais sobre como homens e mulheres devem se comportar, sentir e se relacionar." tabindex="0" role="button" aria-label="masculinidade tóxica: Conjunto de expectativas e normas sociais sobre como homens e mulheres devem se comportar, sentir e se relacionar.">masculinidade tóxica</span> funciona como uma barreira que impede muitos homens de reconhecerem seus próprios sintomas, de pedirem ajuda e de buscarem tratamento. O resultado é que, quando finalmente chegam a um serviço de saúde, muitas vezes já estão em quadros graves e com maior risco de morte.</p>
+                </div>
+
+                <div class="caixa-dado">
+                    <span class="dado-numero">3,8×</span>
+                    <span class="dado-texto"><strong>maior risco de morte por suicídio entre homens</strong> do que entre mulheres no Brasil (2019), segundo dados do Ministério da Saúde. Ao mesmo tempo, as mulheres recebem mais diagnósticos de depressão e buscam mais ajuda profissional.</span>
+                </div>
+
+                <div class="grid-teorico">
+                    <div class="card-teorico">
+                        <h4>Mulheres: mais diagnóstico e busca de ajuda</h4>
+                        <p>As mulheres apresentam taxas mais altas de diagnóstico de depressão e de ansiedade. Fatores como dupla jornada, sobrecarga doméstica, violência de gênero e maior exposição a situações de vulnerabilidade social contribuem para esse quadro. Ao mesmo tempo, mulheres tendem a procurar mais serviços de saúde e a verbalizar melhor seu sofrimento.</p>
+                        <span class="ref">(GENEROSO; BORGES; CABRAL, 2025; OMS, 2025)</span>
+                    </div>
+                    <div class="card-teorico">
+                        <h4>Homens: silêncio e risco de morte</h4>
+                        <p>Os homens são menos diagnosticados com depressão, mas morrem mais por suicídio. A dificuldade de reconhecer e admitir o sofrimento, somada à pressão social para parecerem fortes, faz com que muitos não procurem ajuda. O uso de álcool e outras drogas como forma de "automedicação" também é mais frequente entre homens.</p>
+                        <span class="ref">(ABP, 2020; OMS, 2025)</span>
+                    </div>
+                    <div class="card-teorico">
+                        <h4>A construção social do sofrimento</h4>
+                        <p>As diferenças de gênero não são explicadas por fatores biológicos isolados. Elas são produzidas por relações sociais historicamente construídas, que moldam a forma como homens e mulheres sentem, expressam e enfrentam o sofrimento psíquico. Compreender isso é essencial para políticas públicas eficazes.</p>
+                        <span class="ref">(MARX, 2013/1867; COSTA, 2022; PASQUALINI, 2014)</span>
+                    </div>
+                </div>
+
+                <div class="destaque-teorico">
+                    <strong>O silêncio masculino mata.</strong> A dificuldade de homens em reconhecer e pedir ajuda não é uma questão individual, mas sim o resultado de uma socialização que associa sofrimento à fraqueza. Essa construção social tem consequências fatais: <strong>o suicídio é hoje uma das principais causas de morte entre homens jovens no Brasil</strong>. Quebrar esse silêncio é uma questão de saúde pública <span class="referencia-inline">(ABP, 2020; OMS, 2025)</span>.
+                </div>
+
+                <div class="caixa-citacao">
+                    "A relação entre condições materiais e sofrimento psíquico não é uma questão de escolha individual, mas de determinação social objetiva. Isso vale também para as diferenças de gênero nos desfechos de saúde mental."
+                    <cite>— Adaptado de MARX, 2013/1867; COSTA, 2022</cite>
+                </div>
+
+                <p style="text-align:center; margin-top:1.5rem; font-size:0.85rem; color:#a09080;">Fontes: IBGE, PNS 2019; Ministério da Saúde, Boletim Epidemiológico; ABP (2020); OMS (2025); GENEROSO; BORGES; CABRAL (2025). Dados consultados em outubro de 2026.</p>
             </div>
         </section>
 
@@ -2244,9 +2763,19 @@
                 <div class="section-titulo"><h2>Depressão em adolescentes</h2><p>Uma fase de mudanças intensas pode esconder sinais de sofrimento que merecem atenção.</p></div>
                 <div class="texto-corrido">
                     <p>A adolescência é um período de transformações físicas, emocionais e sociais. É comum que os jovens experimentem altos e baixos, mas quando a tristeza, a irritabilidade e o desânimo persistem por semanas e começam a interferir na escola, nas amizades e na convivência familiar, pode ser um sinal de depressão. Infelizmente, muitos casos passam despercebidos, pois os sintomas são confundidos com rebeldia ou "fase difícil".</p>
-                    <p>Diferente dos adultos, adolescentes com depressão podem demonstrar mais irritabilidade, explosões de raiva, isolamento no quarto, queda no rendimento escolar e maior sensibilidade à rejeição. Também é comum o uso excessivo de redes sociais como forma de fuga, além de alterações no sono e no apetite. A automutilação e os pensamentos suicidas são sinais de alerta que exigem intervenção imediata.</p>
+                    <p>Diferente dos adultos, adolescentes com depressão podem demonstrar mais irritabilidade, explosões de raiva, isolamento no quarto, queda no rendimento escolar e maior sensibilidade à rejeição. Também é comum o uso excessivo de redes sociais como forma de fuga, além de alterações no sono e no apetite. A <span class="glossario-termo" data-glossario="Ato de machucar o próprio corpo de forma intencional, geralmente como forma de aliviar sofrimento emocional." tabindex="0" role="button" aria-label="automutilação: Ato de machucar o próprio corpo de forma intencional, geralmente como forma de aliviar sofrimento emocional.">automutilação</span> e os pensamentos suicidas são sinais de alerta que exigem intervenção imediata.</p>
                     <p>O apoio da família e da escola é fundamental. Conversar sem julgamentos, demonstrar interesse genuíno e buscar ajuda profissional são atitudes que podem salvar vidas. A depressão na adolescência tem tratamento e, quanto mais cedo for identificada, melhores são as chances de recuperação completa.</p>
                 </div>
+
+                <div class="destaque-teorico">
+                    <strong>Uma fase de particular vulnerabilidade.</strong> Na sociedade capitalista, os adolescentes enfrentam pressão por desempenho escolar, incerteza em relação ao futuro profissional, exposição a padrões de consumo inalcançáveis e relações sociais cada vez mais mediadas por dispositivos digitais <span class="referencia-inline">(ALONZO et al., 2021; SALEEM; YOUNG; YOUSUF, 2024)</span>.
+                </div>
+
+                <div class="citacao-marx">
+                    "A direção e o conteúdo do desenvolvimento humano em cada período da vida serão determinados pelas condições materiais de cada sujeito, evidenciando o caráter social e histórico do psiquismo por meio da atividade exercida na concretude e nas relações sociais."
+                    <cite>— PASQUALINI, 2014; SHUARE, 2017</cite>
+                </div>
+
                 <div class="container">
                     <img src="https://i.pinimg.com/736x/8f/7f/55/8f7f554e05164594cf86c36787926aae.jpg" alt="Adolescente sentado com expressão de melancolia em ambiente escuro" class="imagem-ilustrativa" style="max-width: 900px;" loading="lazy" decoding="async" width="900" height="600">
                 </div>
@@ -2257,17 +2786,24 @@
             <div class="container">
                 <div class="section-titulo"><h2>Redes sociais e depressão</h2><p>Entre a conexão e o isolamento — o impacto das telas na saúde mental.</p></div>
                 <div class="texto-corrido">
-                    <p>As redes sociais se tornaram parte da vida cotidiana. Para muitos, são espaços de informação, entretenimento e contato com amigos. Mas o uso excessivo e sem crítica pode ter um impacto profundo na saúde mental, especialmente entre adolescentes e jovens adultos. A exposição constante a uma vitrine de vidas "perfeitas" cria comparações irreais e um sentimento persistente de que nunca se é suficiente — fatores que alimentam quadros de ansiedade e depressão.</p>
-                    <p>Um dos efeitos mais nocivos é a <strong>comparação social</strong>. Ao ver apenas os melhores momentos alheios — viagens, conquistas, relacionamentos — a pessoa tende a subestimar a própria vida. Esse contraste contínuo pode levar a sentimentos de inferioridade, baixa autoestima e desesperança. Para quem já tem predisposição à depressão, esse ciclo pode ser devastador.</p>
-                    <p>Outro fator é a <strong>privação de sono</strong>. A luz azul das telas e o estímulo mental constante atrapalham o descanso. A falta de sono adequado é um gatilho conhecido para crises depressivas e ansiosas. Além disso, o uso noturno tende a virar um hábito compulsivo difícil de quebrar: quanto mais cansada a pessoa fica, mais ela recorre às redes para se "distrair" — e o ciclo só piora.</p>
-                    <p>A <strong>dopamina barata</strong> também merece atenção. Curtidas, notificações e vídeos curtos oferecem prazeres rápidos e recompensas instantâneas que vão dessensibilizando o cérebro. Atividades que exigem esforço e tempo (estudar, se exercitar, conversar de verdade) passam a parecer sem graça. Isso reduz a tolerância ao tédio, mina a motivação e contribui para o vazio que caracteriza muitos quadros depressivos.</p>
-                    <p>Existe ainda o fenômeno do <strong>cyberbullying</strong>. Comentários ofensivos, exposição humilhante e o medo constante de julgamento público podem causar traumas profundos. Entre jovens, esse tipo de violência digital está fortemente associado ao aumento de casos de automutilação e ideação suicida. O anonimato na internet frequentemente encoraja crueldade que a pessoa jamais cometeria pessoalmente.</p>
-                    <p>É importante lembrar: as redes sociais <strong>não são vilãs por si só</strong>. Elas podem ser ferramentas valiosas de apoio, informação e acolhimento — inclusive para quem enfrenta depressão. O problema está no uso compulsivo, no consumo passivo e na ausência de limites. <strong>Perceber como você se sente depois de usar as redes é o primeiro passo</strong> para reequilibrar sua relação com elas.</p>
+                    <p>As redes sociais podem informar, divertir e aproximar pessoas, mas o uso excessivo e sem reflexão pode prejudicar a saúde mental, especialmente entre adolescentes e jovens. A exposição a vidas aparentemente perfeitas alimenta a <span class="glossario-termo" data-glossario="Tendência a comparar a própria vida com a dos outros, geralmente de forma desfavorável — fator que alimenta ansiedade e depressão." tabindex="0" role="button" aria-label="comparação social: Tendência a comparar a própria vida com a dos outros, geralmente de forma desfavorável — fator que alimenta ansiedade e depressão.">comparação social</span>, a baixa autoestima e a desesperança.</p>
+                    <p>A falta de sono também é um risco: a luz azul e o estímulo constante das telas atrapalham o descanso, enquanto notificações, curtidas e vídeos curtos oferecem recompensas rápidas que podem reduzir a motivação para atividades que exigem mais tempo e esforço. O <span class="glossario-termo" data-glossario="Violência verbal, psicológica ou moral praticada por meio de redes sociais, mensagens ou ambientes digitais. Pode causar traumas profundos." tabindex="0" role="button" aria-label="cyberbullying: Violência verbal, psicológica ou moral praticada por meio de redes sociais, mensagens ou ambientes digitais. Pode causar traumas profundos.">cyberbullying</span> e o medo de julgamentos públicos também estão associados a sofrimento intenso, automutilação e ideação suicida entre jovens.</p>
+                    <p>As redes sociais <strong>não são vilãs por si só</strong>: podem oferecer apoio, informação e acolhimento. O problema está no uso compulsivo, no consumo passivo e na falta de limites. Estabeleça horários, evite o celular antes de dormir, faça pausas, deixe de seguir perfis que fazem mal e procure um profissional se as redes intensificarem tristeza, vazio ou ansiedade.</p>
                 </div>
+
+                <div class="destaque-teorico">
+                    <strong>Alienação digital.</strong> As plataformas digitais, que são empresas capitalistas voltadas para a extração de mais-valia por meio da atenção dos usuários, ao mesmo tempo em que oferecem formas de sociabilidade, produzem novas formas de alienação e sofrimento <span class="referencia-inline">(MARX, 2013/1867; COSTA, 2022)</span>.
+                </div>
+
+                <div class="caixa-dado">
+                    <span class="dado-numero">38%</span>
+                    <span class="dado-texto"><strong>de aumento de casos</strong> de depressão entre jovens foi registrado nos últimos anos, com as redes sociais desempenhando papel central nesse crescimento <span class="referencia-inline">(SALEEM; YOUNG; YOUSUF, 2024)</span>.</span>
+                </div>
+
                 <img src="https://i.pinimg.com/736x/ff/64/db/ff64dbc8fa042b6704ce9836bb7c2612.jpg" alt="descrição da imagem" class="imagem-ilustrativa" loading="lazy" decoding="async" width="700" height="467">
                 <div class="texto-corrido">
                     <p><strong>Como usar as redes de forma mais saudável:</strong></p>
-                    <p>Estabeleça horários para usar o celular, especialmente longe da hora de dormir. Faça pausas regulares — o famoso <em>detox digital</em> — e observe como seu humor reage. Deixe de seguir perfis que te fazem mal ou que promovem comparações constantes. Prefira conteúdos que informem, ensinem ou tragam leveza de verdade. E lembre-se: <strong>a vida real acontece fora da tela.</strong></p>
+                    <p>Estabeleça horários para usar o celular, especialmente longe da hora de dormir. Faça pausas regulares — o famoso <em><span class="glossario-termo" data-glossario="Período de pausa consciente no uso de telas e redes sociais, para reequilibrar a relação com a tecnologia." tabindex="0" role="button" aria-label="detox digital: Período de pausa consciente no uso de telas e redes sociais, para reequilibrar a relação com a tecnologia.">detox digital</span></em> — e observe como seu humor reage. Deixe de seguir perfis que te fazem mal ou que promovem comparações constantes. Prefira conteúdos que informem, ensinem ou tragam leveza de verdade. E lembre-se: <strong>a vida real acontece fora da tela.</strong></p>
                     <p>Se você perceber que o uso das redes tem intensificado sintomas de tristeza, vazio ou ansiedade, procure conversar com um profissional. Às vezes, mudar a relação com o celular é uma parte importante do tratamento — e pode fazer toda a diferença.</p>
                 </div>
             </div>
@@ -2280,9 +2816,31 @@
                     <p>A depressão tem tratamento e a recuperação é possível.</p>
                 </div>
                 <div class="texto-corrido">
-                    <p>O tratamento da depressão geralmente envolve psicoterapia e, em alguns casos, uso de medicamentos antidepressivos prescritos por um psiquiatra. A Terapia Cognitivo-Comportamental (TCC) é uma das abordagens mais eficazes, ajudando a pessoa a identificar e modificar padrões de pensamento negativos. A medicação atua regulando substâncias químicas no cérebro, proporcionando alívio dos sintomas mais intensos.</p>
+                    <p>O tratamento da depressão geralmente envolve <span class="glossario-termo" data-glossario="Tratamento feito por meio de conversas com um psicólogo, com técnicas para compreender emoções e modificar padrões de sofrimento." tabindex="0" role="button" aria-label="psicoterapia: Tratamento feito por meio de conversas com um psicólogo, com técnicas para compreender emoções e modificar padrões de sofrimento.">psicoterapia</span> e, em alguns casos, uso de <span class="glossario-termo" data-glossario="Medicamentos prescritos por psiquiatras que atuam regulando neurotransmissores no cérebro, aliviando os sintomas da depressão." tabindex="0" role="button" aria-label="antidepressivos: Medicamentos prescritos por psiquiatras que atuam regulando neurotransmissores no cérebro, aliviando os sintomas da depressão.">antidepressivos</span> prescritos por um psiquiatra. A <span class="glossario-termo" data-glossario="Abordagem psicoterapêutica (TCC) que ajuda a identificar e modificar padrões de pensamento e comportamento negativos." tabindex="0" role="button" aria-label="Terapia Cognitivo-Comportamental: Abordagem psicoterapêutica (TCC) que ajuda a identificar e modificar padrões de pensamento e comportamento negativos.">Terapia Cognitivo-Comportamental</span> (TCC) é uma das abordagens mais eficazes, ajudando a pessoa a identificar e modificar padrões de pensamento negativos. A medicação atua regulando substâncias químicas no cérebro, proporcionando alívio dos sintomas mais intensos.</p>
                     <p>Além do acompanhamento profissional, mudanças no estilo de vida são grandes aliadas: praticar exercícios físicos regularmente, manter uma alimentação equilibrada, dormir bem, reduzir o estresse e fortalecer os vínculos sociais contribuem para a melhora. O apoio de amigos e familiares também é fundamental nesse processo.</p>
                     <p>O mais importante é entender que a depressão não precisa ser enfrentada sozinha. Existem profissionais capacitados e serviços públicos de saúde prontos para ajudar. Você não está sozinho nessa jornada.</p>
+                </div>
+
+                <div class="destaque-teorico">
+                    <strong>Tratamento é um direito.</strong> O <span class="glossario-termo" data-glossario="Sistema Único de Saúde — sistema público de saúde do Brasil, que oferece atendimento gratuito a toda a população." tabindex="0" role="button" aria-label="SUS: Sistema Único de Saúde — sistema público de saúde do Brasil, que oferece atendimento gratuito a toda a população.">SUS</span> oferece atendimento psicológico e psiquiátrico gratuito por meio dos <span class="glossario-termo" data-glossario="Centro de Atenção Psicossocial — serviço público do SUS que oferece atendimento psicológico e psiquiátrico gratuito." tabindex="0" role="button" aria-label="CAPS: Centro de Atenção Psicossocial — serviço público do SUS que oferece atendimento psicológico e psiquiátrico gratuito.">CAPS</span> e das <span class="glossario-termo" data-glossario="Unidade Básica de Saúde — porta de entrada do SUS, onde você pode pedir encaminhamento para atendimento especializado." tabindex="0" role="button" aria-label="UBS: Unidade Básica de Saúde — porta de entrada do SUS, onde você pode pedir encaminhamento para atendimento especializado.">UBS</span>. Buscar ajuda não é fraqueza — é um ato de cuidado consigo mesmo.
+                </div>
+
+                <div class="grid-teorico">
+                    <div class="card-teorico">
+                        <h4>Psicoterapia</h4>
+                        <p>Tratamento baseado na fala e na relação terapêutica, que ajuda a compreender emoções e modificar padrões de sofrimento.</p>
+                        <span class="ref">(ABP, [s.d.])</span>
+                    </div>
+                    <div class="card-teorico">
+                        <h4>Medicamentos</h4>
+                        <p>Prescritos por psiquiatras, atuam regulando neurotransmissores e aliviando os sintomas mais intensos.</p>
+                        <span class="ref">(BRASIL, [s.d.])</span>
+                    </div>
+                    <div class="card-teorico">
+                        <h4>Mudanças no estilo de vida</h4>
+                        <p>Exercícios físicos, alimentação equilibrada, sono de qualidade e vínculos sociais fortalecem o tratamento.</p>
+                        <span class="ref">(OMS, 2025)</span>
+                    </div>
                 </div>
             </div>
         </section>
@@ -2305,7 +2863,16 @@
                 <div class="texto-corrido">
                     <p>Se você conhece alguém que está passando por um quadro depressivo, a sua presença e compreensão são valiosas. Primeiro, ofereça um ouvido atento, sem julgamentos. Deixe a pessoa falar sobre o que sente, sem interromper ou minimizar a dor dela. Frases como "não é nada", "se anime" ou "tem gente pior" não ajudam e podem até piorar o sofrimento.</p>
                     <p>Incentive a busca por ajuda profissional de forma gentil e respeitosa. Ofereça-se para acompanhar a pessoa a uma consulta com psicólogo ou psiquiatra, se ela desejar. Esteja presente também nos momentos simples: um convite para um café, uma caminhada leve ou apenas ficar em silêncio ao lado dela pode transmitir acolhimento.</p>
-                    <p>Fique atento a sinais de alerta, como falas sobre morte, despedidas ou falta de esperança. Se perceber risco de suicídio, não hesite em buscar ajuda imediatamente: ligue para o CVV (188) ou encaminhe a pessoa a um serviço de emergência. Nunca deixe a pessoa sozinha nesses momentos.</p>
+                    <p>Fique atento a sinais de alerta, como falas sobre morte, despedidas ou falta de esperança. Se perceber risco de suicídio, não hesite em buscar ajuda imediatamente: ligue para o <span class="glossario-termo" data-glossario="Centro de Valorização da Vida — serviço gratuito de apoio emocional por telefone, chat e e-mail. Ligue 188." tabindex="0" role="button" aria-label="CVV: Centro de Valorização da Vida — serviço gratuito de apoio emocional por telefone, chat e e-mail. Ligue 188.">CVV</span> (188) ou encaminhe a pessoa a um serviço de emergência. Nunca deixe a pessoa sozinha nesses momentos.</p>
+                </div>
+
+                <div class="destaque-teorico">
+                    <strong>A escuta ativa salva vidas.</strong> Ouvir sem julgar, sem minimizar, sem tentar resolver. Às vezes, a coisa mais importante que você pode oferecer é a sua presença e a disposição de ficar ao lado da pessoa, mesmo em silêncio. O acolhimento é uma das formas mais poderosas de cuidado <span class="referencia-inline">(BRASIL, [s.d.])</span>.
+                </div>
+
+                <div class="caixa-citacao">
+                    "Se perceber risco de suicídio, não hesite em buscar ajuda imediatamente. Nunca deixe a pessoa sozinha nesses momentos."
+                    <cite>— Recomendação do Ministério da Saúde</cite>
                 </div>
             </div>
         </section>
@@ -2332,23 +2899,23 @@
                         <button class="btn-voltar-quiz" id="btnVoltarQuiz" title="Voltar uma pergunta" disabled>← Voltar uma pergunta</button>
                     </div>
                 </div>
+
+                <div class="destaque-teorico" style="margin-top: 2rem;">
+                    <strong>Lembrete importante.</strong> Esta autoavaliação é um instrumento de reflexão, não um diagnóstico. Apenas um profissional de saúde mental pode avaliar adequadamente o seu quadro, considerando seu histórico, contexto social e fatores biológicos <span class="referencia-inline">(OMS, 2025)</span>.
+                </div>
             </div>
         </section>
 
-        <section id="respiro">
+        <!-- MENSAGEM DE CONFORTO FINAL -->
+        <section id="mensagem-final" class="mensagem-conforto mensagem-com-fundo-gradiente">
             <div class="container">
-                <div class="section-titulo">
-                    <h2>Como se acalmar</h2>
-                    <p>Técnicas simples para reduzir a ansiedade e encontrar um momento de paz.</p>
-                </div>
-                <div class="respiro-container">
-                    <p class="respiro-instrucoes">Em momentos de ansiedade, experimente a respiração diafragmática:</p>
-                    <p class="respiro-passo"><strong>Passo 1:</strong> Sente-se confortavelmente e coloque uma mão no peito e outra no abdômen.</p>
-                    <p class="respiro-passo"><strong>Passo 2:</strong> Inspire lentamente pelo nariz, contando até 4.</p>
-                    <p class="respiro-passo"><strong>Passo 3:</strong> Segure a respiração por 2 segundos.</p>
-                    <p class="respiro-passo"><strong>Passo 4:</strong> Expire lentamente pela boca, contando até 6.</p>
-                    <p class="respiro-passo"><strong>Passo 5:</strong> Repita por 5 a 10 minutos, focando na sensação do ar entrando e saindo.</p>
-                    <p class="respiro-grounding">Outra técnica é o <em>grounding</em> (ancoragem): identifique 5 coisas que você pode ver, 4 que pode tocar, 3 que pode ouvir, 2 que pode cheirar e 1 que pode saborear.</p>
+                <h2>Não guarde o seu sofrimento para si mesmo</h2>
+                <p>Se você chegou até aqui, é porque algo dentro de você busca compreensão, alívio ou apenas um lugar onde possa respirar sem medo. Saiba que este espaço é seu. E mais importante: <strong>você não precisa carregar tudo sozinho</strong>.</p>
+                <p>A dor que você sente é real. Mas ela não é a última palavra sobre a sua história. Há caminhos, há tratamento, há pessoas dispostas a ouvir — profissionais, amigos, familiares, serviços gratuitos como o CVV (188).</p>
+                <p>Pedir ajuda não é fraqueza. É um ato de coragem e de amor-próprio. Às vezes, tudo o que precisamos é de alguém que nos diga: "Eu vejo você. Eu fico aqui."</p>
+                <div class="destaque-conforto">
+                    Você importa. Sua vida tem valor. E você não está sozinho.
+                    <span>Se estiver em crise, ligue agora para o CVV — 188. Atendimento gratuito, 24 horas por dia.</span>
                 </div>
             </div>
         </section>
@@ -2377,6 +2944,10 @@
                         <span class="telefone destaque-vermelho">192 (SAMU)</span>
                         <span class="telefone destaque-vermelho">190 (Polícia)</span>
                     </div>
+                </div>
+
+                <div class="destaque-teorico" style="margin-top: 2rem;">
+                    <strong>Acesso à saúde mental é um direito.</strong> No entanto, a maior concentração dos casos em regiões com melhor infraestrutura revela desigualdades no acesso ao diagnóstico e tratamento <span class="referencia-inline">(OMS, 2025)</span>. Por isso, é fundamental cobrar políticas públicas que garantam atendimento de qualidade para todas as pessoas.
                 </div>
             </div>
         </section>
@@ -2409,19 +2980,23 @@
             </div>
         </section>
 
+
+
         <section id="equipe" class="secao-clara" style="padding-top: 2rem;">
             <div class="container">
                 <div class="section-titulo">
                     <h2>Equipe do Projeto</h2>
-                    <p>Nome e e-mails dos integrantes do trabalho.</p>
+                    <p>Integrantes do trabalho.</p>
                 </div>
                 <div class="equipe-lista">
-                    <div class="membro-card"><div><span class="membro-nome">Christian Inamoto</span></div><a href="mailto:christianInamoto@proton.me" class="membro-email">christianInamoto@proton.me</a></div>
-                    <div class="membro-card"><div><span class="membro-nome">Gustavo Lorenzo</span></div><a href="mailto:gustavo.martins.anjos@escola.pr.gov.br" class="membro-email">gustavo.martins.anjos@escola.pr.gov.br</a></div>
-                    <div class="membro-card"><div><span class="membro-nome">Enzo Keiji Tamazumi Marcal</span></div><a href="mailto:marcal.enzo@escola.pr.gov.br" class="membro-email">marcal.enzo@escola.pr.gov.br</a></div>
-                    <div class="membro-card"><div><span class="membro-nome">Gabriel Bones Dias</span></div><a href="mailto:gabriel.bones.dias@escola.pr.gov.br" class="membro-email">gabriel.bones.dias@escola.pr.gov.br</a></div>
-                    <div class="membro-card"><div><span class="membro-nome">Pedro Rafael</span></div><a href="mailto:pedro.negri.pereira@escola.pr.gov.br" class="membro-email">pedro.negri.pereira@escola.pr.gov.br</a></div>
+                    <div class="membro-card"><div><span class="membro-nome">Christian Inamoto Ferreira Guerreiro Biégas</span></div></div>
+                    <div class="membro-card"><div><span class="membro-nome">Enzo Keije Tamazume Marçal</span></div></div>
+                    <div class="membro-card"><div><span class="membro-nome">Gustavo Lorenzo Martins dos Anjos</span></div></div>
+                    <div class="membro-card"><div><span class="membro-nome">Pedro Rafael Negri Pereira</span></div></div>
+                    <div class="membro-card"><div><span class="membro-nome">Gabriel Bones Dias</span></div></div>
                 </div>
+                <p class="ods-info" style="margin-top: 2rem;"><strong>Professor orientador:</strong> José Augusto Valim</p>
+                <p class="ods-info"><strong>Colégio Estadual Doutor Gastão Vidigal</strong> — Maringá, Paraná — Brasil</p>
             </div>
         </section>
 
@@ -2459,22 +3034,35 @@
                     <p>Referências utilizadas na produção deste material.</p>
                 </div>
                 <ol class="fontes-lista">
+                    <li>AGÊNCIA BRASIL. IBGE: pelo menos uma doença crônica afetou 52% dos adultos em 2019. Brasília, DF: EBC, 2020. Disponível em: <a href="https://agenciabrasil.ebc.com.br/saude/noticia/2020-11/ibge-pelo-menos-uma-doenca-cronica-afetou-52-dos-adultos-em-2019" target="_blank" rel="noopener">https://agenciabrasil.ebc.com.br/saude/noticia/2020-11/ibge-pelo-menos-uma-doenca-cronica-afetou-52-dos-adultos-em-2019</a>. Acesso em: 5 out. 2026.</li>
                     <li>AHMED, Oli et al. Social media use, mental health and sleep: a systematic review with meta-analyses. <em>Journal of Affective Disorders</em>, v. 367, p. 701-712, 2024. DOI: 10.1016/j.jad.2024.08.193. Disponível em: <a href="https://pubmed.ncbi.nlm.nih.gov/39242043/" target="_blank" rel="noopener">https://pubmed.ncbi.nlm.nih.gov/39242043/</a>. Acesso em: 23 set. 2026.</li>
                     <li>ALONZO, Rea et al. Interplay between social media use, sleep quality, and mental health in youth: a systematic review. <em>Sleep Medicine Reviews</em>, v. 56, 101414, 2021. DOI: 10.1016/j.smrv.2020.101414. Disponível em: <a href="https://pubmed.ncbi.nlm.nih.gov/33385767/" target="_blank" rel="noopener">https://pubmed.ncbi.nlm.nih.gov/33385767/</a>. Acesso em: 23 set. 2026.</li>
                     <li>ASSOCIAÇÃO BRASILEIRA DE PSIQUIATRIA. <em>ABP TV: tratamento da depressão</em>. Rio de Janeiro: ABP, 2023. Disponível em: <a href="https://www.abp.org.br/post/abp-tv-tratamento-depressao" target="_blank" rel="noopener">https://www.abp.org.br/post/abp-tv-tratamento-depressao</a>. Acesso em: 23 set. 2026.</li>
                     <li>ASSOCIAÇÃO BRASILEIRA DE PSIQUIATRIA. <em>Diretrizes para um modelo de assistência integral em saúde mental no Brasil</em>. Rio de Janeiro: ABP, [s. d.]. Disponível em: <a href="https://www.abp.org.br/diretrizes" target="_blank" rel="noopener">https://www.abp.org.br/diretrizes</a>. Acesso em: 23 set. 2026.</li>
                     <li>ASSOCIAÇÃO BRASILEIRA DE PSIQUIATRIA. <em>Diretrizes da Associação Brasileira de Psiquiatria para o manejo do comportamento suicida</em>. Rio de Janeiro: ABP, 2020. Disponível em: <a href="https://www.abp.org.br/post/abp-lanca-diretrizes-tratmento-comportamento-suicida" target="_blank" rel="noopener">https://www.abp.org.br/post/abp-lanca-diretrizes-tratmento-comportamento-suicida</a>. Acesso em: 23 set. 2026.</li>
+                    <li>ASSOCIAÇÃO PAULISTA DE MEDICINA. <em>Suicídio e lesões autoprovocadas são temas de Boletim Epidemiológico</em>. São Paulo: APM, [s. d.]. Disponível em: <a href="https://www.apm.org.br/suicidio-e-lesoes-autoprovocadas-sao-temas-de-boletim-epidemiologico/" target="_blank" rel="noopener">https://www.apm.org.br/suicidio-e-lesoes-autoprovocadas-sao-temas-de-boletim-epidemiologico/</a>. Acesso em: 5 out. 2026.</li>
                     <li>BRASIL. Ministério da Saúde. <em>Centros de Atenção Psicossocial — CAPS</em>. Brasília, DF: Ministério da Saúde, [s. d.]. Disponível em: <a href="https://www.gov.br/saude/pt-br/composicao/saes/desmad/raps/caps" target="_blank" rel="noopener">https://www.gov.br/saude/pt-br/composicao/saes/desmad/raps/caps</a>. Acesso em: 23 set. 2026.</li>
                     <li>BRASIL. Ministério da Saúde. <em>Depressão</em>. Brasília, DF: Ministério da Saúde, [s. d.]. Disponível em: <a href="https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/d/depressao" target="_blank" rel="noopener">https://www.gov.br/saude/pt-br/assuntos/saude-de-a-a-z/d/depressao</a>. Acesso em: 23 set. 2026.</li>
                     <li>BRASIL. Ministério da Saúde. <em>Manejo inicial/conduta — situações agudas: transtornos de ansiedade no adulto</em>. Brasília, DF: Ministério da Saúde, [s. d.]. Disponível em: <a href="https://linhasdecuidado.saude.gov.br/portal/ansiedade/unidade-de-atencao-primaria/manejo-inicial-conduta/" target="_blank" rel="noopener">https://linhasdecuidado.saude.gov.br/portal/ansiedade/unidade-de-atencao-primaria/manejo-inicial-conduta/</a>. Acesso em: 23 set. 2026.</li>
                     <li>BRASIL. Ministério da Saúde. <em>SAMU 192 — Serviço de Atendimento Móvel de Urgência</em>. Brasília, DF: Ministério da Saúde, [s. d.]. Disponível em: <a href="https://www.gov.br/saude/pt-br/composicao/saes/samu-192" target="_blank" rel="noopener">https://www.gov.br/saude/pt-br/composicao/saes/samu-192</a>. Acesso em: 23 set. 2026.</li>
                     <li>CENTRO DE VALORIZAÇÃO DA VIDA. <em>Informações sobre o atendimento pelo número 188</em>. São Paulo: CVV, [s. d.]. Disponível em: <a href="https://cvv.org.br/informacoes-sobre-o-atendimento-pelo-numero-188/" target="_blank" rel="noopener">https://cvv.org.br/informacoes-sobre-o-atendimento-pelo-numero-188/</a>. Acesso em: 23 set. 2026.</li>
+                    <li>COSTA, Pedro Henrique Antunes da. Marx sobre a loucura. <em>Revista Dialectus</em>, ano 11, n. 26, p. 11-31, jul.-ago. 2022. Disponível em: <a href="http://www.periodicos.ufc.br/dialectus" target="_blank" rel="noopener">http://www.periodicos.ufc.br/dialectus</a>. Acesso em: 27 set. 2026.</li>
+                    <li>GENEROSO, Nicolas Kimura; BORGES, Ana Luiza Vilela; CABRAL, Cristiane da Silva. Gender differences in anxiety and perceived stress during the Covid-19 pandemic among Brazilian adolescents from impoverished communities. <em>PLOS ONE</em>, 2025. PMCID: PMC12798566. Disponível em: <a href="https://europepmc.org/article/PMC/12798566" target="_blank" rel="noopener">https://europepmc.org/article/PMC/12798566</a>. Acesso em: 27 set. 2026.</li>
                     <li>INSTITUTO BRASILEIRO DE GEOGRAFIA E ESTATÍSTICA. <em>PNS 2013: IBGE faz um amplo retrato da saúde dos adultos brasileiros</em>. Rio de Janeiro: IBGE, 2014. Disponível em: <a href="https://agenciadenoticias.ibge.gov.br/agencia-de-noticias/releases/14724-asi-pns-2013-faz-um-amplo-retrato-da-saude-dos-adultos-brasileiros" target="_blank" rel="noopener">https://agenciadenoticias.ibge.gov.br/agencia-de-noticias/releases/14724-asi-pns-2013-faz-um-amplo-retrato-da-saude-dos-adultos-brasileiros</a>. Acesso em: 23 set. 2026.</li>
                     <li>INSTITUTO BRASILEIRO DE GEOGRAFIA E ESTATÍSTICA. <em>PNS 2019: cai o consumo de tabaco, mas aumenta o de bebida alcoólica</em>. Rio de Janeiro: IBGE, 2020. Disponível em: <a href="https://agenciadenoticias.ibge.gov.br/agencia-de-noticias/releases/29471-pns-2019-cai-o-consumo-de-tabaco-mas-aumenta-o-de-bebida-alcoolica" target="_blank" rel="noopener">https://agenciadenoticias.ibge.gov.br/agencia-de-noticias/releases/29471-pns-2019-cai-o-consumo-de-tabaco-mas-aumenta-o-de-bebida-alcoolica</a>. Acesso em: 23 set. 2026.</li>
+                    <li>MARX, Karl. <em>Contribuição à crítica da economia política</em>. 1859. Disponível em: <a href="https://www.marxists.org" target="_blank" rel="noopener">https://www.marxists.org</a>. Acesso em: 27 set. 2026.</li>
+                    <li>MARX, Karl. <em>O capital: crítica da economia política</em>. Livro I. São Paulo: Boitempo, 2013/1867.</li>
+                    <li>MARX, Karl. <em>Sobre o suicídio</em>. São Paulo: Boitempo, 2006/1846.</li>
                     <li>ORGANIZAÇÃO MUNDIAL DA SAÚDE. <em>Depressive disorder (depression)</em>. Geneva: World Health Organization, 2026. Disponível em: <a href="https://www.who.int/news-room/fact-sheets/detail/depression" target="_blank" rel="noopener">https://www.who.int/news-room/fact-sheets/detail/depression</a>. Acesso em: 23 set. 2026.</li>
                     <li>ORGANIZAÇÃO MUNDIAL DA SAÚDE. <em>Guidelines on mental health promotive and preventive interventions for adolescents: helping adolescents thrive</em>. Geneva: World Health Organization, 2021. Disponível em: <a href="https://www.who.int/publications/i/item/guidelines-on-mental-health-promotive-and-preventive-interventions-for-adolescents" target="_blank" rel="noopener">https://www.who.int/publications/i/item/guidelines-on-mental-health-promotive-and-preventive-interventions-for-adolescents</a>. Acesso em: 23 set. 2026.</li>
                     <li>ORGANIZAÇÃO MUNDIAL DA SAÚDE. <em>Mental health of adolescents</em>. Geneva: World Health Organization, 2025. Disponível em: <a href="https://www.who.int/news-room/fact-sheets/detail/adolescent-mental-health" target="_blank" rel="noopener">https://www.who.int/news-room/fact-sheets/detail/adolescent-mental-health</a>. Acesso em: 23 set. 2026.</li>
+                    <li>PASQUALINI, Juliana Campregher. <em>O desenvolvimento de adolescentes em situação de acolhimento institucional: contribuições da Psicologia Histórico-Cultural</em>. 2014. Disponível em: <a href="https://ppi.uem.br" target="_blank" rel="noopener">https://ppi.uem.br</a>. Acesso em: 27 set. 2026.</li>
+                    <li>RIO GRANDE DO SUL. Secretaria da Saúde. <em>Informe epidemiológico DVE/CEVS 07-2023: suicídio e lesão autoprovocada</em>. Porto Alegre: SES-RS, 2023. Disponível em: <a href="https://saude.rs.gov.br/upload/arquivos/202309/19110011-informe-epidemiologico-sobre-suicidio-e-lesoes-autoprovocadas.pdf" target="_blank" rel="noopener">https://saude.rs.gov.br/upload/arquivos/202309/19110011-informe-epidemiologico-sobre-suicidio-e-lesoes-autoprovocadas.pdf</a>. Acesso em: 5 out. 2026.</li>
                     <li>SALEEM, Naila; YOUNG, Paul; YOUSUF, Saman. Exploring the relationship between social media use and symptoms of depression and anxiety among children and adolescents: a systematic narrative review. <em>Cyberpsychology, Behavior, and Social Networking</em>, v. 27, n. 11, p. 771-797, 2024. DOI: 10.1089/cyber.2023.0456. Disponível em: <a href="https://pubmed.ncbi.nlm.nih.gov/39446668/" target="_blank" rel="noopener">https://pubmed.ncbi.nlm.nih.gov/39446668/</a>. Acesso em: 23 set. 2026.</li>
+                    <li>SHUARE, Marta. <em>A psicologia soviética: minha visão</em>. São Paulo: Livraria da Física, 2017.</li>
+                    <li>SOUSA, Carlos Daniel Soares de et al. Impactos da COVID-19 na saúde mental infantojuvenil e na rede de atenção psicossocial. <em>Revista Eletrônica Acervo Científico</em>, ISSN 2595-7899. Disponível em: <a href="https://acervomais.com.br" target="_blank" rel="noopener">https://acervomais.com.br</a>. Acesso em: 27 set. 2026.</li>
+                    <li>UNESCO. <em>Global education monitoring report 2023: technology in education: a tool on whose terms?</em> Paris: UNESCO, 2023. Disponível em: <a href="https://www.unesco.org/en/articles/2023-global-education-monitoring-report-technology-education-tool-whose-terms" target="_blank" rel="noopener">https://www.unesco.org/en/articles/2023-global-education-monitoring-report-technology-education-tool-whose-terms</a>. Acesso em: 27 set. 2026.</li>
+                    <li>VIGOTSKI, Lev Semionovitch. <em>Teoria e método em psicologia</em>. São Paulo: Martins Fontes, 1996.</li>
                 </ol>
             </div>
         </section>
@@ -2485,14 +3073,16 @@
                     <a href="#inicio">Início</a>
                     <a href="#sobre">O que é</a>
                     <a href="#tabu">Quebrando o tabu</a>
+                    <a href="#materialismo">Materialismo</a>
                     <a href="#sintomas">Sintomas</a>
                     <a href="#gravidade">Gravidade</a>
+                    <a href="#genero">Gênero</a>
                     <a href="#adolescentes">Adolescentes</a>
                     <a href="#redes-sociais">Redes sociais</a>
                     <a href="#tratamentos">Tratamentos</a>
                     <a href="#ajudar">Como ajudar</a>
                     <a href="#autoavaliacao">Autoavaliação</a>
-                    <a href="#respiro">Como se acalmar</a>
+                    <a href="#mensagem-final">Mensagem final</a>
                     <a href="#ajuda">Ajuda</a>
                     <a href="#mapa">Mapa</a>
                     <a href="#compartilhar">Compartilhar</a>
@@ -2503,6 +3093,7 @@
                 <p>Projeto <strong>voceimporta</strong> — Conscientização sobre Depressão para a Expotech 2026.</p>
                 <p style="margin-top: 0.5rem; font-size: 0.8rem;">Feito por estudantes de Desenvolvimento de Sistemas - 2ºB DS.</p>
                 <p style="margin-top: 0.5rem; font-size: 0.8rem;">- Colégio Gastão Vidal -</p>
+                <p style="margin-top: 0.5rem; font-size: 0.75rem; color: #6a5a4a;">ODS 1 — Saúde e Bem-Estar · ODS 2 — Educação de Qualidade</p>
             </div>
         </footer>
 
@@ -2623,14 +3214,11 @@
         }
 
         function applyFxState() {
-            // CRT master
             document.body.classList.toggle('crt-off', !fxState.crt);
-            // Efeitos individuais (classes -off)
             document.body.classList.toggle('fx-scanlines-off', !fxState.scanlines);
             document.body.classList.toggle('fx-flicker-off', !fxState.flicker);
             document.body.classList.toggle('fx-noise-off', !fxState.noiseCrt);
             document.body.classList.toggle('fx-marquee-off', !fxState.marquee);
-            // Hero
             document.body.classList.toggle('hero-glow-off', !fxState.heroGlow);
             document.body.classList.toggle('hero-aura-off', !fxState.heroAura);
             if (typeof aplicarEstadoHeroFX === 'function') aplicarEstadoHeroFX();
@@ -2638,14 +3226,10 @@
             if (typeof aplicarEstadoLeituraCalma === 'function') aplicarEstadoLeituraCalma();
             document.documentElement.style.setProperty('--hero-glow-duration', fxState.heroSpeed + 's');
             document.documentElement.style.setProperty('--hero-blur-mult', String(fxState.heroIntensity));
-            // Noise overlay
             document.documentElement.style.setProperty('--noise-max', String(fxState.noiseMax));
-            // Novas intensidades
             document.documentElement.style.setProperty('--flicker-intensity', String(fxState.flickerIntensity));
             document.documentElement.style.setProperty('--scanlines-intensity', String(fxState.scanlinesIntensity));
-            // Sincroniza botão sidebar CRT
             if (typeof aplicarEstadoCRT === 'function') aplicarEstadoCRT();
-            // Atualiza noise imediatamente
             if (typeof updateNoiseOpacity === 'function') updateNoiseOpacity();
             if (typeof sincronizarPainelEfeitos === 'function') sincronizarPainelEfeitos();
         }
@@ -2986,18 +3570,18 @@
         const crtOverlay = document.getElementById('crtOverlay');
         const crtFlicker = document.getElementById('crtFlicker');
         const crtNoise = document.getElementById('crtNoise');
-        const respiroSection = document.getElementById('respiro');
+        const messageEffectSection = document.querySelector('.mensagem-com-fundo-gradiente');
         const ajudaSection = document.getElementById('ajuda');
 
         const desktopMedia = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 1025px)');
         function updateCRTEffect() {
             if (!desktopMedia.matches) return;
-            if (!respiroSection || !ajudaSection) return;
+            if (!messageEffectSection || !ajudaSection) return;
             if (!crtOverlay || !crtFlicker || !crtNoise) return;
-            const respiroTop = respiroSection.offsetTop;
+            const effectSectionTop = messageEffectSection.offsetTop;
             const ajudaTop = ajudaSection.offsetTop;
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-            const fadeStart = respiroTop - 500;
+            const fadeStart = effectSectionTop - 500;
             const fadeEnd = ajudaTop;
             let opacity = 1;
             if (scrollTop >= fadeEnd) opacity = 0;
@@ -3037,7 +3621,6 @@
         sidebarOverlay.addEventListener('click', fecharSidebar);
         document.querySelectorAll('.sidebar-nav a').forEach(link => { link.addEventListener('click', fecharSidebar); });
 
-        /* Explorador: pastas recolhíveis, teclado e arquivo ativo. */
         document.querySelectorAll('.tree-folder').forEach(folder => {
             const group = folder.closest('.tree-group');
             const alternarPasta = () => {
@@ -3410,7 +3993,6 @@
                 });
             }
 
-            /* ---------------------- PAINEL DE EFEITOS ---------------------- */
             function buildEffectsPanel(body) {
                 const panel = document.createElement('div');
                 panel.className = 'effects-panel';
@@ -3473,13 +4055,11 @@
                     return row;
                 }
 
-                // INTRO
                 const intro = document.createElement('div');
                 intro.className = 'fx-intro';
                 intro.textContent = '// painel de controle · ajustes salvos automaticamente neste navegador';
                 panel.appendChild(intro);
 
-                // ---- GRUPO CRT ----
                 const g1 = document.createElement('div');
                 g1.className = 'fx-group';
                 const h1 = document.createElement('h3');
@@ -3510,7 +4090,6 @@
                 ));
                 panel.appendChild(g1);
 
-                // ---- GRUPO HERO ----
                 const g2 = document.createElement('div');
                 g2.className = 'fx-group';
                 const h2 = document.createElement('h3');
@@ -3532,7 +4111,6 @@
                 ));
                 panel.appendChild(g2);
 
-                // ---- AÇÕES ----
                 const actions = document.createElement('div');
                 actions.className = 'fx-actions';
 
@@ -3561,7 +4139,6 @@
 
                 panel.appendChild(actions);
 
-                // ---- INFO ----
                 const info = document.createElement('div');
                 info.className = 'fx-info-row';
                 info.innerHTML = '<span>// persistência: localStorage</span><span>v1 · fx-panel</span>';
@@ -4067,7 +4644,7 @@
         })();
 
         /* ===================================================================== */
-        /* BOTÃO "PRECISO DE AJUDA AGORA" — abre em janela flutuante             */
+        /* BOTÃO "PRECISO DE AJUDA AGORA" */
         /* ===================================================================== */
         const btnAjudaAgora = document.getElementById('btnAjudaAgora');
         if (btnAjudaAgora) {
@@ -4910,14 +5487,23 @@
                 'autocompaixão': 'Capacidade de tratar a si mesmo com gentileza e compreensão, especialmente em momentos difíceis.',
                 'escuta ativa': 'Prática de ouvir com atenção plena, sem julgar ou interromper, demonstrando interesse genuíno pelo outro.',
                 'acolhimento': 'Ato de receber alguém com atenção, respeito e cuidado, sem julgamentos.',
-                'preconceito': 'Opinião negativa formada sem conhecimento ou reflexão, geralmente baseada em estereótipos.'
+                'preconceito': 'Opinião negativa formada sem conhecimento ou reflexão, geralmente baseada em estereótipos.',
+                'materialismo histórico': 'Método de análise formulado por Marx e Engels que parte da produção da vida material como base fundamental da organização social.',
+                'mais-valia': 'Conceito marxista que designa o valor excedente produzido pelo trabalhador e apropriado pelo capitalista.',
+                'alienação': 'Processo pelo qual o ser humano se torna estranho ao produto de seu trabalho e às relações sociais que o constituem.',
+                'psicologia histórico-cultural': 'Abordagem psicológica fundamentada no materialismo histórico-dialético, desenvolvida por Vigotski e colaboradores.',
+                'vigotski': 'Lev Semionovitch Vigotski (1896-1934), psicólogo soviético que desenvolveu a Psicologia Histórico-Cultural.',
+                'capitalismo': 'Modo de produção baseado na propriedade privada dos meios de produção e na exploração da força de trabalho.',
+                'pandemia': 'Epidemia de grandes proporções que atinge diversos continentes, como a COVID-19.',
+                'masculinidade tóxica': 'Conjunto de expectativas e normas sociais sobre como homens e mulheres devem se comportar, sentir e se relacionar.',
+                'gênero': 'Construção social e cultural que define papéis, comportamentos e expectativas atribuídos a homens e mulheres.',
+                'suicídio': 'Ato de tirar a própria vida. É uma questão complexa de saúde pública, cercada de tabus e que exige acolhimento, não julgamento.'
             };
 
             const tooltip = document.getElementById('glossarioTooltip');
             const raiz = document.getElementById('mainContent');
             if (!tooltip || !raiz) return;
 
-            // Ordena por tamanho (maior primeiro) para evitar matches parciais
             const termos = Object.keys(GLOSSARIO).sort((a, b) => b.length - a.length);
             const escapados = termos.map(t => t.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
             const regex = new RegExp('(?:' + escapados.join('|') + ')', 'gi');
@@ -4970,7 +5556,6 @@
                 let frag = null;
                 while ((m = regex.exec(texto)) !== null) {
                     const original = m[0];
-                    // Verifica limites (não casar dentro de palavra maior)
                     const antes = m.index > 0 ? texto[m.index - 1] : '';
                     const depois = m.index + original.length < texto.length ? texto[m.index + original.length] : '';
                     if (antes && LETTER_RE.test(antes)) continue;
@@ -5017,7 +5602,6 @@
                 nodes.forEach(envolverTexto);
             }
 
-            // ---------- Tooltip positioning ----------
             let rafPos = null;
             function posicionar(el) {
                 if (!tooltip.classList.contains('visivel')) return;
@@ -5074,7 +5658,6 @@
                 if (t) esconder();
             });
 
-            // Suporte a toque: tap alterna o tooltip
             let ultimoToque = null;
             document.addEventListener('touchstart', (e) => {
                 const t = e.target && e.target.closest ? e.target.closest('.glossario-termo') : null;
@@ -5092,7 +5675,6 @@
                 }
             }, { passive: true });
 
-            // Reposiciona ao rolar/redimensionar
             window.addEventListener('scroll', () => {
                 if (tooltip.classList.contains('visivel') && ultimoToque) posicionar(ultimoToque);
             }, { passive: true });
@@ -5100,12 +5682,67 @@
                 if (tooltip.classList.contains('visivel') && ultimoToque) posicionar(ultimoToque);
             });
 
-            // Roda após o resto da inicialização
             if (document.readyState === 'loading') {
                 document.addEventListener('DOMContentLoaded', aplicar);
             } else {
                 setTimeout(aplicar, 0);
             }
+        })();
+    </script>
+
+    <script>
+        /* ===================================================================== */
+        /* ORGANIZAÇÃO DE LEITURA — mostra o essencial e guarda o resto em "Ler mais" */
+        /* ===================================================================== */
+        (function organizarLeitura() {
+            const FORA = ['inicio', 'estatisticas', 'citacoes', 'tratamentos', 'ajudar', 'autoavaliacao', 'mensagem-final', 'ajuda', 'mapa', 'compartilhar', 'equipe', 'contato', 'fontes'];
+            const MOVER = '.texto-corrido, .destaque-teorico, .caixa-citacao, .citacao-marx, .grid-teorico';
+            const plural = (n, s, p) => n + ' ' + (n === 1 ? s : p);
+
+            document.querySelectorAll('section[id]').forEach(sec => {
+                if (FORA.indexOf(sec.id) !== -1) return;
+                const cont = sec.querySelector(':scope > .container');
+                if (!cont) return;
+
+                const filhos = Array.from(cont.children);
+                const primeiro = filhos.find(el => el.classList.contains('texto-corrido'));
+                const mover = filhos.filter(el => el.matches(MOVER) && el !== primeiro);
+                const extras = primeiro ? Array.from(primeiro.querySelectorAll(':scope > p')).slice(1) : [];
+                if (!mover.length && !extras.length) return;
+
+                let nParag = extras.length, nDest = 0;
+                mover.forEach(el => {
+                    if (el.classList.contains('texto-corrido')) nParag += el.querySelectorAll(':scope > p').length;
+                    else nDest++;
+                });
+
+                const corpo = document.createElement('div');
+                corpo.className = 'lm-corpo';
+                if (extras.length) {
+                    const bloco = document.createElement('div');
+                    bloco.className = 'texto-corrido';
+                    extras.forEach(p => bloco.appendChild(p));
+                    corpo.appendChild(bloco);
+                }
+                mover.forEach(el => corpo.appendChild(el));
+
+                const det = document.createElement('details');
+                det.className = 'ler-mais';
+                const sum = document.createElement('summary');
+                sum.innerHTML = '<span class="lm-seta" aria-hidden="true">▸</span>' +
+                    '<span class="lm-titulo"><span class="lm-fechado">Ler mais sobre este tema</span><span class="lm-aberto">Recolher</span></span>' +
+                    '<span class="lm-info"></span>';
+                const partes = [];
+                if (nParag) partes.push(plural(nParag, 'parágrafo', 'parágrafos'));
+                if (nDest) partes.push(plural(nDest, 'destaque ou citação', 'destaques e citações'));
+                sum.querySelector('.lm-info').textContent = partes.join(' · ');
+                det.appendChild(sum);
+                det.appendChild(corpo);
+
+                const ultimo = cont.lastElementChild;
+                if (ultimo && ultimo.tagName === 'P') cont.insertBefore(det, ultimo);
+                else cont.appendChild(det);
+            });
         })();
     </script>
 </body>
