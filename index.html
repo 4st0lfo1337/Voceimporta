@@ -115,7 +115,7 @@
 
         /* ===================================================================== */
         /* STICKY BAR */
-        /* ===================================================================== a*/
+        /* ===================================================================== */
         .sticky-bar {
             position: fixed;
             top: 0;
@@ -2975,8 +2975,6 @@
             </div>
         </section>
 
-
-
         <section id="equipe" class="secao-clara" style="padding-top: 2rem;">
             <div class="container">
                 <div class="section-titulo">
@@ -3116,17 +3114,18 @@
             'noiseMax', 'flickerIntensity', 'scanlinesIntensity',
             'heroGlow', 'heroAura', 'heroSpeed', 'heroIntensity'
         ];
+        // Alterado: padrões para desativar CRT, brilho e aura
         const FX_DEFAULTS = {
-            crt: true,
-            scanlines: true,
-            flicker: true,
-            noiseCrt: true,
+            crt: false,
+            scanlines: false,
+            flicker: false,
+            noiseCrt: false,
             marquee: true,
-            noiseMax: 0.8,
-            flickerIntensity: 1,
-            scanlinesIntensity: 1,
-            heroGlow: true,
-            heroAura: true,
+            noiseMax: 0,
+            flickerIntensity: 0,
+            scanlinesIntensity: 0,
+            heroGlow: false,
+            heroAura: false,
             heroSpeed: 4,
             heroIntensity: 1,
             leituraCalma: false
@@ -3135,7 +3134,11 @@
         let leituraCalmaBackup = null;
         try {
             const raw = localStorage.getItem(FX_STORAGE_KEY);
-            if (raw) Object.assign(fxState, JSON.parse(raw));
+            if (raw) {
+                const saved = JSON.parse(raw);
+                // Aplica apenas as chaves salvas, mantendo os padrões para o resto
+                Object.assign(fxState, saved);
+            }
             const calmBackup = localStorage.getItem(FX_CALM_BACKUP_KEY);
             if (calmBackup) leituraCalmaBackup = JSON.parse(calmBackup);
         } catch (e) {}
