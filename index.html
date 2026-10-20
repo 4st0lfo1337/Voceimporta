@@ -685,6 +685,8 @@
         .texto-corrido strong { color: #d0c8b8; }
 
         .citacao { background: #0f0a08; color: #c8b8a8; padding: 3rem 0; text-align: center; border-top: 2px solid #3a3028; border-bottom: 2px solid #3a3028; box-shadow: inset 0 0 80px rgba(30,20,10,0.7); }
+        .citacao.secao-clara { background: #d0c8b8; color: #2a2018; border-top-color: #9a8a7a; border-bottom-color: #9a8a7a; box-shadow: inset 0 0 80px rgba(0,0,0,0.08); }
+        .citacao.secao-clara cite { color: #5a4a3a; }
         .citacao blockquote { font-size: 1.3rem; font-style: italic; max-width: 800px; margin: 0 auto; line-height: 1.8; opacity: 0.9; }
         .citacao cite { display: block; margin-top: 1rem; font-size: 1rem; font-style: normal; opacity: 0.7; color: #a09080; }
 
@@ -725,6 +727,53 @@
         .btn-voltar-quiz { display: inline-block; padding: 0.7rem 1.8rem; background: transparent; color: #c8b090; border: 1px solid #c8b090; border-radius: 2px; cursor: pointer; font-size: 0.95rem; font-weight: 600; margin-top: 1rem; margin-left: 0.5rem; transition: all 0.2s; font-family: inherit; letter-spacing: 1px; }
         .btn-voltar-quiz:hover:not(:disabled) { background: #c8b090; color: #0d0a08; }
         .btn-voltar-quiz:disabled { opacity: 0.35; cursor: not-allowed; }
+
+        /* Caixa de autoavaliação no tema claro */
+        .secao-clara .quiz-container {
+            background: #e0d8c8;
+            border-color: #9a8a7a;
+            box-shadow: 0 8px 30px rgba(70, 55, 40, 0.18), inset 0 0 20px rgba(255,255,255,0.22);
+        }
+        .secao-clara .quiz-contador {
+            color: #5a4a3a;
+            border-bottom-color: #9a8a7a;
+        }
+        .secao-clara .quiz-contador .barra-progresso {
+            background: #c0b8a8;
+            border-color: #9a8a7a;
+        }
+        .secao-clara .quiz-contador .barra-progresso-preenchida {
+            background: linear-gradient(90deg, #6a5a4a, #a89060);
+        }
+        .secao-clara .quiz-pergunta { color: #1a1510; }
+        .secao-clara .quiz-opcao {
+            background: #f0e8d8;
+            border-color: #9a8a7a;
+            color: #3a3028;
+        }
+        .secao-clara .quiz-opcao:hover {
+            background: #d8d0c0;
+            border-color: #6a5a4a;
+        }
+        .secao-clara .quiz-opcao.selecionada {
+            background: #c8b898;
+            border-color: #6a5a4a;
+            color: #1a1510;
+        }
+        .secao-clara .btn-quiz {
+            background: #6a5a4a;
+            border-color: #4a3a2a;
+            color: #f0e8d8;
+        }
+        .secao-clara .btn-quiz:hover { background: #5a4a3a; }
+        .secao-clara .btn-voltar-quiz {
+            color: #5a4a3a;
+            border-color: #6a5a4a;
+        }
+        .secao-clara .btn-voltar-quiz:hover:not(:disabled) {
+            background: #6a5a4a;
+            color: #f0e8d8;
+        }
 
         .ajuda-lista { max-width: 900px; margin: 2rem auto 0; display: flex; flex-direction: column; gap: 1.5rem; }
         .ajuda-item { background: #e0d8c8; border-left: 4px solid var(--cor-primaria); border-radius: 2px; padding: 1.5rem 2rem; box-shadow: 0 4px 15px rgba(0,0,0,0.2); text-align: left; transition: transform 0.2s ease, box-shadow 0.2s ease, border-left-color 0.2s ease; }
@@ -2196,8 +2245,8 @@
             text-align: center;
             box-shadow: inset 0 0 80px rgba(30, 20, 10, 0.6);
         }
-        .mensagem-conforto.mensagem-com-fundo-gradiente {
-            background: linear-gradient(to bottom, #1a1510 0%, #e0d8c8 100%);
+        .mensagem-com-fundo-gradiente {
+            background: linear-gradient(to bottom, #1a1510 0%, #d0c8b8 100%);
         }
         .mensagem-conforto .container {
             max-width: 750px;
@@ -2777,7 +2826,7 @@
             </div>
         </section>
 
-        <section id="redes-sociais" style="background: #0f0a08;">
+        <section id="redes-sociais" class="mensagem-com-fundo-gradiente">
             <div class="container">
                 <div class="section-titulo"><h2>Redes sociais e depressão</h2><p>Entre a conexão e o isolamento — o impacto das telas na saúde mental.</p></div>
                 <div class="texto-corrido">
@@ -2804,7 +2853,7 @@
             </div>
         </section>
 
-        <section id="tratamentos">
+        <section id="tratamentos" class="secao-clara">
             <div class="container">
                 <div class="section-titulo">
                     <h2>Tratamentos disponíveis</h2>
@@ -2840,7 +2889,7 @@
             </div>
         </section>
 
-        <section class="citacao">
+        <section class="citacao secao-clara">
             <div class="container">
                 <blockquote>
                     "A depressão é uma prisão onde você é tanto o prisioneiro quanto o carcereiro. Mas a porta está aberta — às vezes só precisamos de alguém para nos mostrar o caminho."
@@ -2849,7 +2898,7 @@
             </div>
         </section>
 
-        <section id="ajudar">
+        <section id="ajudar" class="secao-clara">
             <div class="container">
                 <div class="section-titulo">
                     <h2>Como ajudar alguém com depressão</h2>
@@ -2872,7 +2921,7 @@
             </div>
         </section>
 
-        <section id="autoavaliacao" style="background: #1a1510;">
+        <section id="autoavaliacao" class="secao-clara">
             <div class="container">
                 <div class="section-titulo">
                     <h2>Autoavaliação: como você tem se sentido?</h2>
@@ -2902,7 +2951,7 @@
         </section>
 
         <!-- MENSAGEM DE CONFORTO FINAL -->
-        <section id="mensagem-final" class="mensagem-conforto mensagem-com-fundo-gradiente">
+        <section id="mensagem-final" class="mensagem-conforto secao-clara">
             <div class="container">
                 <h2>Não guarde o seu sofrimento para si mesmo</h2>
                 <p>Se você chegou até aqui, é porque algo dentro de você busca compreensão, alívio ou apenas um lugar onde possa respirar sem medo. Saiba que este espaço é seu. E mais importante: <strong>você não precisa carregar tudo sozinho</strong>.</p>
@@ -3568,19 +3617,18 @@
         const crtOverlay = document.getElementById('crtOverlay');
         const crtFlicker = document.getElementById('crtFlicker');
         const crtNoise = document.getElementById('crtNoise');
-        const messageEffectSection = document.querySelector('.mensagem-com-fundo-gradiente');
-        const ajudaSection = document.getElementById('ajuda');
+        const transitionEffectSection = document.querySelector('.mensagem-com-fundo-gradiente');
 
         const desktopMedia = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 1025px)');
         function updateCRTEffect() {
             if (!desktopMedia.matches) return;
-            if (!messageEffectSection || !ajudaSection) return;
+            if (!transitionEffectSection) return;
             if (!crtOverlay || !crtFlicker || !crtNoise) return;
-            const effectSectionTop = messageEffectSection.offsetTop;
-            const ajudaTop = ajudaSection.offsetTop;
+            const effectSectionTop = transitionEffectSection.offsetTop;
+            const effectSectionEnd = effectSectionTop + transitionEffectSection.offsetHeight;
             const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
             const fadeStart = effectSectionTop - 500;
-            const fadeEnd = ajudaTop;
+            const fadeEnd = effectSectionEnd;
             let opacity = 1;
             if (scrollTop >= fadeEnd) opacity = 0;
             else if (scrollTop >= fadeStart) {
@@ -3599,10 +3647,12 @@
 
         const noiseOverlay = document.getElementById('noise-overlay');
         function updateNoiseOpacity() {
-            if (!ajudaSection || !noiseOverlay) return;
-            const targetDistance = ajudaSection.offsetTop;
+            if (!transitionEffectSection || !noiseOverlay) return;
+            const effectSectionTop = transitionEffectSection.offsetTop;
+            const effectSectionEnd = effectSectionTop + transitionEffectSection.offsetHeight;
             const currentScroll = window.scrollY;
-            const scrollFraction = Math.min(currentScroll / (targetDistance * 0.85), 1);
+            const fadeStart = effectSectionTop - 500;
+            const scrollFraction = Math.max(0, Math.min((currentScroll - fadeStart) / (effectSectionEnd - fadeStart), 1));
             const maxOpacity = fxState.noiseMax;
             const currentOpacity = maxOpacity * (1 - scrollFraction);
             document.documentElement.style.setProperty('--noise-opacity', currentOpacity.toFixed(3));
