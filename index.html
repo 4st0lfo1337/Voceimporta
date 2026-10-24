@@ -170,6 +170,149 @@
         }
 
         /* ===================================================================== */
+        /* AVISO DE CONTEÚDO SENSÍVEL                                            */
+        /* ===================================================================== */
+        #sensitiveWarning {
+            position: fixed;
+            inset: 0;
+            z-index: 100000;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: clamp(16px, 11vh, 120px) 20px 24px;
+            overflow-y: auto;
+            background: #050403;
+            color: #1a1510;
+            font-family: Helvetica, Arial, 'Liberation Sans', sans-serif;
+            transition: opacity 0.45s ease, visibility 0.45s ease;
+        }
+        #sensitiveWarning.fade-out { opacity: 0; visibility: hidden; pointer-events: none; }
+
+        /* Janela estilo xdm: caixa chanfrada, fundo liso, sem arredondamento */
+        .xdm-box {
+            position: relative;
+            width: min(940px, 100%);
+            display: grid;
+            grid-template-columns: 1fr 230px;
+            background: #bfb49d;
+            border: 5px solid;
+            border-color: #efe6d2 #3a3028 #3a3028 #efe6d2;
+            box-shadow: 6px 6px 0 #1a1510;
+        }
+        .xdm-main { padding: 26px 22px 22px 28px; min-width: 0; }
+        .xdm-title {
+            text-align: center;
+            margin: 6px 0 18px;
+            font-family: 'DejaVu Serif', Georgia, 'Times New Roman', serif;
+            font-style: italic;
+            font-weight: 700;
+            font-size: clamp(1.35rem, 3.4vw, 2rem);
+            line-height: 1.25;
+            color: #6a2a18;
+        }
+        .xdm-rule {
+            border: 0;
+            height: 2px;
+            margin: 0 0 20px;
+            background: linear-gradient(#5a4a3a 0 1px, #efe6d2 1px 2px);
+        }
+        .xdm-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            margin-bottom: 18px;
+        }
+        .xdm-label { font-weight: 700; font-size: 1.15rem; color: #1a1510; }
+        .xdm-field {
+            flex: 1 1 auto;
+            max-width: 470px;
+            min-height: 40px;
+            padding: 6px 10px;
+            display: flex;
+            align-items: center;
+            background: #bfb49d;
+            border: 2px solid;
+            border-color: #4a3a2a #efe6d2 #efe6d2 #4a3a2a;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.05rem;
+            color: #1a1510;
+        }
+        .xdm-caret {
+            display: inline-block;
+            width: 2px;
+            height: 1.15em;
+            margin-left: 1px;
+            background: #1a1510;
+            animation: xdm-blink 1s steps(1) infinite;
+        }
+        @keyframes xdm-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+        .xdm-msg {
+            margin: 0 auto 12px;
+            max-width: 640px;
+            font-size: 0.98rem;
+            line-height: 1.6;
+            color: #1a1510;
+        }
+        .xdm-msg strong { color: #3a1a08; }
+        .xdm-help {
+            max-width: 640px;
+            margin: 16px auto 18px;
+            padding: 10px 14px;
+            background: #bfb49d;
+            border: 2px solid;
+            border-color: #4a3a2a #efe6d2 #efe6d2 #4a3a2a;
+            font-size: 0.9rem;
+            line-height: 1.55;
+            color: #2a2018;
+        }
+        .xdm-help strong { color: #6a2a18; }
+        #sensitiveContinue {
+            display: block;
+            margin: 0 auto;
+            padding: 8px 26px;
+            background: #bfb49d;
+            color: #1a1510;
+            border: 3px solid;
+            border-color: #efe6d2 #3a3028 #3a3028 #efe6d2;
+            border-radius: 0;
+            cursor: pointer;
+            font: inherit;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+        #sensitiveContinue:hover { background: #cdc2ab; }
+        #sensitiveContinue:active { border-color: #3a3028 #efe6d2 #efe6d2 #3a3028; padding: 9px 25px 7px 27px; }
+        #sensitiveContinue:focus-visible { outline: 1px dotted #1a1510; outline-offset: -7px; }
+
+        .xdm-logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 22px 18px 20px 4px;
+        }
+        .xdm-logo img { width: 150px; height: auto; display: block; }
+        .xdm-wordmark {
+            font-family: Helvetica, Arial, sans-serif;
+            font-weight: 700;
+            font-size: 1.7rem;
+            letter-spacing: 1px;
+            color: #1a1510;
+            line-height: 1;
+        }
+        @media (max-width: 720px) {
+            #sensitiveWarning { padding-top: 16px; }
+            .xdm-box { grid-template-columns: 1fr; }
+            .xdm-main { padding: 18px 14px 8px; }
+            .xdm-logo { flex-direction: row; justify-content: center; gap: 14px; padding: 4px 14px 18px; }
+            .xdm-logo img { width: 64px; }
+            .xdm-row { flex-direction: column; align-items: stretch; gap: 6px; }
+            .xdm-label { text-align: center; }
+            .xdm-field { max-width: none; }
+        }
+        @media (prefers-reduced-motion: reduce) { .xdm-caret { animation: none; } }
+
         /* BOOT SCREEN */
         /* ===================================================================== */
         #bootScreen {
@@ -2377,6 +2520,28 @@
         </div>
     </div>
 
+    <!-- AVISO DE CONTEÚDO SENSÍVEL -->
+    <div id="sensitiveWarning" role="alertdialog" aria-modal="true" aria-labelledby="sensitiveWarningTitle" aria-describedby="sensitiveWarningDescription">
+        <div class="xdm-box">
+            <div class="xdm-main">
+                <h1 class="xdm-title" id="sensitiveWarningTitle">Aviso de conteúdo sensível</h1>
+                <hr class="xdm-rule">
+                <div class="xdm-row" aria-hidden="true">
+                    <span class="xdm-label">Login:</span>
+                    <span class="xdm-field">visitante<span class="xdm-caret"></span></span>
+                </div>
+                <p class="xdm-msg" id="sensitiveWarningDescription">Este site aborda temas relacionados à <strong>depressão, sofrimento emocional, automutilação e pensamentos suicidas</strong>.</p>
+                <p class="xdm-msg">Se esse conteúdo puder causar desconforto neste momento, tudo bem sair ou fazer uma pausa. Você pode continuar quando se sentir preparado(a).</p>
+                <p class="xdm-help">Se estiver em perigo imediato, procure alguém de confiança ou ligue para o <strong>CVV — 188</strong>, disponível gratuitamente 24 horas.</p>
+                <button id="sensitiveContinue" type="button" autofocus>Entendi, quero continuar</button>
+            </div>
+            <div class="xdm-logo" aria-hidden="true">
+                <img src="img/Former_Ubuntu_logo.svg.webp" alt="" width="150" height="150">
+                <span class="xdm-wordmark">voceimporta</span>
+            </div>
+        </div>
+    </div>
+
     <!-- BOOT SCREEN -->
     <div id="bootScreen" role="presentation" aria-hidden="true">
         <div id="bootOutput"></div>
@@ -3281,20 +3446,42 @@
             if (typeof sincronizarPainelEfeitos === 'function') sincronizarPainelEfeitos();
         }
 
-        /* ===================================================================== */
-        /* BOOT SCREEN                                                            */
-        /* ===================================================================== */
         (function iniciarBoot() {
+            const sensitiveWarning = document.getElementById('sensitiveWarning');
+            const sensitiveContinue = document.getElementById('sensitiveContinue');
             const bootScreen = document.getElementById('bootScreen');
             const bootOutput = document.getElementById('bootOutput');
             if (!bootScreen || !bootOutput) return;
+
+            if (sensitiveWarning && sensitiveContinue && !sensitiveWarning.classList.contains('confirmed')) {
+                document.documentElement.classList.add('boot-lock');
+                document.body.classList.add('boot-lock');
+                sensitiveContinue.addEventListener('click', () => {
+                    sensitiveWarning.classList.add('confirmed', 'fade-out');
+                    sensitiveWarning.setAttribute('aria-hidden', 'true');
+                    setTimeout(() => {
+                        try { if (sensitiveWarning.parentNode) sensitiveWarning.parentNode.removeChild(sensitiveWarning); } catch (e) {}
+                        iniciarBootLoader();
+                    }, 450);
+                }, { once: true });
+                return;
+            }
+
+            iniciarBootLoader();
+
+            function iniciarBootLoader() {
 
             const isMobile = (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) || window.innerWidth <= 768;
             const prefereSemAnimacao = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
             let jaBootou = false;
             try { jaBootou = sessionStorage.getItem('voceimporta_booted') === '1'; } catch (e) { jaBootou = false; }
-            if (jaBootou) { try { if (bootScreen.parentNode) bootScreen.parentNode.removeChild(bootScreen); } catch (e) {} return; }
+            if (jaBootou) {
+                try { if (bootScreen.parentNode) bootScreen.parentNode.removeChild(bootScreen); } catch (e) {}
+                document.documentElement.classList.remove('boot-lock');
+                document.body.classList.remove('boot-lock');
+                return;
+            }
 
             document.documentElement.classList.add('boot-lock');
             document.body.classList.add('boot-lock');
@@ -3449,6 +3636,7 @@
 
             if (prefereSemAnimacao) { renderizarTudo(); timeoutAtual = setTimeout(finalizar, 1400); }
             else { timeoutAtual = setTimeout(proximaLinha, isMobile ? 250 : 350); }
+            }
         })();
 
         /* ===================================================================== */
