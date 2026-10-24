@@ -3643,7 +3643,7 @@
         /* STICKY BAR                                                            */
         /* ===================================================================== */
         const stickyBar = document.getElementById('stickyBar');
-        const ajudaSecaoEl = document.getElementById('ajuda');
+        const tratamentosSecaoEl = document.getElementById('tratamentos');
         let stickyRafPending = false;
 
         function updateStickyBarNow() {
@@ -3652,10 +3652,10 @@
             const scrollY = window.pageYOffset || document.documentElement.scrollTop;
             if (scrollY > 70) stickyBar.classList.add('visivel');
             else stickyBar.classList.remove('visivel');
-            if (ajudaSecaoEl) {
-                const rect = ajudaSecaoEl.getBoundingClientRect();
-                const ajudaTop = rect.top + scrollY;
-                if (scrollY + 50 >= ajudaTop) stickyBar.classList.add('bar-clara');
+            if (tratamentosSecaoEl) {
+                const rect = tratamentosSecaoEl.getBoundingClientRect();
+                const tratamentosTop = rect.top + scrollY;
+                if (scrollY + 50 >= tratamentosTop) stickyBar.classList.add('bar-clara');
                 else stickyBar.classList.remove('bar-clara');
             }
         }
