@@ -1166,17 +1166,40 @@
             font-family: 'Courier New', Courier, monospace;
             color: #c8c0b8; pointer-events: auto; overflow: hidden;
             min-width: 320px; min-height: 180px;
-            animation: os-window-in 0.18s ease-out;
-            transition: box-shadow 0.2s;
+            transition: box-shadow 0.25s;
         }
-        @keyframes os-window-in { from { opacity: 0; transform: scale(0.97); } to { opacity: 1; transform: scale(1); } }
+        @keyframes os-window-in { from { opacity: 0; transform: translateY(10px) scale(0.95); } to { opacity: 1; transform: none; } }
+        /* animação de abrir só existe enquanto a classe 'opening' estiver presente (removida ao terminar) — evita reiniciar ao soltar arrastar/redimensionar */
+        .os-window.opening { animation: os-window-in 0.26s cubic-bezier(.2,.8,.2,1); }
         .os-window.focused { box-shadow: 0 16px 60px rgba(0,0,0,0.95), inset 1px 1px 0 rgba(255,255,255,0.08), 0 0 0 1px rgba(200, 176, 144, 0.25); }
         .os-window.focused .os-window-titlebar { background: linear-gradient(180deg, #4a3520 0%, #3a2515 50%, #1a1008 100%); }
-        .os-window.maximized { top: var(--sticky-bar-h) !important; left: 0 !important; right: 0 !important; bottom: var(--window-taskbar-h) !important; width: auto !important; height: auto !important; }
+        .os-window.maximized { top: var(--sticky-bar-h) !important; left: 0 !important; right: auto !important; bottom: auto !important; width: 100% !important; height: calc(100% - var(--sticky-bar-h) - var(--window-taskbar-h)) !important; }
         .os-window.maximized .os-window-resize { display: none; }
-        .os-window.minimized { height: auto !important; min-height: 0 !important; }
-        .os-window.minimized .os-window-body { display: none; }
-        .os-window.minimized .os-window-resize { display: none; }
+        .os-window.minimized { display: none !important; }
+        .os-window.minimizing { animation: os-window-min 0.24s cubic-bezier(.5,0,.75,0) forwards; pointer-events: none; }
+        .os-window.restoring { animation: os-window-restore 0.3s cubic-bezier(.2,.8,.2,1); }
+        .os-window.dragging, .os-window.resizing { animation: none; transition: none; }
+        .os-window.dragging .os-window-body, .os-window.resizing .os-window-body { pointer-events: none; }
+        .os-window-titlebar, .os-window-resize { touch-action: none; }
+        @keyframes os-window-min { to { opacity: 0; transform: translate(var(--mx, 0px), var(--my, 60px)) scale(0.15); } }
+        @keyframes os-window-restore { from { opacity: 0; transform: translate(var(--mx, 0px), var(--my, 60px)) scale(0.15); } to { opacity: 1; transform: none; } }
+        @media (prefers-reduced-motion: reduce) { .os-window.opening, .os-window.restoring { animation: none; } }
+
+        /* ---- suavização: geometria animada, fechar, taskbar e snap ---- */
+        .os-window { transition: left .3s cubic-bezier(.2,.8,.2,1), top .3s cubic-bezier(.2,.8,.2,1), width .3s cubic-bezier(.2,.8,.2,1), height .3s cubic-bezier(.2,.8,.2,1), box-shadow .25s; }
+        .os-window.dragging, .os-window.resizing, .vp-resizing .os-window { transition: none !important; }
+        .os-window.closing { animation: os-window-out .2s cubic-bezier(.4,0,1,1) forwards; pointer-events: none; }
+        @keyframes os-window-out { to { opacity: 0; transform: translateY(8px) scale(0.94); } }
+        .window-taskbar.visivel { animation: tb-in .26s cubic-bezier(.2,.8,.2,1); }
+        @keyframes tb-in { from { transform: translateY(100%); opacity: 0; } to { transform: none; opacity: 1; } }
+        .taskbar-item[data-win-id] { animation: tb-item-in .24s cubic-bezier(.2,.8,.2,1); }
+        .taskbar-item.saindo { animation: tb-item-out .2s ease-in forwards; pointer-events: none; }
+        @keyframes tb-item-in { from { opacity: 0; transform: translateY(8px) scale(.9); } to { opacity: 1; transform: none; } }
+        @keyframes tb-item-out { to { opacity: 0; transform: scale(.85); } }
+        .taskbar-item { transition: background .18s, color .18s, opacity .2s; }
+        #snapPreview { display: block; opacity: 0; visibility: hidden; transition: opacity .18s ease, visibility 0s linear .18s, top .22s cubic-bezier(.2,.8,.2,1), left .22s cubic-bezier(.2,.8,.2,1), width .22s cubic-bezier(.2,.8,.2,1), height .22s cubic-bezier(.2,.8,.2,1); }
+        #snapPreview.visivel { opacity: 1; visibility: visible; transition-delay: 0s; }
+        @media (prefers-reduced-motion: reduce) { .os-window, .window-taskbar.visivel, .taskbar-item[data-win-id] { transition: none !important; animation: none !important; } }
         .os-window-titlebar {
             display: flex; align-items: center; gap: 8px;
             padding: 4px 5px 4px 9px;
@@ -1309,6 +1332,24 @@
         .taskbar-item-label { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 150px; }
         .taskbar-item-close { display: flex; align-items: center; justify-content: center; width: 16px; height: 16px; margin-left: 2px; color: #8a7a6a; font-size: 0.85rem; font-weight: 700; line-height: 1; border-radius: 1px; }
         .taskbar-item-close:hover { background: #5a1a1a; color: #ffb0a0; }
+        .taskbar-item.minimizada { opacity: 0.6; font-style: italic; }
+        .taskbar-item.minimizada .taskbar-item-label::before { content: '▁ '; }
+        .taskbar-item:focus-visible { outline: 1px dashed #c8b090; outline-offset: -3px; }
+        .taskbar-show-desktop { flex: 0 0 auto; margin-right: 6px; padding: 4px 10px; max-width: none; }
+        .window-taskbar-items { scroll-behavior: smooth; }
+        .tb-menu {
+            position: fixed; z-index: 10850; min-width: 180px; padding: 3px;
+            background: #1e1812; border: 2px solid; border-color: #5a4a3a #1a1008 #1a1008 #5a4a3a;
+            box-shadow: 0 -8px 30px rgba(0,0,0,0.85); font-family: 'Courier New', Courier, monospace;
+            display: flex; flex-direction: column; animation: os-window-in 0.12s ease-out;
+        }
+        .tb-menu-item { background: transparent; border: 0; color: #c8b090; text-align: left; padding: 6px 12px; font: inherit; font-size: 0.76rem; font-weight: 700; letter-spacing: 0.5px; cursor: pointer; }
+        .tb-menu-item:hover, .tb-menu-item:focus-visible { background: #3a2a1a; color: #e8d5a3; outline: none; }
+        .tb-menu-sep { height: 1px; margin: 3px 4px; background: #3a3028; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .tb-menu { background: #e0d8c8; border-color: #f0e8d8 #8a7a6a #8a7a6a #f0e8d8; box-shadow: 0 -8px 30px rgba(70,55,40,.3); }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .tb-menu-item { color: #3a3028; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .tb-menu-item:hover { background: #c8bfa8; color: #000; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .tb-menu-sep { background: #9a8a7a; }
 
         .snap-preview {
             position: fixed;
@@ -4041,18 +4082,42 @@
             }
             function getWorkArea() {
                 return {
-                    top: getStickyH(),
-                    left: 0,
+                    top: getStickyH(), left: 0,
                     right: window.innerWidth,
                     bottom: window.innerHeight - getTaskbarH(),
                     width: window.innerWidth,
                     height: window.innerHeight - getStickyH() - getTaskbarH()
                 };
             }
-
             function getSectionTitle(section) {
                 const h2 = section.querySelector('.section-titulo h2, h2');
                 return h2 ? h2.textContent.trim() : (section.id || 'seção');
+            }
+            function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+            const reduceMotion = () => !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+            /* ---- estado: pilha de z-order (último = topo), botões da taskbar, menu ---- */
+            const stack = [];
+            const tbButtons = new Map();
+            let desktopHidden = [];
+            let showDesktopBtn = null;
+            let menuEl = null;
+
+            const visibleIds = () => stack.filter(id => windows[id] && windows[id].state !== 'minimized' && !windows[id].closing);
+            function pickNext(excludeId) {
+                const ids = visibleIds().filter(i => i !== excludeId);
+                return ids.length ? ids[ids.length - 1] : null;
+            }
+            function rectFromStyle(el) {
+                return {
+                    left: parseFloat(el.style.left) || 0, top: parseFloat(el.style.top) || 0,
+                    width: parseFloat(el.style.width) || MIN_W, height: parseFloat(el.style.height) || MIN_H
+                };
+            }
+            function applyRect(w, r, store) {
+                w.el.style.left = r.left + 'px'; w.el.style.top = r.top + 'px';
+                w.el.style.width = r.width + 'px'; w.el.style.height = r.height + 'px';
+                if (store) w.rect = { left: r.left, top: r.top, width: r.width, height: r.height };
             }
 
             function updateTaskbarVisibility() {
@@ -4064,50 +4129,65 @@
                 document.body.classList.toggle('has-maximized-window', anyMax);
             }
 
-            function renderTaskbar() {
-                if (!taskbarItemsEl) return;
-                taskbarItemsEl.innerHTML = '';
-                Object.values(windows).forEach(w => {
-                    const item = document.createElement('button');
-                    item.type = 'button';
-                    item.className = 'taskbar-item';
-                    if (w.id === focusedId) item.classList.add('ativo');
-                    if (w.isHelp) item.classList.add('taskbar-item-help');
-                    if (w.isFx) item.classList.add('taskbar-item-fx');
-                    item.dataset.winId = w.id;
-                    item.title = w.title;
-                    const label = document.createElement('span');
-                    label.className = 'taskbar-item-label';
-                    label.textContent = w.title;
-                    item.appendChild(label);
-                    const close = document.createElement('span');
-                    close.className = 'taskbar-item-close';
-                    close.textContent = '×';
-                    close.dataset.closeWinId = w.id;
-                    item.appendChild(close);
-                    taskbarItemsEl.appendChild(item);
-                });
+            function buildTaskbarItem(w) {
+                const item = document.createElement('button');
+                item.type = 'button';
+                item.className = 'taskbar-item' + (w.isHelp ? ' taskbar-item-help' : '') + (w.isFx ? ' taskbar-item-fx' : '');
+                item.dataset.winId = w.id;
+                item.title = w.title + ' — clique: focar/minimizar · botão direito: opções · botão do meio: fechar';
+                const label = document.createElement('span');
+                label.className = 'taskbar-item-label';
+                label.textContent = w.title;
+                const close = document.createElement('span');
+                close.className = 'taskbar-item-close';
+                close.textContent = '×';
+                close.dataset.closeWinId = w.id;
+                item.appendChild(label);
+                item.appendChild(close);
+                return item;
             }
 
-            function renormalizeZ() {
-                const sorted = Object.values(windows).sort((a, b) => (parseInt(a.el.style.zIndex, 10) || 0) - (parseInt(b.el.style.zIndex, 10) || 0));
-                zCounter = BASE_Z;
-                sorted.forEach(w => { w.el.style.zIndex = zCounter++; });
+            /* atualiza a taskbar "no lugar" (sem recriar os botões): mantém ordem, scroll e hover */
+            function syncTaskbar() {
+                if (!taskbarItemsEl) return;
+                tbButtons.forEach((btn, id) => { if (!windows[id]) { btn.remove(); tbButtons.delete(id); } });
+                Object.keys(windows).forEach(id => {
+                    const w = windows[id];
+                    let btn = tbButtons.get(id);
+                    if (!btn) { btn = buildTaskbarItem(w); tbButtons.set(id, btn); taskbarItemsEl.appendChild(btn); }
+                    const min = w.state === 'minimized';
+                    btn.classList.toggle('ativo', id === focusedId && !min);
+                    btn.classList.toggle('minimizada', min);
+                    btn.setAttribute('aria-pressed', String(id === focusedId && !min));
+                });
+                if (showDesktopBtn) showDesktopBtn.setAttribute('aria-pressed', String(visibleIds().length === 0 && stack.length > 0));
+                const act = taskbarItemsEl.querySelector('.ativo');
+                if (act) {
+                    const cr = taskbarItemsEl.getBoundingClientRect(), ar = act.getBoundingClientRect();
+                    if (ar.left < cr.left) taskbarItemsEl.scrollLeft -= (cr.left - ar.left) + 4;
+                    else if (ar.right > cr.right) taskbarItemsEl.scrollLeft += (ar.right - cr.right) + 4;
+                }
+            }
+            function renderTaskbar() { syncTaskbar(); }
+
+            function applyZ() {
+                stack.forEach((id, i) => { const w = windows[id]; if (w) w.el.style.zIndex = Math.min(BASE_Z + i, MAX_Z); });
+                zCounter = BASE_Z + stack.length;
             }
 
             function focusWindow(id) {
                 const w = windows[id];
-                if (!w || focusedId === id) { if (w) renderTaskbar(); return; }
+                if (!w) return;
+                if (w.state === 'minimized') { unminimizeWindow(id); return; }
+                if (focusedId === id && stack[stack.length - 1] === id) { w.el.classList.add('focused'); return; }
+                const i = stack.indexOf(id);
+                if (i > -1) stack.splice(i, 1);
+                stack.push(id);
                 focusedId = id;
-                if (zCounter > MAX_Z - 20) renormalizeZ();
-                w.el.style.zIndex = zCounter++;
-                Object.keys(windows).forEach(wid => {
-                    windows[wid].el.classList.toggle('focused', wid === id);
-                });
-                renderTaskbar();
+                applyZ();
+                Object.keys(windows).forEach(wid => windows[wid].el.classList.toggle('focused', wid === id));
+                syncTaskbar();
             }
-
-            function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
 
             function computeInitialGeometry() {
                 const wa = getWorkArea();
@@ -4154,7 +4234,7 @@
                 opts = opts || {};
                 const geo = opts.geometry ? opts.geometry() : computeInitialGeometry();
                 const win = document.createElement('div');
-                win.className = 'os-window focused' + (opts.extraClass ? ' ' + opts.extraClass : '');
+                win.className = 'os-window focused opening' + (opts.extraClass ? ' ' + opts.extraClass : '');
                 win.dataset.winId = id;
                 win.style.top = geo.top + 'px';
                 win.style.left = geo.left + 'px';
@@ -4185,17 +4265,20 @@
             }
 
             function wireWindowChrome(win, id) {
+                const w = windows[id];
+                win.addEventListener('animationend', (e) => { if (e.target === win) win.classList.remove('opening'); });
+                setTimeout(() => win.classList.remove('opening'), 450);
+                if (w) { w.rect = rectFromStyle(win); w.snap = null; w.restoreState = null; w.minTimer = null; }
                 win.querySelectorAll('.os-window-ctrl').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         const action = btn.dataset.action;
-                        if (action === 'close') closeWindow(id);
+                        if (action === 'close') closeWindowAnimated(id);
                         else if (action === 'minimize') minimizeWindow(id);
                         else if (action === 'maximize') toggleMaximizeWindow(id);
                     });
                 });
-                win.addEventListener('mousedown', () => focusWindow(id), true);
-                win.addEventListener('touchstart', () => focusWindow(id), { passive: true });
+                win.addEventListener('pointerdown', () => { if (windows[id]) focusWindow(id); }, true);
                 const titlebar = win.querySelector('.os-window-titlebar');
                 titlebar.addEventListener('dblclick', (e) => {
                     if (e.target.closest('.os-window-ctrl')) return;
@@ -4594,6 +4677,8 @@
             function closeWindow(id) {
                 const w = windows[id];
                 if (!w) return;
+                clearTimeout(w.minTimer);
+                clearTimeout(w.closeTimer);
                 if (typeof w.onClose === 'function') { try { w.onClose(); } catch (e) {} }
                 if (w.placeholder && w.placeholder.parentNode) {
                     w.placeholder.parentNode.insertBefore(w.section, w.placeholder);
@@ -4604,156 +4689,162 @@
                 }
                 if (w.el && w.el.parentNode) w.el.parentNode.removeChild(w.el);
                 delete windows[id];
+                const si = stack.indexOf(id);
+                if (si > -1) stack.splice(si, 1);
+                desktopHidden = desktopHidden.filter(i => i !== id);
                 if (focusedId === id) {
-                    const remaining = Object.keys(windows);
-                    focusedId = remaining.length ? remaining[remaining.length - 1] : null;
-                    if (focusedId) focusWindow(focusedId);
+                    focusedId = null;
+                    const next = pickNext(id);
+                    if (next) focusWindow(next);
                 }
+                closeMenu();
                 updateTaskbarVisibility();
-                renderTaskbar();
+                syncTaskbar();
             }
 
-            function closeAllWindows() {
-                const ids = Object.keys(windows);
-                ids.forEach(closeWindow);
+            function closeWindowAnimated(id) {
+                const w = windows[id];
+                if (!w || w.closing) return;
+                if (w.state === 'minimized' || reduceMotion()) { closeWindow(id); return; }
+                w.closing = true;
+                w.el.classList.remove('focused');
+                w.el.classList.add('closing');
+                const b = tbButtons.get(id);
+                if (b) b.classList.add('saindo');
+                if (focusedId === id) {
+                    focusedId = null;
+                    const n = pickNext(id);
+                    if (n) focusWindow(n);
+                }
+                syncTaskbar();
+                w.closeTimer = setTimeout(() => { if (windows[id]) closeWindow(id); }, 200);
+            }
+
+            function closeAllWindows() { Object.keys(windows).forEach(closeWindow); }
+
+            /* centro da janela (esperado) e do botão da taskbar → animação "voa" até/desde a taskbar */
+            function setFlyVars(w) {
+                const btn = tbButtons.get(w.id);
+                if (!btn) return;
+                const wa = getWorkArea();
+                const r = w.state === 'maximized' ? { left: 0, top: wa.top, width: wa.width, height: wa.height } : rectFromStyle(w.el);
+                const b = btn.getBoundingClientRect();
+                w.el.style.setProperty('--mx', (b.left + b.width / 2 - (r.left + r.width / 2)) + 'px');
+                w.el.style.setProperty('--my', (b.top + b.height / 2 - (r.top + r.height / 2)) + 'px');
             }
 
             function minimizeWindow(id) {
                 const w = windows[id];
                 if (!w || w.state === 'minimized') return;
-                if (w.state === 'normal') {
-                    w.prevRect = { top: w.el.style.top, left: w.el.style.left, width: w.el.style.width, height: w.el.style.height };
-                }
+                w.restoreState = w.state;
                 w.prevState = w.state;
+                setFlyVars(w);
                 w.state = 'minimized';
-                w.el.classList.add('minimized');
-                w.el.classList.remove('maximized');
-                const remaining = Object.keys(windows).filter(i => i !== id && windows[i].state !== 'minimized');
-                if (remaining.length) focusWindow(remaining[remaining.length - 1]);
-                else {
+                w.el.classList.remove('focused', 'restoring', 'opening');
+                clearTimeout(w.minTimer);
+                if (reduceMotion()) {
+                    w.el.classList.add('minimized');
+                } else {
+                    w.el.classList.add('minimizing');
+                    w.minTimer = setTimeout(() => {
+                        if (w.state === 'minimized') { w.el.classList.remove('minimizing'); w.el.classList.add('minimized'); }
+                    }, 250);
+                }
+                if (focusedId === id) {
                     focusedId = null;
-                    Object.keys(windows).forEach(wid => windows[wid].el.classList.remove('focused'));
+                    const n = pickNext(id);
+                    if (n) focusWindow(n);
                 }
                 updateTaskbarVisibility();
-                renderTaskbar();
+                syncTaskbar();
             }
 
             function unminimizeWindow(id) {
                 const w = windows[id];
                 if (!w || w.state !== 'minimized') return;
-                w.el.classList.remove('minimized');
-                if (w.prevState === 'maximized') {
-                    w.el.classList.add('maximized');
-                    w.state = 'maximized';
-                } else {
-                    if (w.prevRect) {
-                        w.el.style.top = w.prevRect.top;
-                        w.el.style.left = w.prevRect.left;
-                        w.el.style.width = w.prevRect.width;
-                        w.el.style.height = w.prevRect.height;
-                    }
-                    w.state = 'normal';
+                clearTimeout(w.minTimer);
+                w.state = w.restoreState || 'normal';
+                setFlyVars(w);
+                w.el.classList.remove('minimized', 'minimizing');
+                if (!reduceMotion()) {
+                    w.el.classList.add('restoring');
+                    const done = (e) => {
+                        if (e.target !== w.el) return;
+                        w.el.classList.remove('restoring');
+                        w.el.removeEventListener('animationend', done);
+                    };
+                    w.el.addEventListener('animationend', done);
+                    setTimeout(() => w.el.classList.remove('restoring'), 450);
                 }
                 focusWindow(id);
                 updateTaskbarVisibility();
-                renderTaskbar();
+                syncTaskbar();
             }
 
             function toggleMaximizeWindow(id) {
                 const w = windows[id];
                 if (!w) return;
+                if (w.state === 'minimized') {
+                    w.restoreState = 'maximized';
+                    w.el.classList.add('maximized');
+                    unminimizeWindow(id);
+                    return;
+                }
                 if (w.state === 'maximized') {
                     w.el.classList.remove('maximized');
-                    if (w.prevRect) {
-                        w.el.style.top = w.prevRect.top;
-                        w.el.style.left = w.prevRect.left;
-                        w.el.style.width = w.prevRect.width;
-                        w.el.style.height = w.prevRect.height;
-                    }
                     w.state = 'normal';
+                    w.snap = null;
+                    const wa = getWorkArea();
+                    const r = w.rect || rectFromStyle(w.el);
+                    applyRect(w, {
+                        width: clamp(r.width, MIN_W, wa.width), height: clamp(r.height, MIN_H, wa.height),
+                        left: r.left, top: clamp(r.top, wa.top, wa.bottom - 30)
+                    }, false);
                 } else {
-                    if (w.state === 'normal') {
-                        w.prevRect = { top: w.el.style.top, left: w.el.style.left, width: w.el.style.width, height: w.el.style.height };
-                    }
-                    w.el.classList.remove('minimized');
+                    if (!w.snap) w.rect = rectFromStyle(w.el);
+                    w.snap = null;
                     w.el.classList.add('maximized');
                     w.state = 'maximized';
                 }
                 focusWindow(id);
                 updateTaskbarVisibility();
-                renderTaskbar();
+                syncTaskbar();
             }
 
-            function makeDraggable(win, handle, id) {
-                let dragging = false;
-                let startX = 0, startY = 0, startLeft = 0, startTop = 0;
-                let snapSide = null;
-                function begin(cx, cy) {
-                    const w = windows[id];
-                    if (!w || w.state === 'maximized' || isMobile()) return;
-                    dragging = true;
-                    startX = cx; startY = cy;
-                    const r = win.getBoundingClientRect();
-                    startLeft = r.left;
-                    startTop = r.top;
-                    document.body.style.userSelect = 'none';
-                }
-                function move(cx, cy) {
-                    if (!dragging) return;
-                    const dx = cx - startX, dy = cy - startY;
-                    let nl = startLeft + dx, nt = startTop + dy;
-                    const wa = getWorkArea();
-                    const winW = win.offsetWidth;
-                    const minVisible = 60;
-                    nl = clamp(nl, -winW + minVisible, wa.right - minVisible);
-                    nt = clamp(nt, wa.top, wa.bottom - 30);
-                    win.style.left = nl + 'px';
-                    win.style.top = nt + 'px';
-                    snapSide = null;
-                    if (cx <= wa.left + SNAP_THRESHOLD) snapSide = 'left';
-                    else if (cx >= wa.right - SNAP_THRESHOLD) snapSide = 'right';
-                    else if (cy <= wa.top + SNAP_THRESHOLD) snapSide = 'top';
-                    showSnapPreview(snapSide);
-                }
-                function end() {
-                    if (!dragging) return;
-                    dragging = false;
-                    document.body.style.userSelect = '';
-                    hideSnapPreview();
-                    if (snapSide) { applySnap(id, snapSide); snapSide = null; }
-                }
-                handle.addEventListener('mousedown', (e) => {
-                    if (e.target.closest('.os-window-ctrl')) return;
-                    e.preventDefault();
-                    begin(e.clientX, e.clientY);
-                });
-                document.addEventListener('mousemove', (e) => move(e.clientX, e.clientY));
-                document.addEventListener('mouseup', end);
-                handle.addEventListener('touchstart', (e) => {
-                    if (e.target.closest('.os-window-ctrl')) return;
-                    const t = e.touches[0];
-                    begin(t.clientX, t.clientY);
-                }, { passive: true });
-                document.addEventListener('touchmove', (e) => {
-                    if (!dragging) return;
-                    const t = e.touches[0];
-                    move(t.clientX, t.clientY);
-                }, { passive: true });
-                document.addEventListener('touchend', end);
-                document.addEventListener('touchcancel', end);
+            /* ---- snap: metades, cantos (quartos) e topo (maximizar) ---- */
+            function detectSnap(cx, cy, wa) {
+                const T = SNAP_THRESHOLD;
+                const l = cx <= wa.left + T, r = cx >= wa.right - T, t = cy <= wa.top + T, b = cy >= wa.bottom - T;
+                if (t && l) return 'tl';
+                if (t && r) return 'tr';
+                if (b && l) return 'bl';
+                if (b && r) return 'br';
+                if (l) return 'left';
+                if (r) return 'right';
+                if (t) return 'top';
+                return null;
             }
-
+            function snapRect(side, wa) {
+                const hw = Math.floor(wa.width / 2), hh = Math.floor(wa.height / 2);
+                const R = { left: hw, width: wa.width - hw }, L = { left: 0, width: hw };
+                switch (side) {
+                    case 'left':  return { ...L, top: wa.top, height: wa.height };
+                    case 'right': return { ...R, top: wa.top, height: wa.height };
+                    case 'tl':    return { ...L, top: wa.top, height: hh };
+                    case 'tr':    return { ...R, top: wa.top, height: hh };
+                    case 'bl':    return { ...L, top: wa.top + hh, height: wa.height - hh };
+                    case 'br':    return { ...R, top: wa.top + hh, height: wa.height - hh };
+                    default:      return { left: 0, top: wa.top, width: wa.width, height: wa.height };
+                }
+            }
             function showSnapPreview(side) {
                 if (!snapPreview) return;
                 if (!side) { snapPreview.classList.remove('visivel'); return; }
-                const wa = getWorkArea();
-                let top = wa.top, left = 0, width = wa.width, height = wa.height;
-                if (side === 'left') { width = wa.width / 2; }
-                else if (side === 'right') { left = wa.width / 2; width = wa.width / 2; }
-                snapPreview.style.top = top + 'px';
-                snapPreview.style.left = left + 'px';
-                snapPreview.style.width = width + 'px';
-                snapPreview.style.height = height + 'px';
+                const r = snapRect(side, getWorkArea());
+                snapPreview.style.top = r.top + 'px';
+                snapPreview.style.left = r.left + 'px';
+                snapPreview.style.width = r.width + 'px';
+                snapPreview.style.height = r.height + 'px';
                 snapPreview.classList.add('visivel');
             }
             function hideSnapPreview() { if (snapPreview) snapPreview.classList.remove('visivel'); }
@@ -4761,102 +4852,232 @@
             function applySnap(id, side) {
                 const w = windows[id];
                 if (!w) return;
-                const wa = getWorkArea();
-                if (w.state === 'normal') {
-                    w.prevRect = { top: w.el.style.top, left: w.el.style.left, width: w.el.style.width, height: w.el.style.height };
-                }
-                w.el.classList.remove('minimized', 'maximized');
+                w.el.classList.remove('maximized');
                 if (side === 'top') {
                     w.el.classList.add('maximized');
                     w.state = 'maximized';
-                } else if (side === 'left') {
-                    w.el.style.top = wa.top + 'px';
-                    w.el.style.left = '0';
-                    w.el.style.width = (wa.width / 2) + 'px';
-                    w.el.style.height = wa.height + 'px';
+                    w.snap = null;
+                } else {
                     w.state = 'normal';
-                } else if (side === 'right') {
-                    w.el.style.top = wa.top + 'px';
-                    w.el.style.left = (wa.width / 2) + 'px';
-                    w.el.style.width = (wa.width / 2) + 'px';
-                    w.el.style.height = wa.height + 'px';
-                    w.state = 'normal';
+                    w.snap = side;
+                    applyRect(w, snapRect(side, getWorkArea()), false);
                 }
                 focusWindow(id);
                 updateTaskbarVisibility();
-                renderTaskbar();
+                syncTaskbar();
             }
 
-            function makeResizable(win, handle, id) {
-                const dir = handle.dataset.dir;
-                let resizing = false;
-                let startX = 0, startY = 0, startW = 0, startH = 0, startL = 0, startT = 0;
-                function begin(cx, cy) {
+            /* ---- arrastar (Pointer Events: mouse, toque e caneta; arrastar de maximizada/snap restaura) ---- */
+            function makeDraggable(win, handle, id) {
+                let d = null;
+                function begin() {
                     const w = windows[id];
-                    if (!w || w.state === 'maximized' || w.state === 'minimized' || isMobile()) return;
-                    resizing = true;
-                    startX = cx; startY = cy;
-                    const r = win.getBoundingClientRect();
-                    startW = r.width; startH = r.height;
-                    startL = r.left; startT = r.top;
+                    d.active = true;
+                    win.classList.remove('opening', 'restoring');
+                    if (w.state === 'maximized' || w.snap) {
+                        const r = win.getBoundingClientRect();
+                        const ratio = r.width ? (d.sx - r.left) / r.width : 0.5;
+                        const rc = w.rect || rectFromStyle(win);
+                        const width = Math.min(rc.width, getWorkArea().width);
+                        win.classList.remove('maximized');
+                        w.state = 'normal'; w.snap = null;
+                        win.style.width = width + 'px';
+                        win.style.height = rc.height + 'px';
+                        d.offX = ratio * width;
+                        d.offY = Math.min(d.offY, 18);
+                        updateTaskbarVisibility();
+                    }
+                    win.classList.add('dragging');
                     document.body.style.userSelect = 'none';
                 }
-                function move(cx, cy) {
-                    if (!resizing) return;
-                    const dx = cx - startX, dy = cy - startY;
-                    let nw = startW, nh = startH, nl = startL, nt = startT;
-                    if (dir.includes('e')) nw = startW + dx;
-                    if (dir.includes('s')) nh = startH + dy;
-                    if (dir.includes('w')) { nw = startW - dx; nl = startL + dx; }
-                    if (dir.includes('n')) { nh = startH - dy; nt = startT + dy; }
-                    if (nw < MIN_W) { if (dir.includes('w')) nl = startL + startW - MIN_W; nw = MIN_W; }
-                    if (nh < MIN_H) { if (dir.includes('n')) nt = startT + startH - MIN_H; nh = MIN_H; }
+                function step() {
+                    d.raf = 0;
+                    const wa = getWorkArea();
+                    const winW = win.offsetWidth;
+                    win.style.left = clamp(d.cx - d.offX, -winW + 60, wa.right - 60) + 'px';
+                    win.style.top = clamp(d.cy - d.offY, wa.top, wa.bottom - 30) + 'px';
+                    d.snap = detectSnap(d.cx, d.cy, wa);
+                    showSnapPreview(d.snap);
+                }
+                function finish(e) {
+                    if (!d || (e && e.pointerId !== d.pid)) return;
+                    const s = d; d = null;
+                    cancelAnimationFrame(s.raf);
+                    try { handle.releasePointerCapture(s.pid); } catch (_) {}
+                    if (!s.active) return;
+                    win.classList.remove('dragging');
+                    document.body.style.userSelect = '';
+                    hideSnapPreview();
+                    const w = windows[id];
+                    if (!w) return;
+                    if (s.snap) applySnap(id, s.snap);
+                    else w.rect = rectFromStyle(win);
+                }
+                handle.addEventListener('pointerdown', (e) => {
+                    if (e.button !== 0 || e.target.closest('.os-window-ctrl')) return;
+                    const w = windows[id];
+                    if (!w || w.state === 'minimized' || isMobile()) return;
+                    const r = win.getBoundingClientRect();
+                    d = { pid: e.pointerId, sx: e.clientX, sy: e.clientY, cx: e.clientX, cy: e.clientY,
+                          offX: e.clientX - r.left, offY: e.clientY - r.top, active: false, snap: null, raf: 0 };
+                    try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+                });
+                handle.addEventListener('pointermove', (e) => {
+                    if (!d || e.pointerId !== d.pid) return;
+                    d.cx = e.clientX; d.cy = e.clientY;
+                    if (!d.active) {
+                        if (Math.abs(d.cx - d.sx) + Math.abs(d.cy - d.sy) < 4) return;
+                        begin();
+                    }
+                    if (!d.raf) d.raf = requestAnimationFrame(step);
+                });
+                handle.addEventListener('pointerup', finish);
+                handle.addEventListener('pointercancel', finish);
+            }
+
+            /* ---- redimensionar (Pointer Events + rAF, limitado à área de trabalho) ---- */
+            function makeResizable(win, handle, id) {
+                const dir = handle.dataset.dir;
+                let s = null;
+                function step() {
+                    s.raf = 0;
+                    const dx = s.cx - s.sx, dy = s.cy - s.sy;
+                    let nw = s.w, nh = s.h, nl = s.l, nt = s.t;
+                    if (dir.includes('e')) nw = s.w + dx;
+                    if (dir.includes('s')) nh = s.h + dy;
+                    if (dir.includes('w')) { nw = s.w - dx; nl = s.l + dx; }
+                    if (dir.includes('n')) { nh = s.h - dy; nt = s.t + dy; }
+                    if (nw < MIN_W) { if (dir.includes('w')) nl = s.l + s.w - MIN_W; nw = MIN_W; }
+                    if (nh < MIN_H) { if (dir.includes('n')) nt = s.t + s.h - MIN_H; nh = MIN_H; }
                     const wa = getWorkArea();
                     if (nl < wa.left) { nw += nl - wa.left; nl = wa.left; }
                     if (nt < wa.top) { nh += nt - wa.top; nt = wa.top; }
                     if (nl + nw > wa.right) nw = wa.right - nl;
                     if (nt + nh > wa.bottom) nh = wa.bottom - nt;
-                    win.style.left = nl + 'px';
-                    win.style.top = nt + 'px';
-                    win.style.width = nw + 'px';
-                    win.style.height = nh + 'px';
+                    win.style.left = nl + 'px'; win.style.top = nt + 'px';
+                    win.style.width = nw + 'px'; win.style.height = nh + 'px';
                 }
-                function end() { if (!resizing) return; resizing = false; document.body.style.userSelect = ''; }
-                handle.addEventListener('mousedown', (e) => { e.preventDefault(); e.stopPropagation(); begin(e.clientX, e.clientY); });
-                document.addEventListener('mousemove', move);
-                document.addEventListener('mouseup', end);
-                handle.addEventListener('touchstart', (e) => {
-                    e.stopPropagation();
-                    const t = e.touches[0];
-                    begin(t.clientX, t.clientY);
-                }, { passive: true });
-                document.addEventListener('touchmove', (e) => {
-                    if (!resizing) return;
-                    const t = e.touches[0];
-                    move(t.clientX, t.clientY);
-                }, { passive: true });
-                document.addEventListener('touchend', end);
-                document.addEventListener('touchcancel', end);
+                function finish(e) {
+                    if (!s || e.pointerId !== s.pid) return;
+                    const o = s; s = null;
+                    cancelAnimationFrame(o.raf);
+                    try { handle.releasePointerCapture(o.pid); } catch (_) {}
+                    win.classList.remove('resizing');
+                    document.body.style.userSelect = '';
+                    const w = windows[id];
+                    if (w) { w.snap = null; w.rect = rectFromStyle(win); }
+                }
+                handle.addEventListener('pointerdown', (e) => {
+                    if (e.button !== 0) return;
+                    const w = windows[id];
+                    if (!w || w.state !== 'normal' || isMobile()) return;
+                    e.preventDefault(); e.stopPropagation();
+                    const r = win.getBoundingClientRect();
+                    s = { pid: e.pointerId, sx: e.clientX, sy: e.clientY, cx: e.clientX, cy: e.clientY, l: r.left, t: r.top, w: r.width, h: r.height, raf: 0 };
+                    try { handle.setPointerCapture(e.pointerId); } catch (_) {}
+                    win.classList.remove('opening', 'restoring');
+                    win.classList.add('resizing');
+                    document.body.style.userSelect = 'none';
+                });
+                handle.addEventListener('pointermove', (e) => {
+                    if (!s || e.pointerId !== s.pid) return;
+                    s.cx = e.clientX; s.cy = e.clientY;
+                    if (!s.raf) s.raf = requestAnimationFrame(step);
+                });
+                handle.addEventListener('pointerup', finish);
+                handle.addEventListener('pointercancel', finish);
             }
 
+            /* ---- taskbar: mostrar área de trabalho, menu de contexto, ciclo ---- */
+            function toggleShowDesktop() {
+                const vis = visibleIds();
+                if (vis.length) {
+                    desktopHidden = vis.slice();
+                    vis.slice().reverse().forEach(minimizeWindow);
+                } else {
+                    const list = (desktopHidden.length ? desktopHidden : stack.slice()).filter(i => windows[i]);
+                    desktopHidden = [];
+                    list.forEach(unminimizeWindow);
+                }
+            }
+            function cycleWindows(dir) {
+                const ids = Object.keys(windows);
+                if (!ids.length) return;
+                const i = ids.indexOf(focusedId);
+                focusWindow(ids[(i + dir + ids.length) % ids.length]);
+            }
+
+            function closeMenu() { if (menuEl) { menuEl.remove(); menuEl = null; } }
+            function openTaskbarMenu(id, x) {
+                const w = windows[id];
+                if (!w) return;
+                closeMenu();
+                const m = document.createElement('div');
+                m.className = 'tb-menu';
+                m.setAttribute('role', 'menu');
+                const entries = [
+                    [w.state === 'minimized' ? 'Restaurar' : 'Minimizar', () => (w.state === 'minimized' ? unminimizeWindow(id) : minimizeWindow(id))],
+                    [w.state === 'maximized' ? 'Restaurar tamanho' : 'Maximizar', () => toggleMaximizeWindow(id)],
+                    ['Fechar', () => closeWindowAnimated(id)],
+                    null,
+                    ['Fechar as outras', () => Object.keys(windows).filter(i => i !== id).forEach(closeWindowAnimated)],
+                    ['Fechar todas', () => Object.keys(windows).forEach(closeWindowAnimated)]
+                ];
+                entries.forEach(en => {
+                    if (!en) { const sep = document.createElement('div'); sep.className = 'tb-menu-sep'; m.appendChild(sep); return; }
+                    const b = document.createElement('button');
+                    b.type = 'button'; b.className = 'tb-menu-item'; b.setAttribute('role', 'menuitem');
+                    b.textContent = en[0];
+                    b.addEventListener('click', () => { closeMenu(); en[1](); });
+                    m.appendChild(b);
+                });
+                document.body.appendChild(m);
+                const tr = taskbar.getBoundingClientRect();
+                m.style.bottom = (window.innerHeight - tr.top + 4) + 'px';
+                m.style.left = clamp(x - 10, 4, window.innerWidth - m.offsetWidth - 4) + 'px';
+                const first = m.querySelector('.tb-menu-item');
+                if (first) first.focus();
+                menuEl = m;
+            }
+            document.addEventListener('pointerdown', (e) => { if (menuEl && !menuEl.contains(e.target)) closeMenu(); }, true);
+            window.addEventListener('blur', closeMenu);
+
             if (taskbar) {
+                showDesktopBtn = document.createElement('button');
+                showDesktopBtn.type = 'button';
+                showDesktopBtn.className = 'taskbar-item taskbar-show-desktop';
+                showDesktopBtn.textContent = '▁';
+                showDesktopBtn.title = 'Mostrar área de trabalho (Ctrl+Alt+D)';
+                showDesktopBtn.setAttribute('aria-label', 'Mostrar área de trabalho');
+                showDesktopBtn.addEventListener('click', toggleShowDesktop);
+                taskbar.insertBefore(showDesktopBtn, taskbar.firstChild);
+
                 taskbar.addEventListener('click', (e) => {
                     const closeBtn = e.target.closest('.taskbar-item-close');
-                    if (closeBtn) {
-                        e.stopPropagation();
-                        const id = closeBtn.dataset.closeWinId;
-                        if (id) closeWindow(id);
-                        return;
-                    }
+                    if (closeBtn) { e.stopPropagation(); closeWindowAnimated(closeBtn.dataset.closeWinId); return; }
                     const item = e.target.closest('.taskbar-item');
-                    if (item) {
-                        const id = item.dataset.winId;
-                        if (windows[id]) {
-                            if (windows[id].state === 'minimized') unminimizeWindow(id);
-                            focusWindow(id);
-                        }
-                    }
+                    const id = item && item.dataset.winId;
+                    const w = id && windows[id];
+                    if (!w) return;
+                    if (w.state === 'minimized') unminimizeWindow(id);
+                    else if (id === focusedId) minimizeWindow(id);   // clicar na ativa minimiza
+                    else focusWindow(id);
                 });
+                taskbar.addEventListener('mousedown', (e) => { if (e.button === 1 && e.target.closest('.taskbar-item[data-win-id]')) e.preventDefault(); });
+                taskbar.addEventListener('auxclick', (e) => {
+                    if (e.button !== 1) return;
+                    const item = e.target.closest('.taskbar-item[data-win-id]');
+                    if (item) { e.preventDefault(); closeWindowAnimated(item.dataset.winId); }
+                });
+                taskbar.addEventListener('contextmenu', (e) => {
+                    const item = e.target.closest('.taskbar-item[data-win-id]');
+                    if (!item) return;
+                    e.preventDefault();
+                    openTaskbarMenu(item.dataset.winId, e.clientX);
+                });
+                taskbarItemsEl.addEventListener('wheel', (e) => {
+                    if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { taskbarItemsEl.scrollLeft += e.deltaY; e.preventDefault(); }
+                }, { passive: false });
             }
 
             const POP_OUT_SVG = '<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="miter"><rect x="1" y="1" width="7" height="7"/><rect x="5" y="5" width="7" height="7"/></svg>';
@@ -4896,33 +5117,44 @@
             });
 
             document.addEventListener('keydown', (e) => {
+                if (menuEl && e.key === 'Escape') { e.preventDefault(); closeMenu(); return; }
+                const mod = e.ctrlKey || e.metaKey;
+                if (mod && e.altKey && e.key.toLowerCase() === 'd') { e.preventDefault(); toggleShowDesktop(); return; }
+                if (mod && e.altKey && (e.key === 'ArrowRight' || e.key === 'ArrowLeft')) { e.preventDefault(); cycleWindows(e.key === 'ArrowRight' ? 1 : -1); return; }
                 if (!focusedId) return;
                 if (document.getElementById('sidebar').classList.contains('ativo')) return;
-                if (e.key === 'Escape') { e.preventDefault(); closeWindow(focusedId); return; }
-                if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'w') { e.preventDefault(); closeWindow(focusedId); return; }
-                if ((e.ctrlKey || e.metaKey) && !e.shiftKey && e.key.toLowerCase() === 'm') { e.preventDefault(); minimizeWindow(focusedId); return; }
-                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key.toLowerCase() === 'm') { e.preventDefault(); toggleMaximizeWindow(focusedId); return; }
+                if (e.key === 'Escape') {
+                    const t = e.target;
+                    if (t && t.matches && t.matches('input[type="text"], textarea')) { t.blur(); return; }  // 1º Esc só tira o foco do campo
+                    e.preventDefault(); closeWindowAnimated(focusedId); return;
+                }
+                if (mod && !e.shiftKey && e.key.toLowerCase() === 'w') { e.preventDefault(); closeWindowAnimated(focusedId); return; }
+                if (mod && !e.shiftKey && e.key.toLowerCase() === 'm') { e.preventDefault(); minimizeWindow(focusedId); return; }
+                if (mod && e.shiftKey && e.key.toLowerCase() === 'm') { e.preventDefault(); toggleMaximizeWindow(focusedId); return; }
             });
 
             let resizeDebounce = null;
             window.addEventListener('resize', () => {
+                document.documentElement.classList.add('vp-resizing');
                 clearTimeout(resizeDebounce);
                 resizeDebounce = setTimeout(() => {
+                    document.documentElement.classList.remove('vp-resizing');
+                    closeMenu();
+                    hideSnapPreview();
+                    if (isMobile()) return;
                     const wa = getWorkArea();
                     Object.values(windows).forEach(w => {
                         if (w.state === 'maximized') return;
-                        const win = w.el;
-                        const r = win.getBoundingClientRect();
-                        let top = r.top, left = r.left;
-                        const minVisible = 60;
-                        top = clamp(top, wa.top, wa.bottom - 30);
-                        left = clamp(left, -r.width + minVisible, wa.right - minVisible);
-                        win.style.top = top + 'px';
-                        win.style.left = left + 'px';
-                        if (r.right > wa.right) win.style.width = Math.max(MIN_W, wa.right - left) + 'px';
-                        if (r.bottom > wa.bottom) win.style.height = Math.max(MIN_H, wa.bottom - top) + 'px';
+                        if (w.snap) { applyRect(w, snapRect(w.snap, wa), false); return; }
+                        const r = rectFromStyle(w.el);
+                        const width = clamp(r.width, MIN_W, Math.max(MIN_W, wa.width));
+                        const height = clamp(r.height, MIN_H, Math.max(MIN_H, wa.height));
+                        applyRect(w, {
+                            width, height,
+                            left: clamp(r.left, -width + 60, wa.right - 60),
+                            top: clamp(r.top, wa.top, wa.bottom - 30)
+                        }, true);
                     });
-                    hideSnapPreview();
                 }, 120);
             });
 
@@ -4946,6 +5178,7 @@
                 unminimize: unminimizeWindow,
                 toggleMaximize: toggleMaximizeWindow,
                 focus: focusWindow,
+                showDesktop: toggleShowDesktop,
                 list: () => Object.values(windows).map(w => ({
                     id: w.id,
                     title: w.title,
