@@ -2211,6 +2211,31 @@
         :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .sidebar .crt-toggle-btn:hover { background: #c8bfa8; color: #000; }
         :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .sidebar .crt-toggle-btn:active { border-color: #8a7a6a #f0e8d8 #f0e8d8 #8a7a6a; }
         :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .sidebar .crt-toggle-btn:focus-visible { outline-color: #3a3028; }
+
+        /* TASKBAR CLARA — acompanha a sticky bar e a sidebar quando elas ficam claras */
+        .window-taskbar { isolation: isolate; transition: left 0.3s ease, border-color var(--tema-transicao), box-shadow var(--tema-transicao); }
+        /* Camada clara com fade (gradientes/rgba não animam bem, então o fade é feito por opacidade) */
+        .window-taskbar::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: rgba(224, 216, 200, 0.96); opacity: 0; transition: opacity var(--tema-transicao); }
+        .taskbar-item, .taskbar-item-close, .window-taskbar-items::-webkit-scrollbar-thumb { transition: background-color var(--tema-transicao), color var(--tema-transicao), border-color var(--tema-transicao), box-shadow var(--tema-transicao); }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .window-taskbar::before { opacity: 1; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .window-taskbar { border-top-color: #9a8a7a; box-shadow: 0 -4px 20px rgba(70,55,40,.25); }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .window-taskbar-items { scrollbar-color: #9a8a7a transparent; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .window-taskbar-items::-webkit-scrollbar-track { background: #d0c8b8; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .window-taskbar-items::-webkit-scrollbar-thumb { background: #9a8a7a; border-color: #c0b8a8 #6a5a4a #6a5a4a #c0b8a8; }
+        /* itens normais */
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .taskbar-item { background: #e8dfcc; color: #3a3028; border-color: #f0e8d8 #8a7a6a #8a7a6a #f0e8d8; box-shadow: none; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .taskbar-item:hover { background: #c8bfa8; color: #000; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .taskbar-item.ativo { background: #c8b898; color: #1a1510; border-color: #8a7a6a #f0e8d8 #f0e8d8 #8a7a6a; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .taskbar-item-close { color: #5a4a3a; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .taskbar-item-close:hover { background: #c87a6a; color: #fff; }
+        /* item da janela de ajuda urgente (tom avermelhado claro) */
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .taskbar-item.taskbar-item-help { background: #ecd0c4; color: #6a1a0c; border-color: #f6e4da #b0705a #b0705a #f6e4da; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .taskbar-item.taskbar-item-help:hover { background: #e0b8a8; color: #3a0a04; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .taskbar-item.taskbar-item-help.ativo { background: #d8a898; color: #3a0a04; border-color: #b0705a #f6e4da #f6e4da #b0705a; }
+        /* item do painel de efeitos (tom esverdeado claro) */
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .taskbar-item.taskbar-item-fx { background: #d6e0c4; color: #1e3010; border-color: #e6eed6 #7a9060 #7a9060 #e6eed6; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .taskbar-item.taskbar-item-fx:hover { background: #c4d2ac; color: #0c1c04; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .taskbar-item.taskbar-item-fx.ativo { background: #b8caa0; color: #0c1c04; border-color: #7a9060 #e6eed6 #e6eed6 #7a9060; }
         @media (prefers-reduced-motion: reduce) { :root { --tema-transicao: 0s linear; } }
 
         /* ===================================================================== */
