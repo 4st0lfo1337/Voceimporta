@@ -1248,25 +1248,6 @@
         .os-window-resize[data-dir="nw"] { top: -4px; left: -4px; width: 14px; height: 14px; cursor: nw-resize; }
         .os-window-resize[data-dir="se"] { bottom: -4px; right: -4px; width: 14px; height: 14px; cursor: se-resize; }
         .os-window-resize[data-dir="sw"] { bottom: -4px; left: -4px; width: 14px; height: 14px; cursor: sw-resize; }
-        .window-placeholder {
-            max-width: 1100px; margin: 2rem auto; padding: 1.2rem 1.8rem;
-            display: flex; align-items: center; justify-content: center;
-            gap: 14px; flex-wrap: wrap; text-align: center;
-            background: rgba(30, 24, 18, 0.4);
-            border: 1px dashed #5a4a3a;
-            color: #a09890;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 0.9rem; border-radius: 2px; letter-spacing: 0.5px;
-        }
-        .window-placeholder .placeholder-icon { font-size: 1.1rem; filter: sepia(0.7) saturate(0.6) brightness(0.95); }
-        .window-placeholder button {
-            background: #4a3a2a; border: 1px solid #6a5a4a; color: #d0c8b8;
-            padding: 0.35rem 0.9rem; font-family: inherit; font-size: 0.78rem;
-            cursor: pointer; letter-spacing: 1px; text-transform: uppercase;
-            font-weight: 700; transition: background 0.15s;
-        }
-        .window-placeholder button:hover { background: #5a4a3a; }
-        .window-placeholder button:active { background: #3a2a1a; }
         .pop-out-btn {
             position: absolute; top: 0; right: 0;
             width: 32px; height: 30px;
@@ -4300,14 +4281,8 @@
                 }
                 const title = getSectionTitle(section);
                 const id = 'w' + (winIdCounter++);
-                const placeholder = document.createElement('div');
-                placeholder.className = 'window-placeholder';
-                placeholder.dataset.placeholderFor = sectionId;
-                placeholder.innerHTML = `
-                    <span class="placeholder-icon">🗗</span>
-                    <span>"${title}" — aberta em janela</span>
-                    <button type="button" data-reopen-section="${sectionId}">trazer para frente</button>
-                `;
+                /* marcador invisível (nó de comentário): só guarda a posição original da seção para devolvê-la ao fechar a janela */
+                const placeholder = document.createComment('janela:' + sectionId);
                 section.parentNode.insertBefore(placeholder, section);
                 const win = createWindowElement(id, title);
                 const body = win.querySelector('.os-window-body');
@@ -4318,7 +4293,6 @@
                 updateTaskbarVisibility();
                 renderTaskbar();
                 focusWindow(id);
-                try { placeholder.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
                 return id;
             }
 
@@ -5100,20 +5074,6 @@
             document.addEventListener('click', (e) => {
                 const popBtn = e.target.closest('.pop-out-btn');
                 if (popBtn) { e.preventDefault(); openWindow(popBtn.dataset.target); return; }
-                const reopenBtn = e.target.closest('[data-reopen-section]');
-                if (reopenBtn) {
-                    e.preventDefault();
-                    const sid = reopenBtn.dataset.reopenSection;
-                    for (const id in windows) {
-                        if (windows[id].sectionId === sid) {
-                            if (windows[id].state === 'minimized') unminimizeWindow(id);
-                            focusWindow(id);
-                            return;
-                        }
-                    }
-                    openWindow(sid);
-                    return;
-                }
             });
 
             document.addEventListener('keydown', (e) => {
@@ -6226,7 +6186,6 @@
                 '.debug-overlay',
                 '#bootScreen',
                 '.pop-out-btn',
-                '.window-placeholder',
                 '.snap-preview',
                 '.window-taskbar',
                 '.botao-ajuda-flutuante'
