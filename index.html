@@ -2234,6 +2234,84 @@
         :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .sidebar .crt-toggle-btn:active { border-color: #8a7a6a #f0e8d8 #f0e8d8 #8a7a6a; }
         :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .sidebar .crt-toggle-btn:focus-visible { outline-color: #3a3028; }
 
+        /* ===================================================================== */
+        /* SIDEBAR → JANELA FLUTUANTE (arraste o cabeçalho para destacar / reacoplar) */
+        /* ===================================================================== */
+        .sidebar-dock-btn {
+            display: none; flex: 0 0 auto; width: 20px; height: 18px;
+            background: #252018; border: 1px solid;
+            border-color: #5a4a3a #1a1008 #1a1008 #5a4a3a;
+            color: #c8b090; cursor: pointer; padding: 0;
+            align-items: center; justify-content: center;
+            box-shadow: inset 1px 1px 0 rgba(255,255,255,0.06);
+            transition: background 0.1s ease; position: relative; z-index: 1;
+        }
+        .sidebar-dock-btn svg { display: block; }
+        .sidebar-dock-btn:hover { background: #3a2a1a; color: #e8d5a3; }
+        .sidebar-dock-btn:active { border-color: #1a1008 #5a4a3a #5a4a3a #1a1008; box-shadow: inset -1px -1px 0 rgba(255,255,255,0.06); }
+        .sidebar.flutuante .sidebar-dock-btn { display: flex; }
+
+        .sidebar-resize { display: none; position: absolute; z-index: 30; background: transparent; touch-action: none; }
+        .sidebar.flutuante .sidebar-resize { display: block; }
+        .sidebar-resize[data-dir="n"]  { top: 0; left: 10px; right: 10px; height: 5px; cursor: n-resize; }
+        .sidebar-resize[data-dir="s"]  { bottom: 0; left: 10px; right: 10px; height: 5px; cursor: s-resize; }
+        .sidebar-resize[data-dir="e"]  { right: 0; top: 10px; bottom: 10px; width: 4px; cursor: e-resize; }
+        .sidebar-resize[data-dir="w"]  { left: 0; top: 10px; bottom: 10px; width: 5px; cursor: w-resize; }
+        .sidebar-resize[data-dir="ne"] { top: 0; right: 0; width: 12px; height: 12px; cursor: ne-resize; }
+        .sidebar-resize[data-dir="nw"] { top: 0; left: 0; width: 12px; height: 12px; cursor: nw-resize; }
+        .sidebar-resize[data-dir="se"] { bottom: 0; right: 0; width: 14px; height: 14px; cursor: se-resize; }
+        .sidebar-resize[data-dir="sw"] { bottom: 0; left: 0; width: 14px; height: 14px; cursor: sw-resize; }
+
+        @media (min-width: 1025px) {
+            .sidebar-header { cursor: grab; user-select: none; -webkit-user-select: none; touch-action: none; }
+            .sidebar-header .explorer-title { cursor: inherit; }
+            .sidebar.arrastando .sidebar-header { cursor: grabbing; }
+        }
+        body.sb-arrastando { user-select: none; -webkit-user-select: none; }
+        .sidebar.arrastando, .sidebar.redimensionando { transition: none !important; }
+
+        /* animação ao voltar a ser sidebar */
+        .sidebar.redocando { transition: left .25s cubic-bezier(.2,.8,.2,1), top .25s cubic-bezier(.2,.8,.2,1), width .25s cubic-bezier(.2,.8,.2,1), height .25s cubic-bezier(.2,.8,.2,1), transform 0.3s ease, border-color var(--tema-transicao), box-shadow var(--tema-transicao); }
+
+        /* modo janela */
+        .sidebar.flutuante {
+            border: 2px solid; border-color: #5a4a3a #1a1008 #1a1008 #5a4a3a;
+            box-shadow: 0 16px 60px rgba(0,0,0,0.95), inset 1px 1px 0 rgba(255,255,255,0.08), 0 0 0 1px rgba(200,176,144,0.25);
+            z-index: 10150;
+            transition: transform .18s ease, opacity .18s ease, visibility 0s, border-color var(--tema-transicao), box-shadow var(--tema-transicao);
+        }
+        .sidebar.flutuante .sidebar-header {
+            background: linear-gradient(180deg, #4a3520 0%, #3a2515 50%, #1a1008 100%);
+            border-bottom: 2px solid #1a1008;
+        }
+        .sidebar.flutuante.escondida {
+            transform: scale(.96); opacity: 0; visibility: hidden; pointer-events: none;
+            transition: transform .18s ease, opacity .18s ease, visibility 0s linear .18s;
+        }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .sidebar.flutuante {
+            border-color: #f0e8d8 #8a7a6a #8a7a6a #f0e8d8;
+            box-shadow: 0 16px 50px rgba(70,55,40,.4), inset 1px 1px 0 rgba(255,255,255,.35);
+        }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .sidebar .sidebar-dock-btn { background: #e8dfcc; color: #3a3028; border-color: #f0e8d8 #8a7a6a #8a7a6a #f0e8d8; box-shadow: none; }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .sidebar .sidebar-dock-btn:hover { background: #c8bfa8; color: #000; }
+
+        /* pré-visualização da zona de encaixe (borda esquerda) */
+        .sidebar-dock-preview {
+            position: fixed; top: 0; left: 0; width: 286px; height: 100vh;
+            background: rgba(200,176,144,0.12); border: 2px dashed #c8b090;
+            box-shadow: inset 0 0 30px rgba(200,176,144,0.08);
+            z-index: 10160; pointer-events: none;
+            opacity: 0; visibility: hidden;
+            transition: opacity .18s ease, visibility 0s linear .18s;
+        }
+        .sidebar-dock-preview.visivel { opacity: 1; visibility: visible; transition-delay: 0s; }
+        @media (max-width: 1024px) {
+            .sidebar-dock-btn, .sidebar-resize, .sidebar-dock-preview { display: none !important; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .sidebar.redocando, .sidebar.flutuante, .sidebar-dock-preview { transition: none !important; }
+        }
+
         /* TASKBAR CLARA — acompanha a sticky bar e a sidebar quando elas ficam claras */
         .window-taskbar { isolation: isolate; transition: left 0.3s ease, border-color var(--tema-transicao), box-shadow var(--tema-transicao); }
         /* Camada clara com fade (gradientes/rgba não animam bem, então o fade é feito por opacidade) */
@@ -2719,9 +2797,10 @@
 
     <!-- SIDEBAR / EXPLORADOR DE ARQUIVOS -->
     <nav class="sidebar" id="sidebar" aria-label="Explorador de arquivos do site">
-        <div class="sidebar-header">
+        <div class="sidebar-header" title="Arraste para soltar como janela">
             <span class="explorer-icon" aria-hidden="true">📁︎</span>
             <span class="explorer-title">voceimporta — Explorer</span>
+            <button class="sidebar-dock-btn" id="sidebarDockBtn" type="button" aria-label="Fixar como menu lateral" title="Fixar como menu lateral"><svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true"><rect x="1.5" y="1.5" width="9" height="9" fill="none" stroke="currentColor"/><rect x="1.5" y="1.5" width="3.5" height="9" fill="currentColor"/></svg></button>
             <button class="sidebar-hide-btn" id="sidebarHideBtn" type="button" aria-label="Esconder menu lateral" title="Esconder menu">×</button>
         </div>
         <div class="sidebar-path" aria-label="Caminho atual"><span aria-hidden="true">⌂</span><span class="path-slash">/</span><strong>mnt</strong><span class="path-slash">/</span><strong>voceimporta</strong></div>
@@ -2782,6 +2861,7 @@
             <div class="sidebar-footer-text">Expotech 2026</div>
         </div>
     </nav>
+    <div class="sidebar-dock-preview" id="sidebarDockPreview" aria-hidden="true"></div>
 
     <!-- MAIN CONTENT -->
     <div class="main-content" id="mainContent">
@@ -3865,21 +3945,24 @@
 
         const isTouchDevice = window.matchMedia('(hover: none) and (pointer: coarse)').matches;
 
+        /* "sidebar-oculta*" = a área principal não tem sidebar ENCAIXADA (escondida OU flutuando como janela) */
+        function sbLayout() {
+            const livre = sidebar.classList.contains('escondida') || sidebar.classList.contains('flutuante');
+            mainContent.classList.toggle('sidebar-oculta', livre);
+            document.body.classList.toggle('sidebar-oculta-body', livre);
+            scheduleStickyUpdate();
+        }
         function esconderSidebar() {
             sidebar.classList.add('escondida');
-            mainContent.classList.add('sidebar-oculta');
             if (sidebarDesktopIcon) sidebarDesktopIcon.classList.add('visivel');
-            document.body.classList.add('sidebar-oculta-body');
+            sbLayout();
             try { localStorage.setItem('voceimporta_sidebar_oculta', '1'); } catch (e) {}
-            scheduleStickyUpdate();
         }
         function mostrarSidebar() {
             sidebar.classList.remove('escondida');
-            mainContent.classList.remove('sidebar-oculta');
             if (sidebarDesktopIcon) sidebarDesktopIcon.classList.remove('visivel');
-            document.body.classList.remove('sidebar-oculta-body');
+            sbLayout();
             try { localStorage.setItem('voceimporta_sidebar_oculta', '0'); } catch (e) {}
-            scheduleStickyUpdate();
         }
 
         function abrirSidebarDoAtalho() {
@@ -3910,6 +3993,199 @@
                 }
             });
         }
+
+        /* ===================================================================== */
+        /* SIDEBAR ⇄ JANELA                                                       */
+        /* Arraste o cabeçalho para soltar a sidebar como janela flutuante.       */
+        /* Arraste a janela até a borda esquerda (ou duplo clique / botão) para   */
+        /* ela voltar a ser sidebar.                                              */
+        /* ===================================================================== */
+        const sbHeader = sidebar.querySelector('.sidebar-header');
+        const sbDockBtn = document.getElementById('sidebarDockBtn');
+        const sbPreview = document.getElementById('sidebarDockPreview');
+        const sbDesktop = window.matchMedia('(min-width: 1025px)');
+        const SB_MIN_W = 230, SB_MIN_H = 260;   // tamanho mínimo da janela
+        const SB_LIMIAR = 6;                    // px de movimento para destacar
+        const SB_ZONA = 36;                     // px da borda esquerda que re-encaixa
+        const SB_Z_FRENTE = 10150, SB_Z_ATRAS = 10050;
+        const SB_DICA_DOCADA = 'Arraste para soltar como janela';
+        const SB_DICA_JANELA = 'Arraste até a borda esquerda (ou dê duplo clique) para voltar a ser menu lateral';
+        let sbGeo = null;      // {left, top, width, height} da janela
+        let sbArrasto = null;  // estado do arrasto atual
+
+        function sbFlutuante() { return sidebar.classList.contains('flutuante'); }
+        function sbAplicar() {
+            sidebar.style.left = sbGeo.left + 'px';
+            sidebar.style.top = sbGeo.top + 'px';
+            sidebar.style.width = sbGeo.width + 'px';
+            sidebar.style.height = sbGeo.height + 'px';
+        }
+        function sbClamp(g) {
+            const vw = window.innerWidth, vh = window.innerHeight;
+            const w = Math.max(SB_MIN_W, Math.min(g.width, vw - 16));
+            const h = Math.max(SB_MIN_H, Math.min(g.height, vh - 16));
+            return {
+                width: w, height: h,
+                left: Math.max(-w + 90, Math.min(g.left, vw - 90)),
+                top: Math.max(0, Math.min(g.top, vh - 40))
+            };
+        }
+        function sbSalvar() {
+            try {
+                localStorage.setItem('voceimporta_sidebar_modo', sbFlutuante() ? 'flutuante' : 'docada');
+                if (sbGeo) localStorage.setItem('voceimporta_sidebar_geo', JSON.stringify(sbGeo));
+            } catch (e) {}
+        }
+        function sbGeoPadrao() {
+            return { left: 90, top: 70, width: 300, height: Math.min(560, window.innerHeight - 110) };
+        }
+        function sbDesacoplar(geo) {
+            sbGeo = sbClamp(geo);
+            sidebar.classList.remove('redocando');
+            sidebar.classList.add('flutuante');
+            sbAplicar();
+            sidebar.style.zIndex = SB_Z_FRENTE;
+            sbHeader.title = SB_DICA_JANELA;
+            sbLayout();
+            sbSalvar();
+        }
+        function sbAcoplar(animar) {
+            if (!sbFlutuante()) return;
+            if (animar) {
+                sidebar.classList.add('redocando');
+                setTimeout(() => sidebar.classList.remove('redocando'), 320);
+            }
+            sidebar.classList.remove('flutuante');
+            ['left', 'top', 'width', 'height', 'zIndex'].forEach(p => { sidebar.style[p] = ''; });
+            sbHeader.title = SB_DICA_DOCADA;
+            sbLayout();
+            sbSalvar();
+        }
+        function sbFimDoArrasto(e, cancelar) {
+            if (!sbArrasto || e.pointerId !== sbArrasto.id) return;
+            const reencaixar = sbArrasto.ativo && !cancelar && e.clientX <= SB_ZONA;
+            sbArrasto = null;
+            document.body.classList.remove('sb-arrastando');
+            sidebar.classList.remove('arrastando');
+            sbPreview.classList.remove('visivel');
+            try { sbHeader.releasePointerCapture(e.pointerId); } catch (_) {}
+            if (reencaixar) sbAcoplar(true);
+            else if (sbFlutuante()) sbSalvar();
+        }
+
+        /* --- arrastar pelo cabeçalho --- */
+        sbHeader.addEventListener('pointerdown', (e) => {
+            if (!sbDesktop.matches) return;
+            if (e.pointerType === 'mouse' && e.button !== 0) return;
+            if (e.target.closest('button')) return;
+            const r = sidebar.getBoundingClientRect();
+            sbArrasto = {
+                id: e.pointerId, sx: e.clientX, sy: e.clientY,
+                ox: e.clientX - r.left, oy: e.clientY - r.top,
+                ativo: sbFlutuante()
+            };
+            if (sbFlutuante()) sidebar.style.zIndex = SB_Z_FRENTE;
+            try { sbHeader.setPointerCapture(e.pointerId); } catch (_) {}
+        });
+        sbHeader.addEventListener('pointermove', (e) => {
+            if (!sbArrasto || e.pointerId !== sbArrasto.id) return;
+            if (!sbArrasto.ativo) {
+                if (Math.hypot(e.clientX - sbArrasto.sx, e.clientY - sbArrasto.sy) < SB_LIMIAR) return;
+                /* destaca: a sidebar vira janela, mantendo o cursor na mesma posição do cabeçalho */
+                const w = Math.round(sidebar.getBoundingClientRect().width);
+                const h = Math.min(window.innerHeight - 100, 620);
+                sbArrasto.ativo = true;
+                sbArrasto.ox = Math.min(sbArrasto.ox, w - 60);
+                sbArrasto.oy = Math.min(sbArrasto.oy, 30);
+                document.body.classList.add('sb-arrastando');
+                sidebar.classList.add('arrastando');
+                sbDesacoplar({ left: e.clientX - sbArrasto.ox, top: e.clientY - sbArrasto.oy, width: w, height: h });
+            } else {
+                sbGeo = sbClamp({ left: e.clientX - sbArrasto.ox, top: e.clientY - sbArrasto.oy, width: sbGeo.width, height: sbGeo.height });
+                sbAplicar();
+            }
+            sbPreview.classList.toggle('visivel', e.clientX <= SB_ZONA);
+        });
+        sbHeader.addEventListener('pointerup', (e) => sbFimDoArrasto(e, false));
+        sbHeader.addEventListener('pointercancel', (e) => sbFimDoArrasto(e, true));
+        sbHeader.addEventListener('dblclick', (e) => {
+            if (!sbDesktop.matches || e.target.closest('button')) return;
+            if (sbFlutuante()) sbAcoplar(true);
+            else sbDesacoplar(sbGeoPadrao());
+        });
+        if (sbDockBtn) sbDockBtn.addEventListener('click', () => sbAcoplar(true));
+
+        /* --- redimensionar a janela pelas bordas --- */
+        ['n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'].forEach((dir) => {
+            const h = document.createElement('div');
+            h.className = 'sidebar-resize';
+            h.dataset.dir = dir;
+            h.setAttribute('aria-hidden', 'true');
+            sidebar.appendChild(h);
+            let r = null;
+            h.addEventListener('pointerdown', (e) => {
+                if (!sbFlutuante()) return;
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                e.preventDefault(); e.stopPropagation();
+                r = { id: e.pointerId, sx: e.clientX, sy: e.clientY, g: Object.assign({}, sbGeo) };
+                try { h.setPointerCapture(e.pointerId); } catch (_) {}
+                sidebar.classList.add('redimensionando');
+                document.body.classList.add('sb-arrastando');
+            });
+            h.addEventListener('pointermove', (e) => {
+                if (!r || e.pointerId !== r.id) return;
+                const dx = e.clientX - r.sx, dy = e.clientY - r.sy;
+                const g = Object.assign({}, r.g);
+                const maxW = window.innerWidth - 16, maxH = window.innerHeight - 16;
+                if (dir.indexOf('e') !== -1) g.width = r.g.width + dx;
+                if (dir.indexOf('w') !== -1) g.width = r.g.width - dx;
+                if (dir.indexOf('s') !== -1) g.height = r.g.height + dy;
+                if (dir.indexOf('n') !== -1) g.height = r.g.height - dy;
+                g.width = Math.max(SB_MIN_W, Math.min(g.width, maxW));
+                g.height = Math.max(SB_MIN_H, Math.min(g.height, maxH));
+                if (dir.indexOf('w') !== -1) g.left = r.g.left + (r.g.width - g.width);
+                if (dir.indexOf('n') !== -1) g.top = r.g.top + (r.g.height - g.height);
+                if (g.top < 0) { if (dir.indexOf('n') !== -1) g.height = Math.max(SB_MIN_H, g.height + g.top); g.top = 0; }
+                sbGeo = g;
+                sbAplicar();
+            });
+            const fim = (e) => {
+                if (!r || e.pointerId !== r.id) return;
+                r = null;
+                sidebar.classList.remove('redimensionando');
+                document.body.classList.remove('sb-arrastando');
+                try { h.releasePointerCapture(e.pointerId); } catch (_) {}
+                sbSalvar();
+            };
+            h.addEventListener('pointerup', fim);
+            h.addEventListener('pointercancel', fim);
+        });
+
+        /* --- ordem de empilhamento: a janela da sidebar vai à frente ao clicar nela, e atrás ao clicar numa janela do site --- */
+        document.addEventListener('pointerdown', (e) => {
+            if (!sbFlutuante() || !e.target.closest) return;
+            if (e.target.closest('.os-window')) sidebar.style.zIndex = SB_Z_ATRAS;
+            else if (e.target.closest('.sidebar')) sidebar.style.zIndex = SB_Z_FRENTE;
+        }, true);
+
+        /* --- ajustes de viewport --- */
+        window.addEventListener('resize', () => {
+            if (!sbFlutuante()) return;
+            if (!sbDesktop.matches) { sbAcoplar(false); return; }
+            sbGeo = sbClamp(sbGeo);
+            sbAplicar();
+        });
+        const sbMq = (e) => { if (!e.matches) sbAcoplar(false); };
+        if (typeof sbDesktop.addEventListener === 'function') sbDesktop.addEventListener('change', sbMq);
+        else if (typeof sbDesktop.addListener === 'function') sbDesktop.addListener(sbMq);
+
+        /* --- restaura o modo salvo --- */
+        try {
+            if (sbDesktop.matches && localStorage.getItem('voceimporta_sidebar_modo') === 'flutuante') {
+                const salvo = JSON.parse(localStorage.getItem('voceimporta_sidebar_geo') || 'null');
+                sbDesacoplar(salvo && typeof salvo.left === 'number' && typeof salvo.width === 'number' ? salvo : sbGeoPadrao());
+            }
+        } catch (e) {}
 
         try {
             if (localStorage.getItem('voceimporta_sidebar_oculta') === '1' && window.matchMedia('(min-width: 1025px)').matches) {
