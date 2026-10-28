@@ -665,6 +665,9 @@
             visibility: hidden;
             transform: scale(0.85);
             pointer-events: none;
+            touch-action: none;
+            -webkit-user-select: none;
+            -webkit-touch-callout: none;
             transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease, background 0.15s ease, border-color 0.15s ease;
         }
         .sidebar-desktop-icon.visivel {
@@ -679,9 +682,25 @@
             border-color: rgba(200, 176, 144, 0.3);
             outline: none;
         }
-        .sidebar-desktop-icon.clicado {
+        .sidebar-desktop-icon.clicado,
+        .sidebar-desktop-icon.selecionado {
             background: rgba(140, 170, 200, 0.28);
             border-color: rgba(140, 170, 200, 0.6);
+        }
+        /* arrastar o atalho (como os ícones da área de trabalho do Windows) */
+        .sidebar-desktop-icon.visivel.arrastando-atalho {
+            cursor: grabbing;
+            opacity: 0.78;
+            z-index: 10130;
+            transition: none;
+            filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.55));
+        }
+        .sidebar-desktop-icon.encaixando {
+            transition: left 0.16s ease-out, top 0.16s ease-out, opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease, background 0.15s ease, border-color 0.15s ease;
+        }
+        body.atalho-arrastando { user-select: none; -webkit-user-select: none; }
+        @media (prefers-reduced-motion: reduce) {
+            .sidebar-desktop-icon.encaixando { transition: none; }
         }
         .sidebar-desktop-icon .desktop-icon-img {
             font-size: 2.15rem;
@@ -2787,7 +2806,7 @@
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- ATALHO ESTILO WINDOWS -->
-    <div class="sidebar-desktop-icon" id="sidebarDesktopIcon" role="button" tabindex="0" aria-label="Abrir menu lateral" title="Duplo clique para abrir o menu">
+    <div class="sidebar-desktop-icon" id="sidebarDesktopIcon" role="button" tabindex="0" aria-label="Abrir menu lateral" title="Duplo clique para abrir o menu — arraste para mover">
         <div class="desktop-icon-img" aria-hidden="true">📁︎</div>
         <div class="desktop-icon-label">
             voceimporta
@@ -3954,19 +3973,21 @@
         }
         function esconderSidebar() {
             sidebar.classList.add('escondida');
-            if (sidebarDesktopIcon) sidebarDesktopIcon.classList.add('visivel');
+            if (sidebarDesktopIcon) { sidebarDesktopIcon.classList.add('visivel'); atalhoReajustar(); }
             sbLayout();
             try { localStorage.setItem('voceimporta_sidebar_oculta', '1'); } catch (e) {}
         }
         function mostrarSidebar() {
             sidebar.classList.remove('escondida');
-            if (sidebarDesktopIcon) sidebarDesktopIcon.classList.remove('visivel');
+            if (sidebarDesktopIcon) { sidebarDesktopIcon.classList.remove('visivel'); sidebarDesktopIcon.classList.remove('selecionado'); }
             sbLayout();
             try { localStorage.setItem('voceimporta_sidebar_oculta', '0'); } catch (e) {}
         }
 
         function abrirSidebarDoAtalho() {
             if (!sidebarDesktopIcon) return;
+            /* ignora o clique/duplo clique gerado ao soltar o atalho depois de arrastá-lo */
+            if (performance.now() - atalhoUltimoArrasto < 350) return;
             sidebarDesktopIcon.classList.add('clicado');
             setTimeout(() => {
                 sidebarDesktopIcon.classList.remove('clicado');
@@ -3992,6 +4013,132 @@
                     abrirSidebarDoAtalho();
                 }
             });
+        }
+
+        /* ===================================================================== */
+        /* ATALHO ARRASTÁVEL (como os ícones da área de trabalho do Windows)     */
+        /* Arraste o atalho para qualquer lugar da tela; a posição fica salva.   */
+        /* Setas do teclado movem o atalho (Shift = uma célula da grade).        */
+        /* ===================================================================== */
+        const ATALHO_SNAP = true;                 // true = alinha à grade ao soltar (como o Windows); false = posição livre
+        const ATALHO_GRADE_W = 100, ATALHO_GRADE_H = 112, ATALHO_GRADE_X0 = 12, ATALHO_GRADE_Y0 = 12;
+        const ATALHO_LIMIAR = 5;                  // px de movimento para considerar arrasto (e não clique)
+        const ATALHO_CHAVE = 'voceimporta_atalho_pos';
+        let atalhoPos = null;                     // {x, y} em px — null = posição padrão do CSS
+        let atalhoArrasto = null;
+        let atalhoUltimoArrasto = -1000;
+
+        function atalhoLimites() {
+            const r = sidebarDesktopIcon.getBoundingClientRect();
+            return { w: r.width, h: r.height, maxX: Math.max(0, window.innerWidth - r.width), maxY: Math.max(0, window.innerHeight - r.height) };
+        }
+        function atalhoClamp(p) {
+            const b = atalhoLimites();
+            if (!b.w) return p;   // oculto (ex.: mobile, display:none)
+            return { x: Math.round(Math.max(0, Math.min(p.x, b.maxX))), y: Math.round(Math.max(0, Math.min(p.y, b.maxY))) };
+        }
+        function atalhoSnap(p) {
+            if (!ATALHO_SNAP) return p;
+            return {
+                x: ATALHO_GRADE_X0 + Math.round((p.x - ATALHO_GRADE_X0) / ATALHO_GRADE_W) * ATALHO_GRADE_W,
+                y: ATALHO_GRADE_Y0 + Math.round((p.y - ATALHO_GRADE_Y0) / ATALHO_GRADE_H) * ATALHO_GRADE_H
+            };
+        }
+        function atalhoAplicar(p) {
+            sidebarDesktopIcon.style.left = p.x + 'px';
+            sidebarDesktopIcon.style.top = p.y + 'px';
+        }
+        function atalhoSalvar() {
+            try { if (atalhoPos) localStorage.setItem(ATALHO_CHAVE, JSON.stringify(atalhoPos)); } catch (e) {}
+        }
+        /* mantém o atalho dentro da tela (ao mostrar, redimensionar ou restaurar) */
+        function atalhoReajustar() {
+            if (!sidebarDesktopIcon || !atalhoPos) return;
+            atalhoPos = atalhoClamp(atalhoPos);
+            atalhoAplicar(atalhoPos);
+        }
+        function atalhoDesmarcar() { if (sidebarDesktopIcon) sidebarDesktopIcon.classList.remove('selecionado'); }
+
+        if (sidebarDesktopIcon) {
+            /* restaura a posição salva */
+            try {
+                const salvo = JSON.parse(localStorage.getItem(ATALHO_CHAVE) || 'null');
+                if (salvo && typeof salvo.x === 'number' && typeof salvo.y === 'number') {
+                    atalhoPos = salvo;
+                    atalhoAplicar(atalhoPos);
+                }
+            } catch (e) {}
+
+            sidebarDesktopIcon.addEventListener('pointerdown', (e) => {
+                if (!sidebarDesktopIcon.classList.contains('visivel')) return;
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                const r = sidebarDesktopIcon.getBoundingClientRect();
+                atalhoArrasto = {
+                    id: e.pointerId, sx: e.clientX, sy: e.clientY,
+                    ox: e.clientX - r.left, oy: e.clientY - r.top,
+                    ativo: false
+                };
+                sidebarDesktopIcon.classList.add('selecionado');
+                try { sidebarDesktopIcon.setPointerCapture(e.pointerId); } catch (_) {}
+            });
+            sidebarDesktopIcon.addEventListener('pointermove', (e) => {
+                if (!atalhoArrasto || e.pointerId !== atalhoArrasto.id) return;
+                if (!atalhoArrasto.ativo) {
+                    if (Math.hypot(e.clientX - atalhoArrasto.sx, e.clientY - atalhoArrasto.sy) < ATALHO_LIMIAR) return;
+                    atalhoArrasto.ativo = true;
+                    sidebarDesktopIcon.classList.remove('encaixando');
+                    sidebarDesktopIcon.classList.add('arrastando-atalho');
+                    document.body.classList.add('atalho-arrastando');
+                }
+                atalhoPos = atalhoClamp({ x: e.clientX - atalhoArrasto.ox, y: e.clientY - atalhoArrasto.oy });
+                atalhoAplicar(atalhoPos);
+            });
+            const atalhoFimArrasto = (e, cancelar) => {
+                if (!atalhoArrasto || e.pointerId !== atalhoArrasto.id) return;
+                const foiArrasto = atalhoArrasto.ativo;
+                atalhoArrasto = null;
+                try { sidebarDesktopIcon.releasePointerCapture(e.pointerId); } catch (_) {}
+                sidebarDesktopIcon.classList.remove('arrastando-atalho');
+                document.body.classList.remove('atalho-arrastando');
+                if (!foiArrasto) return;
+                atalhoUltimoArrasto = performance.now();
+                if (atalhoPos) {
+                    const alvo = atalhoClamp(atalhoSnap(atalhoPos));
+                    if (alvo.x !== atalhoPos.x || alvo.y !== atalhoPos.y) {
+                        sidebarDesktopIcon.classList.add('encaixando');
+                        setTimeout(() => sidebarDesktopIcon.classList.remove('encaixando'), 220);
+                    }
+                    atalhoPos = alvo;
+                    atalhoAplicar(atalhoPos);
+                    atalhoSalvar();
+                }
+            };
+            sidebarDesktopIcon.addEventListener('pointerup', (e) => atalhoFimArrasto(e, false));
+            sidebarDesktopIcon.addEventListener('pointercancel', (e) => atalhoFimArrasto(e, true));
+            sidebarDesktopIcon.addEventListener('lostpointercapture', (e) => atalhoFimArrasto(e, true));
+            sidebarDesktopIcon.addEventListener('dragstart', (e) => e.preventDefault());
+
+            /* clicar fora do atalho tira a seleção (como na área de trabalho) */
+            document.addEventListener('pointerdown', (e) => {
+                if (e.target && e.target.closest && !e.target.closest('#sidebarDesktopIcon')) atalhoDesmarcar();
+            }, true);
+
+            /* setas movem o atalho; Shift = uma célula da grade */
+            sidebarDesktopIcon.addEventListener('keydown', (e) => {
+                const dir = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+                if (!dir) return;
+                e.preventDefault();
+                const r = sidebarDesktopIcon.getBoundingClientRect();
+                const base = atalhoPos || { x: r.left, y: r.top };
+                const passoX = e.shiftKey ? ATALHO_GRADE_W : 10, passoY = e.shiftKey ? ATALHO_GRADE_H : 10;
+                atalhoPos = atalhoClamp({ x: base.x + dir[0] * passoX, y: base.y + dir[1] * passoY });
+                sidebarDesktopIcon.classList.add('encaixando');
+                setTimeout(() => sidebarDesktopIcon.classList.remove('encaixando'), 220);
+                atalhoAplicar(atalhoPos);
+                atalhoSalvar();
+            });
+
+            window.addEventListener('resize', atalhoReajustar);
         }
 
         /* ===================================================================== */
