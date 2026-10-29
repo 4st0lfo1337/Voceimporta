@@ -2794,6 +2794,9 @@
         .ws-icone:hover, .ws-icone:focus-visible { background: rgba(200,176,144,0.14); border-color: rgba(200,176,144,0.3); }
         .ws-icone.selecionado { background: rgba(140,170,200,0.28); border-color: rgba(140,170,200,0.6); }
         .ws-icone.arrastando { transition: none; opacity: 0.8; z-index: 5; cursor: grabbing; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.55)); }
+        .workspace-desktop:focus { outline: none; }
+        /* retângulo de seleção (borracha) — mesma cor azul do ícone selecionado */
+        .ws-borracha { position: absolute; display: none; z-index: 4; pointer-events: none; box-sizing: border-box; border: 1px solid rgba(140,170,200,0.9); background: rgba(140,170,200,0.22); }
         .ws-icone-img {
             height: 2.4rem; display: flex; align-items: center; justify-content: center;
             font-size: 2.15rem; line-height: 1; color: #e8d5a3;
@@ -4886,9 +4889,11 @@
                 rows: Math.max(1, Math.floor((h - WS_Y0) / WS_CEL_H))
             };
         }
+        /* `ignorar` pode ser uma chave (string) ou um Set de chaves */
         function wsOcupadas(ignorar) {
+            const ign = ignorar instanceof Set ? ignorar : new Set(ignorar ? [ignorar] : []);
             const set = new Set();
-            wsAtalhos.forEach(a => { if (a.key !== ignorar && Number.isInteger(a.c) && Number.isInteger(a.r)) set.add(a.c + ',' + a.r); });
+            wsAtalhos.forEach(a => { if (!ign.has(a.key) && Number.isInteger(a.c) && Number.isInteger(a.r)) set.add(a.c + ',' + a.r); });
             return set;
         }
         /* primeira célula livre, descendo a coluna e depois indo para a próxima (como o Windows) */
@@ -4897,9 +4902,9 @@
             for (let c = 0; c < 200; c++) for (let r = 0; r < g.rows; r++) if (!occ.has(c + ',' + r)) return { c, r };
             return { c: 0, r: 0 };
         }
-        /* célula livre mais próxima da preferida */
-        function wsCelulaLivre(pref, ignorar) {
-            const g = wsGrade(), occ = wsOcupadas(ignorar);
+        /* célula livre mais próxima da preferida, dado um conjunto de células ocupadas */
+        function wsLivreEm(pref, occ) {
+            const g = wsGrade();
             const p = { c: Math.max(0, Math.min(pref.c, g.cols - 1)), r: Math.max(0, Math.min(pref.r, g.rows - 1)) };
             if (!occ.has(p.c + ',' + p.r)) return p;
             let melhor = null, menor = Infinity;
@@ -4908,8 +4913,11 @@
                 const dist = (c - p.c) * (c - p.c) + (r - p.r) * (r - p.r);
                 if (dist < menor) { menor = dist; melhor = { c, r }; }
             }
-            return melhor || wsPrimeiraLivre(ignorar);
+            if (melhor) return melhor;
+            for (let c = 0; c < 200; c++) for (let r = 0; r < g.rows; r++) if (!occ.has(c + ',' + r)) return { c, r };
+            return { c: 0, r: 0 };
         }
+        function wsCelulaLivre(pref, ignorar) { return wsLivreEm(pref, wsOcupadas(ignorar)); }
         function wsPosicionar(el, a) {
             el.style.left = (WS_X0 + a.c * WS_CEL_W + (WS_CEL_W - WS_ICONE_W) / 2) + 'px';
             el.style.top = (WS_Y0 + a.r * WS_CEL_H) + 'px';
@@ -4962,6 +4970,61 @@
 
         function wsSelecionar(el) {
             wsIcones.forEach(i => i.classList.toggle('selecionado', i === el));
+        }
+        /* ---- seleção múltipla: chaves selecionadas, mover e remover em grupo ---- */
+        function wsSelecionadosChaves() {
+            const r = [];
+            wsIcones.forEach((el, k) => { if (el.classList.contains('selecionado')) r.push(k); });
+            return r;
+        }
+        /* alvo de uma ação de teclado: a seleção; se o ícone focado não faz parte dela, só ele */
+        function wsChavesAcao(key) {
+            const sel = wsSelecionadosChaves();
+            return key && !sel.includes(key) ? [key] : sel;
+        }
+        /* move um grupo de atalhos juntos (dc/dr em células), mantendo o formato do grupo.
+           Quem cairia numa célula ocupada por um ícone fora do grupo vai para a livre mais próxima. */
+        function wsMoverGrupo(chaves, dc, dr) {
+            const itens = wsAtalhos.filter(a => chaves.includes(a.key) && Number.isInteger(a.c) && Number.isInteger(a.r));
+            if (!itens.length) return;
+            const g = wsGrade();
+            const minC = Math.min(...itens.map(a => a.c)), maxC = Math.max(...itens.map(a => a.c));
+            const minR = Math.min(...itens.map(a => a.r)), maxR = Math.max(...itens.map(a => a.r));
+            dc = Math.max(-minC, Math.min(dc, Math.max(0, g.cols - 1 - maxC)));
+            dr = Math.max(-minR, Math.min(dr, Math.max(0, g.rows - 1 - maxR)));
+            const occ = wsOcupadas(new Set(itens.map(a => a.key)));   /* só os que NÃO estão no grupo */
+            const alvos = itens.map(a => ({ a, c: a.c + dc, r: a.r + dr }));
+            const pendentes = [];
+            alvos.forEach(t => {
+                const k = t.c + ',' + t.r;
+                if (!occ.has(k)) { occ.add(k); t.a.c = t.c; t.a.r = t.r; } else pendentes.push(t);
+            });
+            pendentes.forEach(t => {
+                const p = wsLivreEm({ c: t.c, r: t.r }, occ);
+                occ.add(p.c + ',' + p.r);
+                t.a.c = p.c; t.a.r = p.r;
+            });
+            wsSalvar();
+            itens.forEach(a => { const el = wsIcones.get(a.key); if (el) wsPosicionar(el, a); });
+        }
+        function wsRemoverVarios(chaves) {
+            if (!chaves || !chaves.length) return;
+            const set = new Set(chaves);
+            wsAtalhos = wsAtalhos.filter(a => !set.has(a.key));
+            wsSalvar();
+            wsRender();
+            wsNotificar();
+            try { wsEl.focus({ preventScroll: true }); } catch (e) {}
+        }
+        /* Delete e setas (sem Ctrl/Alt/Meta, que são atalhos das workspaces) agem em toda a seleção */
+        function wsTeclaGrupo(e, key) {
+            if (e.ctrlKey || e.metaKey || e.altKey) return false;
+            if (e.key === 'Delete') { e.preventDefault(); wsRemoverVarios(wsChavesAcao(key)); return true; }
+            const dir = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+            if (!dir) return false;
+            e.preventDefault();
+            wsMoverGrupo(wsChavesAcao(key), dir[0], dir[1]);
+            return true;
         }
 
         /* ---- menu de contexto ---- */
@@ -5018,9 +5081,26 @@
             el.addEventListener('pointerdown', (e) => {
                 if (e.pointerType === 'mouse' && e.button !== 0) return;
                 wsFecharMenu();
-                wsSelecionar(el);
-                const r = el.getBoundingClientRect();
-                d = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: e.clientX - r.left, oy: e.clientY - r.top, ativo: false, x: 0, y: 0 };
+                const aditivo = e.ctrlKey || e.metaKey || e.shiftKey;
+                let colapsar = false;
+                if (aditivo) {
+                    /* Ctrl/Shift+clique: inclui ou tira este ícone da seleção */
+                    el.classList.toggle('selecionado');
+                    if (!el.classList.contains('selecionado')) return;
+                } else if (!el.classList.contains('selecionado')) {
+                    wsSelecionar(el);
+                } else {
+                    /* já está selecionado: mantém o grupo (para arrastar junto); se só clicar, vira seleção única ao soltar */
+                    colapsar = wsSelecionadosChaves().length > 1;
+                }
+                const grupo = [];
+                wsIcones.forEach(i => { if (i.classList.contains('selecionado')) grupo.push(i); });
+                if (!grupo.includes(el)) grupo.push(el);
+                d = {
+                    id: e.pointerId, sx: e.clientX, sy: e.clientY, sl: wsEl.scrollLeft, st: wsEl.scrollTop,
+                    ativo: false, dx: 0, dy: 0, colapsar,
+                    itens: grupo.map(i => ({ el: i, l: i.offsetLeft, t: i.offsetTop }))
+                };
                 try { el.setPointerCapture(e.pointerId); } catch (_) {}
             });
             el.addEventListener('pointermove', (e) => {
@@ -5028,35 +5108,32 @@
                 if (!d.ativo) {
                     if (Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < WS_LIMIAR) return;
                     d.ativo = true;
-                    el.classList.add('arrastando');
+                    d.itens.forEach(it => it.el.classList.add('arrastando'));
                 }
-                const b = wsEl.getBoundingClientRect();
-                d.x = Math.max(0, Math.min(e.clientX - b.left + wsEl.scrollLeft - d.ox, Math.max(0, wsEl.scrollWidth - WS_ICONE_W)));
-                d.y = Math.max(0, Math.min(e.clientY - b.top + wsEl.scrollTop - d.oy, Math.max(0, wsEl.clientHeight - 60)));
-                el.style.left = d.x + 'px';
-                el.style.top = d.y + 'px';
+                let dx = (e.clientX + wsEl.scrollLeft) - (d.sx + d.sl);
+                let dy = (e.clientY + wsEl.scrollTop) - (d.sy + d.st);
+                const minL = Math.min(...d.itens.map(i => i.l)), maxL = Math.max(...d.itens.map(i => i.l));
+                const minT = Math.min(...d.itens.map(i => i.t)), maxT = Math.max(...d.itens.map(i => i.t));
+                dx = Math.max(-minL, Math.min(dx, Math.max(0, wsEl.scrollWidth - WS_ICONE_W) - maxL));
+                dy = Math.max(-minT, Math.min(dy, Math.max(0, wsEl.clientHeight - 60) - maxT));
+                d.dx = dx; d.dy = dy;
+                d.itens.forEach(it => { it.el.style.left = (it.l + dx) + 'px'; it.el.style.top = (it.t + dy) + 'px'; });
             });
             const fim = (e, cancelar) => {
                 if (!d || e.pointerId !== d.id) return;
                 const s = d;
                 d = null;
                 try { el.releasePointerCapture(e.pointerId); } catch (_) {}
-                el.classList.remove('arrastando');
-                const a = dados();
+                s.itens.forEach(it => it.el.classList.remove('arrastando'));
                 if (!s.ativo) {
                     /* toque/caneta: um toque abre; mouse usa duplo clique */
                     if (!cancelar && e.pointerType !== 'mouse') wsAbrir(el.dataset.key);
+                    else if (!cancelar && s.colapsar) wsSelecionar(el);
                     return;
                 }
                 wsUltimoArrasto = performance.now();
-                if (!a) return;
-                const g = wsGrade();
-                const c = Math.max(0, Math.min(Math.round((s.x - WS_X0) / WS_CEL_W), g.cols - 1));
-                const r = Math.max(0, Math.min(Math.round((s.y - WS_Y0) / WS_CEL_H), g.rows - 1));
-                const p = wsCelulaLivre({ c, r }, a.key);
-                a.c = p.c; a.r = p.r;
-                wsSalvar();
-                wsPosicionar(el, a);
+                /* encaixa na grade: o grupo inteiro anda o mesmo número de células */
+                wsMoverGrupo(s.itens.map(it => it.el.dataset.key), Math.round(s.dx / WS_CEL_W), Math.round(s.dy / WS_CEL_H));
             };
             el.addEventListener('pointerup', (e) => fim(e, false));
             el.addEventListener('pointercancel', (e) => fim(e, true));
@@ -5067,11 +5144,14 @@
             });
             el.addEventListener('contextmenu', (e) => {
                 e.preventDefault();
-                wsSelecionar(el);
+                if (!el.classList.contains('selecionado')) wsSelecionar(el);
                 const key = el.dataset.key;
+                const sel = wsSelecionadosChaves();
                 wsMenu(e.clientX, e.clientY, [
                     ['Abrir', () => wsAbrir(key)],
-                    ['Remover atalho', () => wsRemover(key)],
+                    sel.length > 1
+                        ? ['Remover ' + sel.length + ' atalhos selecionados', () => wsRemoverVarios(sel)]
+                        : ['Remover atalho', () => wsRemover(key)],
                     null,
                     ['Remover todos os atalhos', wsLimparTudo]
                 ]);
@@ -5080,18 +5160,7 @@
                 const a = dados();
                 if (!a) return;
                 if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); wsAbrir(a.key); return; }
-                if (e.key === 'Delete') { e.preventDefault(); wsRemover(a.key); return; }
-                const dir = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
-                if (!dir) return;
-                e.preventDefault();
-                const g = wsGrade();
-                const p = wsCelulaLivre({
-                    c: Math.max(0, Math.min(a.c + dir[0], g.cols - 1)),
-                    r: Math.max(0, Math.min(a.r + dir[1], g.rows - 1))
-                }, a.key);
-                a.c = p.c; a.r = p.r;
-                wsSalvar();
-                wsPosicionar(el, a);
+                wsTeclaGrupo(e, a.key);
             });
         }
 
@@ -5116,7 +5185,85 @@
         }
 
         /* clique/menu no fundo da área de trabalho */
-        wsEl.addEventListener('pointerdown', (e) => { if (e.target === wsEl) wsSelecionar(null); });
+        /* seleção por retângulo (rubber band): arraste no fundo vazio com o botão esquerdo.
+           Ctrl/Shift ao começar = soma à seleção atual. Só mouse/caneta (no toque, arrastar continua rolando a tela). */
+        wsEl.tabIndex = -1;   /* o fundo recebe o foco, para Delete/setas/Ctrl+A funcionarem depois de selecionar */
+        const wsBorracha = document.createElement('div');
+        wsBorracha.className = 'ws-borracha';
+        wsBorracha.setAttribute('aria-hidden', 'true');
+        wsEl.appendChild(wsBorracha);
+        let wsBand = null;
+
+        function wsBandAtualizar() {
+            const b = wsBand;
+            if (!b) return;
+            const r = wsEl.getBoundingClientRect();
+            const px = Math.max(r.left, Math.min(b.px, r.right));
+            const py = Math.max(r.top, Math.min(b.py, r.bottom));
+            const x1 = px - r.left + wsEl.scrollLeft, y1 = py - r.top + wsEl.scrollTop;
+            const L = Math.min(b.x0, x1), T = Math.min(b.y0, y1), R = Math.max(b.x0, x1), B = Math.max(b.y0, y1);
+            wsBorracha.style.display = 'block';
+            wsBorracha.style.left = L + 'px';
+            wsBorracha.style.top = T + 'px';
+            wsBorracha.style.width = (R - L) + 'px';
+            wsBorracha.style.height = (B - T) + 'px';
+            wsIcones.forEach((el, key) => {
+                const x = el.offsetLeft, y = el.offsetTop;
+                const toca = x < R && x + el.offsetWidth > L && y < B && y + el.offsetHeight > T;
+                const sel = toca || b.base.has(key);
+                if (el.classList.contains('selecionado') !== sel) el.classList.toggle('selecionado', sel);
+            });
+        }
+        function wsBandFim(e) {
+            if (!wsBand || e.pointerId !== wsBand.id) return;
+            wsBand = null;
+            try { wsEl.releasePointerCapture(e.pointerId); } catch (_) {}
+            wsBorracha.style.display = 'none';
+            try { wsEl.focus({ preventScroll: true }); } catch (_) {}
+        }
+        wsEl.addEventListener('pointerdown', (e) => {
+            if (e.target !== wsEl) return;
+            wsFecharMenu();
+            if (e.pointerType === 'touch' || (e.pointerType === 'mouse' && e.button !== 0)) { wsSelecionar(null); return; }
+            const r = wsEl.getBoundingClientRect();
+            /* clique na barra de rolagem não inicia seleção */
+            if (e.clientX - r.left >= wsEl.clientWidth || e.clientY - r.top >= wsEl.clientHeight) return;
+            const aditivo = e.ctrlKey || e.metaKey || e.shiftKey;
+            const base = new Set(aditivo ? wsSelecionadosChaves() : []);
+            if (!aditivo) wsSelecionar(null);
+            wsBand = {
+                id: e.pointerId, sx: e.clientX, sy: e.clientY, px: e.clientX, py: e.clientY,
+                x0: e.clientX - r.left + wsEl.scrollLeft, y0: e.clientY - r.top + wsEl.scrollTop,
+                ativo: false, base
+            };
+            try { wsEl.setPointerCapture(e.pointerId); } catch (_) {}
+        });
+        wsEl.addEventListener('pointermove', (e) => {
+            if (!wsBand || e.pointerId !== wsBand.id) return;
+            wsBand.px = e.clientX; wsBand.py = e.clientY;
+            if (!wsBand.ativo) {
+                if (Math.hypot(e.clientX - wsBand.sx, e.clientY - wsBand.sy) < WS_LIMIAR) return;
+                wsBand.ativo = true;
+            }
+            wsBandAtualizar();
+        });
+        wsEl.addEventListener('pointerup', wsBandFim);
+        wsEl.addEventListener('pointercancel', wsBandFim);
+        wsEl.addEventListener('lostpointercapture', wsBandFim);
+        wsEl.addEventListener('scroll', () => { if (wsBand && wsBand.ativo) wsBandAtualizar(); }, { passive: true });
+
+        /* teclado com o foco no fundo (depois de selecionar com o retângulo) */
+        wsEl.addEventListener('keydown', (e) => {
+            if (e.target !== wsEl) return;
+            if ((e.ctrlKey || e.metaKey) && !e.altKey && (e.key === 'a' || e.key === 'A')) {
+                e.preventDefault();
+                wsIcones.forEach(i => i.classList.add('selecionado'));
+                return;
+            }
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            if (e.key === 'Escape') { wsSelecionar(null); return; }
+            wsTeclaGrupo(e, null);
+        });
         wsEl.addEventListener('contextmenu', (e) => {
             if (e.target !== wsEl) return;
             e.preventDefault();
