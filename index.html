@@ -1293,7 +1293,9 @@
             background: rgba(15, 10, 8, 0.96);
             border-top: 2px solid #3a3028;
             box-shadow: 0 -4px 20px rgba(0,0,0,0.7);
-            z-index: 9988; display: none; align-items: center;
+            /* acima da camada das janelas (10100 / 10920 na Workspace 2) e da sidebar flutuante (10150);
+               abaixo dos menus (10990), da visão geral das workspaces (11000) e dos avisos */
+            z-index: 10960; display: none; align-items: center;
             padding: 0 8px; pointer-events: auto; overflow: hidden;
             transition: left 0.3s ease;
         }
@@ -1791,6 +1793,7 @@
             background: #0a1505;
             box-shadow: inset -1px -1px 0 rgba(200,255,180,0.08);
         }
+        .fx-btn:disabled { opacity: 0.4; cursor: not-allowed; pointer-events: none; }
         .fx-btn.fx-btn-warn {
             background: #2a1a08;
             border-color: #6a4a2a;
@@ -2739,7 +2742,7 @@
         }
         :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .ws-pager { border-right-color: #9a8a7a; }
 
-        body.ws2-ativo .window-taskbar { left: 0; z-index: 10950; }
+        body.ws2-ativo .window-taskbar { left: 0; z-index: 10960; }
 
         .workspace-desktop {
             position: fixed;
@@ -3755,18 +3758,18 @@
             'noiseMax', 'flickerIntensity', 'scanlinesIntensity',
             'heroGlow', 'heroAura', 'heroSpeed', 'heroIntensity'
         ];
-        // Alterado: padrões para desativar CRT, brilho e aura
+        // Padrões: todos os efeitos ligados (conforme o painel de referência)
         const FX_DEFAULTS = {
-            crt: false,
-            scanlines: false,
-            flicker: false,
-            noiseCrt: false,
+            crt: true,
+            scanlines: true,
+            flicker: true,
+            noiseCrt: true,
             marquee: true,
-            noiseMax: 0,
-            flickerIntensity: 0,
-            scanlinesIntensity: 0,
-            heroGlow: false,
-            heroAura: false,
+            noiseMax: 0.8,
+            flickerIntensity: 1,
+            scanlinesIntensity: 1,
+            heroGlow: true,
+            heroAura: true,
             heroSpeed: 4,
             heroIntensity: 1,
             leituraCalma: false
@@ -3833,7 +3836,24 @@
             applyFxState();
         }
 
+        /* restaura TODOS os efeitos ao padrão (usado pelo botão do painel e pelo comando fx-reset do terminal).
+           Retorna true se algo realmente mudou. */
+        function restaurarPadroesFx() {
+            /* Leitura calma bloqueia o painel: não restaura nada enquanto estiver ativa */
+            if (fxState.leituraCalma) return null;
+            const mudou = Object.keys(FX_DEFAULTS).some(k => fxState[k] !== FX_DEFAULTS[k]) || !!leituraCalmaBackup;
+            Object.assign(fxState, FX_DEFAULTS);
+            leituraCalmaBackup = null;
+            salvarBackupLeituraCalma();
+            saveFxState();
+            try { applyFxState(); } catch (e) { console.error('[fx] restaurar padrões:', e); }
+            /* garante que os controles do painel reflitam o estado mesmo se algo acima falhar */
+            try { sincronizarPainelEfeitos(); } catch (e) { console.error('[fx] sincronizar painel:', e); }
+            return mudou;
+        }
+
         function sincronizarPainelEfeitos() {
+            document.querySelectorAll('[data-fx-reset]').forEach(b => { b.disabled = !!fxState.leituraCalma; });
             document.querySelectorAll('input[data-fx-key]').forEach(inp => {
                 const key = inp.dataset.fxKey;
                 if (!Object.prototype.hasOwnProperty.call(fxState, key)) return;
@@ -5533,11 +5553,29 @@
                 if (store) w.rect = { left: r.left, top: r.top, width: r.width, height: r.height };
             }
 
+            /* a taskbar fica ACIMA das janelas: quando ela aparece, puxa para dentro da área útil as janelas que ficariam escondidas por baixo dela */
+            function ajustarJanelasAoTaskbar() {
+                if (isMobile()) return;
+                const wa = getWorkArea();
+                Object.keys(windows).forEach(id => {
+                    const w = windows[id];
+                    if (!w || !w.el || w.state !== 'normal' || w.snap) return;
+                    const r = rectFromStyle(w.el);
+                    if (r.top + r.height <= wa.bottom) return;
+                    let top = Math.max(wa.top, wa.bottom - r.height);
+                    let height = r.height;
+                    if (top + height > wa.bottom) height = Math.max(MIN_H, wa.bottom - top);
+                    applyRect(w, { left: r.left, top: top, width: r.width, height: height }, true);
+                });
+            }
+
             function updateTaskbarVisibility() {
                 const hasAny = Object.keys(windows).length > 0 || wsContagem() > 0 || wsEstaNoDesktop() || wsTotal > 2;
+                const taskbarJaVisivel = !!(taskbar && taskbar.classList.contains('visivel'));
                 if (taskbar) taskbar.classList.toggle('visivel', hasAny);
                 document.body.classList.toggle('window-taskbar-visible', hasAny);
                 document.documentElement.style.setProperty('--window-taskbar-h', hasAny ? (TASKBAR_H + 'px') : '0px');
+                if (hasAny && !taskbarJaVisivel) ajustarJanelasAoTaskbar();
                 const anyMax = Object.keys(windows).some(id => windows[id].ws === wsAtual && windows[id].state === 'maximized');
                 document.body.classList.toggle('has-maximized-window', anyMax);
             }
@@ -5965,14 +6003,18 @@
                 const btnReset = document.createElement('button');
                 btnReset.type = 'button';
                 btnReset.className = 'fx-btn';
+                btnReset.dataset.fxReset = '1';
+                btnReset.disabled = !!fxState.leituraCalma;
                 btnReset.textContent = '↺ restaurar padrões';
-                btnReset.addEventListener('click', () => {
-                    Object.assign(fxState, FX_DEFAULTS);
-                    leituraCalmaBackup = null;
-                    salvarBackupLeituraCalma();
-                    saveFxState();
-                    applyFxState();
-                    sincronizarPainelEfeitos();
+                btnReset.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    if (fxState.leituraCalma) return;
+                    const mudou = restaurarPadroesFx();
+                    /* feedback visível: mostra que o clique funcionou, mesmo se os efeitos já estavam no padrão */
+                    btnReset.textContent = mudou ? '✓ padrões restaurados' : '✓ já está no padrão';
+                    clearTimeout(btnReset._fxTimer);
+                    btnReset._fxTimer = setTimeout(() => { btnReset.textContent = '↺ restaurar padrões'; }, 1500);
                 });
                 actions.appendChild(btnReset);
 
@@ -7115,9 +7157,11 @@
         }
 
         function cmdFxReset() {
-            Object.assign(fxState, FX_DEFAULTS);
-            saveFxState();
-            applyFxState();
+            if (fxState.leituraCalma) {
+                appendTerminalLinha("fx: bloqueado — desative a Leitura calma para restaurar os efeitos", 't-err');
+                return;
+            }
+            restaurarPadroesFx();
             appendTerminalLinha("fx: todos os efeitos restaurados para o padrão", 't-ok');
         }
 
