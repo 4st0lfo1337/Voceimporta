@@ -1288,7 +1288,7 @@
 
         .window-taskbar {
             position: fixed; bottom: 0;
-            left: var(--sidebar-largura); right: 0;
+            left: 0; right: 0;
             height: var(--window-taskbar-h-real);
             background: rgba(15, 10, 8, 0.96);
             border-top: 2px solid #3a3028;
@@ -2216,7 +2216,9 @@
         @media (prefers-reduced-motion: reduce) { .tree-folder::after { transition: none; } }
 
         /* SIDEBAR CLARA — acompanha a sticky bar quando ela fica clara */
-        .sidebar { isolation: isolate; transition: transform 0.3s ease, border-color var(--tema-transicao), box-shadow var(--tema-transicao); }
+        .sidebar { isolation: isolate; transition: transform 0.3s ease, height 0.26s cubic-bezier(.2,.8,.2,1), border-color var(--tema-transicao), box-shadow var(--tema-transicao); }
+        /* sidebar acoplada: termina rente ao topo da taskbar (sem passar por cima dela) */
+        .sidebar:not(.flutuante) { height: calc(100vh - var(--window-taskbar-h)); height: calc(100dvh - var(--window-taskbar-h)); }
         /* Camada clara com fade (gradientes não animam, então o fade é feito por opacidade) */
         .sidebar::before { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(180deg, #e0d8c8 0%, #d0c8b8 100%); opacity: 0; transition: opacity var(--tema-transicao); }
         .sidebar-header, .sidebar-path, .sidebar-footer, .tree-item, .tree-folder, .crt-toggle-btn, .sidebar-hide-btn, .explorer-title, .sidebar-tools-label, .sidebar-footer-text, .tree-folder::after, .tree-item::after { transition: background-color var(--tema-transicao), color var(--tema-transicao), border-color var(--tema-transicao), box-shadow var(--tema-transicao), text-shadow var(--tema-transicao); }
@@ -2316,7 +2318,7 @@
 
         /* pré-visualização da zona de encaixe (borda esquerda) */
         .sidebar-dock-preview {
-            position: fixed; top: 0; left: 0; width: 286px; height: 100vh;
+            position: fixed; top: 0; left: 0; width: 286px; height: calc(100vh - var(--window-taskbar-h));
             background: rgba(200,176,144,0.12); border: 2px dashed #c8b090;
             box-shadow: inset 0 0 30px rgba(200,176,144,0.08);
             z-index: 10160; pointer-events: none;
@@ -2713,6 +2715,212 @@
             .texto-corrido { font-size: 1rem; line-height: 1.85; }
             .membro-card { flex-direction: row; align-items: center; }
             .lm-corpo { padding: 1.4rem 1rem 0.6rem; }
+        }
+
+        /* ===================================================================== */
+        /* WORKSPACES — pager na taskbar + Workspace 2 (área de trabalho)         */
+        /* ===================================================================== */
+        .tb-menu { z-index: 10990; }
+
+        /* as janelas pertencem à Workspace 2: só aparecem (acima do wallpaper e dos atalhos) quando ela está ativa */
+        /* cada janela pertence a UMA workspace: só aparecem as da workspace ativa (as outras ganham .ws-fora) */
+        body.ws2-ativo .window-layer { z-index: 10920; }
+        .os-window.ws-fora { display: none !important; }
+        body.ws2-ativo .snap-preview { z-index: 10910; }
+        body.ws2-ativo .os-window.maximized { top: 0 !important; height: calc(100% - var(--window-taskbar-h)) !important; }
+        @media (max-width: 1024px) { body.ws2-ativo .os-window { top: 0 !important; } }
+
+        .ws-pager { display: flex; gap: 3px; flex: 0 0 auto; margin-right: 6px; padding-right: 8px; border-right: 1px solid #3a3028; align-items: center; }
+        .ws-btn { min-width: 34px; justify-content: center; padding: 4px 9px; max-width: none; }
+        .ws-btn.ws-novo { animation: ws-novo-pulse 0.9s ease-in-out 2; }
+        @keyframes ws-novo-pulse {
+            0%, 100% { box-shadow: inset 1px 1px 0 rgba(255,255,255,0.06); }
+            50% { box-shadow: 0 0 12px 2px rgba(200,176,144,0.85); background: #5a4a30; }
+        }
+        :is(body.barra-clara.barra-visivel, body.barra-clara.has-maximized-window) .ws-pager { border-right-color: #9a8a7a; }
+
+        body.ws2-ativo .window-taskbar { left: 0; z-index: 10950; }
+
+        .workspace-desktop {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            bottom: var(--window-taskbar-h);
+            z-index: 10900;
+            overflow: auto;
+            overscroll-behavior: contain;
+            user-select: none;
+            -webkit-user-select: none;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #120d0a;
+            /* 1ª camada = wallpaper (definido por --ws-wallpaper no JS); as demais são o fundo de reserva */
+            background-image:
+                var(--ws-wallpaper, none),
+                radial-gradient(ellipse at 28% 25%, rgba(110,75,45,0.45) 0%, transparent 60%),
+                radial-gradient(ellipse at 75% 82%, rgba(70,55,35,0.5) 0%, transparent 55%),
+                linear-gradient(135deg, #1a1510 0%, #0d0a08 100%);
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+            transition: opacity 0.28s ease, visibility 0s linear 0.28s;
+        }
+        .workspace-desktop.ativo { opacity: 1; visibility: visible; pointer-events: auto; transition-delay: 0s; }
+        .workspace-desktop::before {
+            content: ''; position: fixed; top: 0; left: 0; right: 0; bottom: var(--window-taskbar-h);
+            background: linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0.06) 40%, rgba(0,0,0,0.38) 100%);
+            pointer-events: none;
+        }
+
+        .ws-icone {
+            position: absolute;
+            width: 88px;
+            display: flex; flex-direction: column; align-items: center; gap: 4px;
+            padding: 10px 6px 8px;
+            border: 1px solid transparent; border-radius: 3px;
+            text-align: center; cursor: pointer; outline: none;
+            touch-action: none;
+            -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+            transition: background 0.15s ease, border-color 0.15s ease, left 0.16s ease-out, top 0.16s ease-out;
+        }
+        .ws-icone:hover, .ws-icone:focus-visible { background: rgba(200,176,144,0.14); border-color: rgba(200,176,144,0.3); }
+        .ws-icone.selecionado { background: rgba(140,170,200,0.28); border-color: rgba(140,170,200,0.6); }
+        .ws-icone.arrastando { transition: none; opacity: 0.8; z-index: 5; cursor: grabbing; filter: drop-shadow(0 6px 10px rgba(0,0,0,0.55)); }
+        .ws-icone-img {
+            height: 2.4rem; display: flex; align-items: center; justify-content: center;
+            font-size: 2.15rem; line-height: 1; color: #e8d5a3;
+            font-family: "Segoe UI Symbol", "DejaVu Sans", 'Courier New', monospace;
+            text-shadow: 0 0 10px rgba(200,160,100,0.45), 1px 1px 2px rgba(0,0,0,0.9);
+            pointer-events: none;
+        }
+        .ws-icone-rotulo {
+            font-size: 0.68rem; line-height: 1.2; color: #e0d5c0; letter-spacing: 0.3px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.95), 0 0 6px rgba(0,0,0,0.75);
+            word-break: break-word; max-width: 84px;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+            pointer-events: none;
+        }
+        .ws-vazio {
+            display: none; position: fixed; right: 16px; bottom: calc(var(--window-taskbar-h) + 16px);
+            width: min(250px, calc(100vw - 32px)); padding: 0.6rem 0.85rem; text-align: left;
+            font-size: 0.7rem; line-height: 1.5; color: #d8cbb4;
+            background: rgba(15,10,8,0.55); border: 1px dashed rgba(200,176,144,0.4);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.9); pointer-events: none;
+        }
+        .workspace-desktop.sem-atalhos .ws-vazio { display: block; padding-right: 1.7rem; }
+        .workspace-desktop.dica-oculta .ws-vazio { display: none !important; }
+        .ws-vazio-fechar {
+            position: absolute; top: 2px; right: 4px; pointer-events: auto;
+            background: none; border: 0; color: #d8cbb4; cursor: pointer;
+            font-family: inherit; font-size: 1.1rem; line-height: 1; padding: 2px 5px;
+        }
+        .ws-vazio-fechar:hover, .ws-vazio-fechar:focus-visible { color: #fff; background: rgba(200,176,144,0.2); outline: none; }
+        @media (prefers-reduced-motion: reduce) {
+            .workspace-desktop, .ws-icone { transition: none !important; }
+            .ws-btn.ws-novo { animation: none; }
+        }
+
+        /* ===================================================================== */
+        /* VISÃO GERAL DAS WORKSPACES — estilo "Expo" do Linux Mint               */
+        /* ===================================================================== */
+        .ws-btn-expo { font-size: 0.85rem; padding: 4px 8px; min-width: 30px; }
+        .ws-expo {
+            position: fixed; inset: 0; z-index: 11000;
+            display: flex; overflow: auto;
+            background: rgba(16, 12, 9, 0.9);
+            -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
+            font-family: 'Courier New', Courier, monospace;
+            -webkit-user-select: none; user-select: none;
+            opacity: 0; visibility: hidden;
+            transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+        }
+        .ws-expo.aberto { opacity: 1; visibility: visible; transition-delay: 0s; }
+        .ws-expo-grade {
+            margin: auto; padding: 28px 0 56px;
+            display: flex; flex-wrap: wrap; justify-content: center; align-content: center;
+            transform: scale(0.95); transition: transform 0.24s cubic-bezier(.2,.8,.2,1);
+        }
+        .ws-expo.aberto .ws-expo-grade { transform: none; }
+        .ws-expo-item { display: flex; flex-direction: column; align-items: center; gap: 10px; flex: 0 0 auto; }
+        .ws-expo-thumb {
+            position: relative; overflow: hidden; flex: 0 0 auto; box-sizing: border-box;
+            border: 2px solid #3a3028; border-radius: 2px; outline: none; cursor: pointer;
+            background-color: #120d0a; background-size: cover; background-position: center; background-repeat: no-repeat;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+            transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+        }
+        .ws-expo-thumb.tipo-desktop {
+            background-image:
+                var(--ws-wallpaper, none),
+                radial-gradient(ellipse at 28% 25%, rgba(110,75,45,0.45) 0%, transparent 60%),
+                radial-gradient(ellipse at 75% 82%, rgba(70,55,35,0.5) 0%, transparent 55%),
+                linear-gradient(135deg, #1a1510 0%, #0d0a08 100%);
+        }
+        .ws-expo-thumb.tipo-site { background-image: linear-gradient(135deg, #2a2118 0%, #0d0a08 100%); }
+        .ws-expo-thumb:hover, .ws-expo-thumb:focus-visible { border-color: #8a6a4a; }
+        .ws-expo-thumb.atual { border-color: #c8b090; box-shadow: 0 0 0 1px rgba(200,176,144,0.35), 0 8px 24px rgba(0,0,0,0.6); }
+        .ws-expo-item.alvo .ws-expo-thumb { border-color: #8cc0ff; box-shadow: 0 0 0 3px rgba(140,192,255,0.35), 0 8px 24px rgba(0,0,0,0.6); transform: scale(1.025); }
+        .ws-expo-site { position: absolute; inset: 0; pointer-events: none; }
+        .ws-expo-site-barra { position: absolute; left: 0; right: 0; top: 0; background: rgba(15,10,8,0.95); border-bottom: 1px solid #3a3028; }
+        .ws-expo-site-rotulo { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: clamp(9px, 2.2vw, 20px); letter-spacing: 2px; color: rgba(200,176,144,0.38); text-transform: lowercase; }
+        .ws-expo-atalho {
+            position: absolute; text-align: center; line-height: 1; color: #e8d5a3; pointer-events: none;
+            font-family: "Segoe UI Symbol", "DejaVu Sans", 'Courier New', monospace;
+            text-shadow: 0 0 6px rgba(200,160,100,0.4), 1px 1px 1px rgba(0,0,0,0.9);
+        }
+        .ws-expo-janela {
+            position: absolute; display: flex; flex-direction: column; overflow: hidden; box-sizing: border-box;
+            min-width: 22px; min-height: 14px; background: #1e1812; border: 1px solid #5a4a3a;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.7); cursor: grab; touch-action: none; outline: none;
+        }
+        .ws-expo-janela:hover, .ws-expo-janela:focus-visible { border-color: #8a6a4a; }
+        .ws-expo-janela.focada { border-color: #c8b090; }
+        .ws-expo-janela.minimizada { opacity: 0.5; border-style: dashed; }
+        .ws-expo-janela.arrastando { opacity: 0.2; }
+        .ws-expo-janela-barra {
+            flex: 0 0 auto; height: 12px; padding: 0 4px; box-sizing: border-box;
+            background: linear-gradient(180deg, #3a2515 0%, #1a1008 100%);
+            color: #e8d5a3; font-size: 8px; line-height: 12px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+        .ws-expo-janela.focada .ws-expo-janela-barra { background: linear-gradient(180deg, #5a4020 0%, #2a1a0c 100%); }
+        .ws-expo-janela-corpo { flex: 1 1 auto; margin: 4px; background: repeating-linear-gradient(180deg, rgba(200,176,144,0.12) 0 2px, transparent 2px 7px); }
+        .ws-expo-janela.chegou { animation: ws-expo-chegou 0.8s ease-out; }
+        @keyframes ws-expo-chegou { 0% { box-shadow: 0 0 0 3px rgba(140,192,255,0.9), 0 3px 10px rgba(0,0,0,0.7); } 100% { box-shadow: 0 0 0 0 rgba(140,192,255,0), 0 3px 10px rgba(0,0,0,0.7); } }
+        .ws-expo-proxy { position: fixed !important; z-index: 11010; pointer-events: none; opacity: 0.92; cursor: grabbing; box-shadow: 0 14px 34px rgba(0,0,0,0.85); }
+        .ws-expo.arrastando-janela { cursor: grabbing; }
+        .ws-expo-rotulo {
+            padding: 6px 16px; font: inherit; font-size: 0.78rem; letter-spacing: 0.5px; cursor: pointer;
+            background: #2a231c; color: #d8cbb4; border: 1px solid #3a3028; border-radius: 3px;
+        }
+        .ws-expo-rotulo:hover, .ws-expo-rotulo:focus-visible { background: #3a2a1a; color: #fff3d6; outline: none; }
+        .ws-expo-item.atual .ws-expo-rotulo { background: #4a3a28; color: #fff3d6; border-color: #8a6a4a; }
+        .ws-expo-fechar {
+            position: absolute; top: 4px; right: 4px; z-index: 60; width: 22px; height: 22px; padding: 0;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(15,10,8,0.85); color: #d8cbb4; border: 1px solid #5a4a3a; border-radius: 2px;
+            font: inherit; font-size: 1rem; line-height: 1; cursor: pointer; opacity: 0; transition: opacity 0.15s ease;
+        }
+        .ws-expo-thumb:hover .ws-expo-fechar, .ws-expo-thumb:focus-within .ws-expo-fechar { opacity: 1; }
+        .ws-expo-fechar:hover, .ws-expo-fechar:focus-visible { background: #5a1a1a; color: #ffb0a0; outline: none; }
+        @media (hover: none) { .ws-expo-fechar { opacity: 0.85; } }
+        .ws-expo-novo {
+            position: fixed; right: 0; top: 50%; transform: translateY(-50%); z-index: 5;
+            width: 34px; height: 150px; padding: 0; border: 0; border-radius: 6px 0 0 6px;
+            background: rgba(58,48,40,0.92); color: #d8cbb4; font: inherit; font-size: 1.5rem; cursor: pointer;
+            transition: background 0.15s ease, width 0.15s ease;
+        }
+        .ws-expo-novo:hover, .ws-expo-novo:focus-visible, .ws-expo-novo.alvo { background: #5a4a30; color: #fff; width: 42px; outline: none; }
+        .ws-expo-novo[hidden] { display: none; }
+        .ws-expo-dica { position: fixed; left: 0; right: 0; bottom: 12px; text-align: center; font-size: 0.7rem; letter-spacing: 0.5px; color: #8a7a6a; pointer-events: none; padding: 0 44px; }
+        @media (max-width: 600px) {
+            .ws-expo-novo { width: 26px; height: 96px; font-size: 1.2rem; }
+            .ws-expo-novo:hover, .ws-expo-novo:focus-visible, .ws-expo-novo.alvo { width: 30px; }
+            .ws-expo-dica { display: none; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            .ws-expo, .ws-expo-grade, .ws-expo-thumb, .ws-expo-novo, .ws-expo-fechar { transition: none !important; }
+            .ws-expo-janela.chegou { animation: none; }
         }
     </style>
 </head>
@@ -3526,7 +3734,17 @@
         <div class="window-taskbar-items" id="windowTaskbarItems"></div>
     </div>
 
+    <!-- WORKSPACE 2 — área de trabalho com os atalhos das janelas e o wallpaper -->
+    <div class="workspace-desktop" id="workspaceDesktop" role="region" aria-label="Workspace 2 — área de trabalho" aria-hidden="true">
+        <div class="ws-vazio"><button type="button" class="ws-vazio-fechar" id="wsVazioFechar" aria-label="Fechar aviso" title="Fechar aviso">×</button>Área de trabalho vazia.<br>Abra uma janela e clique em ☆ na barra de título dela (ou use o botão direito na taskbar) para criar um atalho aqui.</div>
+    </div>
+
     <script>
+        /* ===================================================================== */
+        /* >>> WALLPAPER DA WORKSPACE 2 — COLE O LINK DA SUA IMAGEM NA LINHA ABAIXO <<< */
+        /* ===================================================================== */
+        const WORKSPACE_WALLPAPER_URL = 'https://i.pinimg.com/1200x/f1/58/26/f15826b186924e595d81f193d0e6cb04.jpg';
+
         /* ===================================================================== */
         /* ESTADO GLOBAL DOS EFEITOS (CRT + Hero)                                */
         /* ===================================================================== */
@@ -4431,6 +4649,798 @@
             secoesDaArvore.forEach(section => observerArvore.observe(section));
         }
 
+        /* ===================================================================== */
+        /* WORKSPACES — a Workspace 2 é a área de trabalho com os atalhos         */
+        /* Atalhos são criados sob demanda: ☆ na janela ou menu da taskbar.        */
+        /* ===================================================================== */
+        const WS_CHAVE = 'voceimporta_ws_atalhos_v1';
+        const WS_CEL_W = 100, WS_CEL_H = 112, WS_X0 = 12, WS_Y0 = 12;
+        const WS_ICONE_W = 88, WS_LIMIAR = 5;
+        const wsEl = document.getElementById('workspaceDesktop');
+        const wsTaskbarEl = document.getElementById('windowTaskbar');
+        const wsBtns = {};
+        const wsIcones = new Map();
+        let wsAtual = 1;
+        let wsAtalhos = [];
+        let wsMenuEl = null;
+        let wsUltimoArrasto = -1000;
+        let wsPulsoTimer = null;
+        const WS_MAX = 8;
+        const WS_TOTAL_CHAVE = 'voceimporta_ws_total_v1';
+        let wsTotal = 2;            /* quantidade de workspaces: 1 = o site; 2 em diante = área de trabalho */
+        let wsUltimoDesktop = 2;    /* última área de trabalho visitada (usada só pelo pulso do botão do pager) */
+        try {
+            const t = parseInt(localStorage.getItem(WS_TOTAL_CHAVE), 10);
+            if (t >= 2 && t <= WS_MAX) wsTotal = t;
+        } catch (e) {}
+
+        try {
+            const salvo = JSON.parse(localStorage.getItem(WS_CHAVE) || '[]');
+            if (Array.isArray(salvo)) wsAtalhos = salvo.filter(a => a && typeof a.key === 'string' && typeof a.titulo === 'string');
+        } catch (e) {}
+
+        /* aplica o wallpaper (se o link falhar, aparece o fundo de reserva) */
+        (function aplicarWallpaper() {
+            const url = (typeof WORKSPACE_WALLPAPER_URL === 'string' ? WORKSPACE_WALLPAPER_URL : '').trim();
+            if (url && wsEl) wsEl.style.setProperty('--ws-wallpaper', 'url(' + JSON.stringify(url) + ')');
+        })();
+
+        /* pager (botões das workspaces + visão geral) na taskbar, estilo XFCE */
+        const wsPager = document.createElement('div');
+        wsPager.className = 'ws-pager';
+        wsPager.setAttribute('role', 'group');
+        wsPager.setAttribute('aria-label', 'Workspaces');
+        if (wsTaskbarEl) wsTaskbarEl.insertBefore(wsPager, wsTaskbarEl.firstChild);
+
+        function wsPagerRender() {
+            wsPager.textContent = '';
+            Object.keys(wsBtns).forEach(k => delete wsBtns[k]);
+            for (let n = 1; n <= wsTotal; n++) {
+                const t = n === 1
+                    ? 'Workspace 1 — o site (Ctrl+Alt+1)'
+                    : 'Workspace ' + n + ' — área de trabalho' + (n === 2 ? ' com os atalhos' : '') + ' (Ctrl+Alt+' + n + ')';
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'taskbar-item ws-btn';
+                b.textContent = String(n);
+                b.title = t;
+                b.setAttribute('aria-label', t);
+                b.addEventListener('click', () => wsIr(n));
+                wsPager.appendChild(b);
+                wsBtns[n] = b;
+            }
+            const bx = document.createElement('button');
+            bx.type = 'button';
+            bx.className = 'taskbar-item ws-btn ws-btn-expo';
+            bx.textContent = '▦';
+            const tx = 'Visão geral das workspaces — mova janelas entre elas (Ctrl+Alt+↑)';
+            bx.title = tx;
+            bx.setAttribute('aria-label', tx);
+            bx.addEventListener('click', wsExpoAlternar);
+            wsPager.appendChild(bx);
+        }
+
+        /* "desktop" = qualquer workspace a partir da 2 (wallpaper + atalhos compartilhados); a 1 é o site */
+        function wsEstaNoDesktop() { return wsAtual >= 2; }
+        function wsTemAtalho(key) { return wsAtalhos.some(a => a.key === key); }
+        function wsContagem() { return wsAtalhos.length; }
+        /* (não usada) — as janelas agora abrem na workspace atual, sem trocar de workspace */
+        function wsGarantirDesktop() { /* intencionalmente vazio */ }
+        function wsNotificar() { try { voceWM.refreshTaskbar(); } catch (e) {} }
+        function wsSalvar() { try { localStorage.setItem(WS_CHAVE, JSON.stringify(wsAtalhos)); } catch (e) {} }
+        function wsSalvarTotal() { try { localStorage.setItem(WS_TOTAL_CHAVE, String(wsTotal)); } catch (e) {} }
+
+        function wsSync() {
+            const d = wsAtual >= 2;
+            if (d) wsUltimoDesktop = wsAtual;
+            document.body.classList.toggle('ws2-ativo', d);   /* "ws2-ativo" = estou em qualquer área de trabalho (2+) */
+            wsEl.classList.toggle('ativo', d);
+            wsEl.setAttribute('aria-hidden', String(!d));
+            wsEl.setAttribute('aria-label', 'Workspace ' + wsAtual + ' — área de trabalho');
+            const camadaJanelas = document.getElementById('windowLayer');
+            if (camadaJanelas) camadaJanelas.removeAttribute('inert');
+            ['mainContent', 'sidebar', 'sidebarDesktopIcon', 'menuToggle'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.toggleAttribute('inert', d);
+            });
+            Object.keys(wsBtns).forEach(k => {
+                const on = Number(k) === wsAtual;
+                wsBtns[k].classList.toggle('ativo', on);
+                wsBtns[k].setAttribute('aria-pressed', String(on));
+            });
+            wsFecharMenu();
+            try { voceWM.applyWorkspace(); } catch (e) {}
+            if (wsExpoAberto) wsExpoInert(true);
+        }
+
+        function wsIr(n) {
+            n = Math.max(1, Math.min(wsTotal, parseInt(n, 10) || 1));
+            if (n === wsAtual) { wsSync(); return; }
+            wsAtual = n;
+            if (n >= 2) {
+                wsUltimoDesktop = n;
+                if (typeof fecharSidebar === 'function') fecharSidebar();
+                wsRender();
+            }
+            wsSync();
+        }
+
+        /* cria uma workspace nova (devolve o número dela, ou 0 se já está no limite) */
+        function wsCriarEspaco() {
+            if (wsTotal >= WS_MAX) return 0;
+            wsTotal++;
+            wsSalvarTotal();
+            wsPagerRender();
+            wsSync();
+            return wsTotal;
+        }
+
+        /* remove uma workspace (3 em diante): as janelas dela vão para a anterior, como no Linux Mint */
+        function wsExcluirEspaco(n) {
+            if (n < 3 || n > wsTotal) return;
+            const destino = n - 1;
+            wsTotal--;
+            if (wsAtual === n) wsAtual = destino; else if (wsAtual > n) wsAtual--;
+            wsUltimoDesktop = Math.max(2, Math.min(wsUltimoDesktop > n ? wsUltimoDesktop - 1 : wsUltimoDesktop, wsTotal));
+            try { voceWM.remapWorkspaces(x => (x === n ? destino : (x > n ? x - 1 : x))); } catch (e) {}
+            wsSalvarTotal();
+            wsPagerRender();
+            wsSync();
+        }
+
+        wsPagerRender();
+
+        /* ---- grade (como a grade de ícones do desktop) ---- */
+        function wsGrade() {
+            const w = wsEl.clientWidth || window.innerWidth;
+            const h = wsEl.clientHeight || window.innerHeight;
+            return {
+                cols: Math.max(1, Math.floor((w - WS_X0) / WS_CEL_W)),
+                rows: Math.max(1, Math.floor((h - WS_Y0) / WS_CEL_H))
+            };
+        }
+        function wsOcupadas(ignorar) {
+            const set = new Set();
+            wsAtalhos.forEach(a => { if (a.key !== ignorar && Number.isInteger(a.c) && Number.isInteger(a.r)) set.add(a.c + ',' + a.r); });
+            return set;
+        }
+        /* primeira célula livre, descendo a coluna e depois indo para a próxima (como o Windows) */
+        function wsPrimeiraLivre(ignorar) {
+            const g = wsGrade(), occ = wsOcupadas(ignorar);
+            for (let c = 0; c < 200; c++) for (let r = 0; r < g.rows; r++) if (!occ.has(c + ',' + r)) return { c, r };
+            return { c: 0, r: 0 };
+        }
+        /* célula livre mais próxima da preferida */
+        function wsCelulaLivre(pref, ignorar) {
+            const g = wsGrade(), occ = wsOcupadas(ignorar);
+            const p = { c: Math.max(0, Math.min(pref.c, g.cols - 1)), r: Math.max(0, Math.min(pref.r, g.rows - 1)) };
+            if (!occ.has(p.c + ',' + p.r)) return p;
+            let melhor = null, menor = Infinity;
+            for (let c = 0; c < g.cols; c++) for (let r = 0; r < g.rows; r++) {
+                if (occ.has(c + ',' + r)) continue;
+                const dist = (c - p.c) * (c - p.c) + (r - p.r) * (r - p.r);
+                if (dist < menor) { menor = dist; melhor = { c, r }; }
+            }
+            return melhor || wsPrimeiraLivre(ignorar);
+        }
+        function wsPosicionar(el, a) {
+            el.style.left = (WS_X0 + a.c * WS_CEL_W + (WS_CEL_W - WS_ICONE_W) / 2) + 'px';
+            el.style.top = (WS_Y0 + a.r * WS_CEL_H) + 'px';
+        }
+
+        /* ---- atalhos ---- */
+        function wsRegistrarAtalho(info) {
+            if (!info || !info.key) return;
+            if (wsAtalhos.some(a => a.key === info.key)) return;
+            const cel = wsPrimeiraLivre(null);
+            wsAtalhos.push({ key: info.key, tipo: info.tipo, alvo: info.alvo || null, titulo: info.titulo, icone: info.icone || '📄︎', c: cel.c, r: cel.r });
+            wsSalvar();
+            wsRender();
+            wsNotificar();
+            if (wsAtual < 2 && wsBtns[wsUltimoDesktop]) {
+                const b = wsBtns[wsUltimoDesktop];
+                b.classList.remove('ws-novo');
+                void b.offsetWidth;
+                b.classList.add('ws-novo');
+                clearTimeout(wsPulsoTimer);
+                wsPulsoTimer = setTimeout(() => b.classList.remove('ws-novo'), 2000);
+            }
+        }
+
+        function wsRemover(key) {
+            wsAtalhos = wsAtalhos.filter(a => a.key !== key);
+            wsSalvar();
+            wsRender();
+            wsNotificar();
+        }
+        function wsLimparTudo() {
+            if (!wsAtalhos.length) return;
+            if (!confirm('Remover todos os atalhos da área de trabalho?')) return;
+            wsAtalhos = [];
+            wsSalvar();
+            wsRender();
+            wsNotificar();
+        }
+
+        function wsAbrir(key) {
+            const a = wsAtalhos.find(x => x.key === key);
+            if (!a) return;
+            try {
+                if (a.tipo === 'sec') voceWM.open(a.alvo);
+                else if (a.tipo === 'ajuda') voceWM.openAjuda();
+                else if (a.tipo === 'fx') voceWM.openEffects();
+                else if (a.tipo === 'terminal') abrirTerminal();
+            } catch (e) {}
+        }
+
+        function wsSelecionar(el) {
+            wsIcones.forEach(i => i.classList.toggle('selecionado', i === el));
+        }
+
+        /* ---- menu de contexto ---- */
+        function wsFecharMenu() { if (wsMenuEl) { wsMenuEl.remove(); wsMenuEl = null; } }
+        function wsMenu(x, y, entradas) {
+            wsFecharMenu();
+            const m = document.createElement('div');
+            m.className = 'tb-menu ws-menu';
+            m.setAttribute('role', 'menu');
+            entradas.forEach(en => {
+                if (!en) { const sep = document.createElement('div'); sep.className = 'tb-menu-sep'; m.appendChild(sep); return; }
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.className = 'tb-menu-item';
+                b.setAttribute('role', 'menuitem');
+                b.textContent = en[0];
+                b.addEventListener('click', () => { wsFecharMenu(); en[1](); });
+                m.appendChild(b);
+            });
+            document.body.appendChild(m);
+            m.style.left = Math.max(4, Math.min(x, window.innerWidth - m.offsetWidth - 4)) + 'px';
+            m.style.top = Math.max(4, Math.min(y, window.innerHeight - m.offsetHeight - 4)) + 'px';
+            const primeiro = m.querySelector('.tb-menu-item');
+            if (primeiro) primeiro.focus();
+            wsMenuEl = m;
+        }
+
+        /* ---- ícones: criar, arrastar, abrir ---- */
+        function wsCriarIcone(a) {
+            const el = document.createElement('div');
+            el.className = 'ws-icone';
+            el.setAttribute('role', 'button');
+            el.tabIndex = 0;
+            el.dataset.key = a.key;
+            el.title = a.titulo + ' — duplo clique (ou toque) para abrir · arraste para mover · botão direito: opções';
+            el.setAttribute('aria-label', 'Abrir ' + a.titulo);
+            const img = document.createElement('div');
+            img.className = 'ws-icone-img';
+            img.setAttribute('aria-hidden', 'true');
+            img.textContent = a.icone || '📄︎';
+            const lb = document.createElement('div');
+            lb.className = 'ws-icone-rotulo';
+            lb.textContent = a.titulo;
+            el.appendChild(img);
+            el.appendChild(lb);
+            wsLigarIcone(el);
+            return el;
+        }
+
+        function wsLigarIcone(el) {
+            let d = null;
+            const dados = () => wsAtalhos.find(x => x.key === el.dataset.key);
+
+            el.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                wsFecharMenu();
+                wsSelecionar(el);
+                const r = el.getBoundingClientRect();
+                d = { id: e.pointerId, sx: e.clientX, sy: e.clientY, ox: e.clientX - r.left, oy: e.clientY - r.top, ativo: false, x: 0, y: 0 };
+                try { el.setPointerCapture(e.pointerId); } catch (_) {}
+            });
+            el.addEventListener('pointermove', (e) => {
+                if (!d || e.pointerId !== d.id) return;
+                if (!d.ativo) {
+                    if (Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < WS_LIMIAR) return;
+                    d.ativo = true;
+                    el.classList.add('arrastando');
+                }
+                const b = wsEl.getBoundingClientRect();
+                d.x = Math.max(0, Math.min(e.clientX - b.left + wsEl.scrollLeft - d.ox, Math.max(0, wsEl.scrollWidth - WS_ICONE_W)));
+                d.y = Math.max(0, Math.min(e.clientY - b.top + wsEl.scrollTop - d.oy, Math.max(0, wsEl.clientHeight - 60)));
+                el.style.left = d.x + 'px';
+                el.style.top = d.y + 'px';
+            });
+            const fim = (e, cancelar) => {
+                if (!d || e.pointerId !== d.id) return;
+                const s = d;
+                d = null;
+                try { el.releasePointerCapture(e.pointerId); } catch (_) {}
+                el.classList.remove('arrastando');
+                const a = dados();
+                if (!s.ativo) {
+                    /* toque/caneta: um toque abre; mouse usa duplo clique */
+                    if (!cancelar && e.pointerType !== 'mouse') wsAbrir(el.dataset.key);
+                    return;
+                }
+                wsUltimoArrasto = performance.now();
+                if (!a) return;
+                const g = wsGrade();
+                const c = Math.max(0, Math.min(Math.round((s.x - WS_X0) / WS_CEL_W), g.cols - 1));
+                const r = Math.max(0, Math.min(Math.round((s.y - WS_Y0) / WS_CEL_H), g.rows - 1));
+                const p = wsCelulaLivre({ c, r }, a.key);
+                a.c = p.c; a.r = p.r;
+                wsSalvar();
+                wsPosicionar(el, a);
+            };
+            el.addEventListener('pointerup', (e) => fim(e, false));
+            el.addEventListener('pointercancel', (e) => fim(e, true));
+            el.addEventListener('dragstart', (e) => e.preventDefault());
+            el.addEventListener('dblclick', () => {
+                if (performance.now() - wsUltimoArrasto < 350) return;
+                wsAbrir(el.dataset.key);
+            });
+            el.addEventListener('contextmenu', (e) => {
+                e.preventDefault();
+                wsSelecionar(el);
+                const key = el.dataset.key;
+                wsMenu(e.clientX, e.clientY, [
+                    ['Abrir', () => wsAbrir(key)],
+                    ['Remover atalho', () => wsRemover(key)],
+                    null,
+                    ['Remover todos os atalhos', wsLimparTudo]
+                ]);
+            });
+            el.addEventListener('keydown', (e) => {
+                const a = dados();
+                if (!a) return;
+                if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); wsAbrir(a.key); return; }
+                if (e.key === 'Delete') { e.preventDefault(); wsRemover(a.key); return; }
+                const dir = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key];
+                if (!dir) return;
+                e.preventDefault();
+                const g = wsGrade();
+                const p = wsCelulaLivre({
+                    c: Math.max(0, Math.min(a.c + dir[0], g.cols - 1)),
+                    r: Math.max(0, Math.min(a.r + dir[1], g.rows - 1))
+                }, a.key);
+                a.c = p.c; a.r = p.r;
+                wsSalvar();
+                wsPosicionar(el, a);
+            });
+        }
+
+        function wsRender() {
+            const g = wsGrade();
+            /* garante que todo atalho tenha uma célula válida dentro da tela */
+            wsAtalhos.forEach(a => {
+                const ok = Number.isInteger(a.c) && Number.isInteger(a.r) && a.c >= 0 && a.r >= 0 && a.r < g.rows;
+                if (!ok) {
+                    const p = wsCelulaLivre({ c: Number.isInteger(a.c) ? a.c : 0, r: Number.isInteger(a.r) ? a.r : 0 }, a.key);
+                    a.c = p.c; a.r = p.r;
+                }
+            });
+            const chaves = new Set(wsAtalhos.map(a => a.key));
+            wsIcones.forEach((el, key) => { if (!chaves.has(key)) { el.remove(); wsIcones.delete(key); } });
+            wsAtalhos.forEach(a => {
+                let el = wsIcones.get(a.key);
+                if (!el) { el = wsCriarIcone(a); wsIcones.set(a.key, el); wsEl.appendChild(el); }
+                wsPosicionar(el, a);
+            });
+            wsEl.classList.toggle('sem-atalhos', wsAtalhos.length === 0);
+        }
+
+        /* clique/menu no fundo da área de trabalho */
+        wsEl.addEventListener('pointerdown', (e) => { if (e.target === wsEl) wsSelecionar(null); });
+        wsEl.addEventListener('contextmenu', (e) => {
+            if (e.target !== wsEl) return;
+            e.preventDefault();
+            wsMenu(e.clientX, e.clientY, [
+                ['Voltar ao site (Workspace 1)', () => wsIr(1)],
+                ['Visão geral das workspaces (Ctrl+Alt+↑)', wsExpoAbrir],
+                [wsEl.classList.contains('dica-oculta') ? 'Mostrar aviso de área vazia' : 'Ocultar aviso de área vazia', () => wsDicaOcultar(!wsEl.classList.contains('dica-oculta'))],
+                null,
+                ['Remover todos os atalhos', wsLimparTudo]
+            ]);
+        });
+        document.addEventListener('pointerdown', (e) => { if (wsMenuEl && !wsMenuEl.contains(e.target)) wsFecharMenu(); }, true);
+        window.addEventListener('blur', wsFecharMenu);
+
+        /* atalhos de teclado: Ctrl+Alt+1…8 (ir para a workspace), Ctrl+Alt+↑ (visão geral),
+           Ctrl+Alt+Shift+←/→ (move a janela ativa para a workspace anterior/seguinte e vai junto) */
+        document.addEventListener('keydown', (e) => {
+            if (wsMenuEl && e.key === 'Escape') { e.preventDefault(); wsFecharMenu(); return; }
+            if (!(e.ctrlKey || e.metaKey) || !e.altKey) return;
+            const dig = /^Digit([1-8])$/.exec(e.code);
+            if (dig) {
+                const n = Number(dig[1]);
+                if (n <= wsTotal) { e.preventDefault(); wsExpoFechar(); wsIr(n); }
+                return;
+            }
+            if (e.code === 'ArrowUp') { e.preventDefault(); e.stopImmediatePropagation(); wsExpoAlternar(); return; }
+            if (e.shiftKey && (e.code === 'ArrowLeft' || e.code === 'ArrowRight')) {
+                e.preventDefault(); e.stopImmediatePropagation();
+                if (!wsExpoAberto) { try { voceWM.moveFocusedBy(e.code === 'ArrowRight' ? 1 : -1); } catch (_) {} }
+            }
+        });
+
+        let wsResizeT = null;
+        window.addEventListener('resize', () => {
+            clearTimeout(wsResizeT);
+            wsResizeT = setTimeout(wsRender, 150);
+        });
+
+        /* aviso da área vazia: dá para fechar no × (e reabrir pelo botão direito no fundo) */
+        const WS_DICA_CHAVE = 'voceimporta_ws_dica_oculta';
+        function wsDicaOcultar(ocultar) {
+            wsEl.classList.toggle('dica-oculta', ocultar);
+            try { localStorage.setItem(WS_DICA_CHAVE, ocultar ? '1' : '0'); } catch (e) {}
+        }
+        try { if (localStorage.getItem(WS_DICA_CHAVE) === '1') wsEl.classList.add('dica-oculta'); } catch (e) {}
+        const wsVazioFechar = document.getElementById('wsVazioFechar');
+        if (wsVazioFechar) wsVazioFechar.addEventListener('click', () => wsDicaOcultar(true));
+
+
+        /* ===================================================================== */
+        /* VISÃO GERAL DAS WORKSPACES — estilo "Expo" do Linux Mint               */
+        /* Ctrl+Alt+↑ ou botão ▦ da taskbar: mostra todas as workspaces lado a    */
+        /* lado, com as janelas de cada uma. Arraste uma janela para outra        */
+        /* workspace (ou para o "+" para criar uma nova) para movê-la.            */
+        /* ===================================================================== */
+        const WS_EXPO_INERT = ['windowLayer', 'mainContent', 'sidebar', 'sidebarDesktopIcon', 'menuToggle', 'windowTaskbar', 'workspaceDesktop'];
+        let wsExpoEl = null, wsExpoGrade = null, wsExpoNovo = null;
+        let wsExpoAberto = false, wsExpoArrasto = null;
+        let wsExpoFlash = null, wsExpoFlashTimer = null, wsExpoRefocar = null;
+        let wsExpoFocoAnterior = null, wsExpoRaf = 0, wsExpoResizeT = null;
+
+        function wsExpoInert(on) {
+            WS_EXPO_INERT.forEach(id => { const el = document.getElementById(id); if (el) el.toggleAttribute('inert', on); });
+        }
+
+        function wsExpoCriar() {
+            if (wsExpoEl) return;
+            wsExpoEl = document.createElement('div');
+            wsExpoEl.className = 'ws-expo';
+            wsExpoEl.id = 'wsExpo';
+            wsExpoEl.setAttribute('role', 'dialog');
+            wsExpoEl.setAttribute('aria-modal', 'true');
+            wsExpoEl.setAttribute('aria-label', 'Visão geral das workspaces');
+            wsExpoEl.setAttribute('aria-hidden', 'true');
+
+            wsExpoGrade = document.createElement('div');
+            wsExpoGrade.className = 'ws-expo-grade';
+
+            wsExpoNovo = document.createElement('button');
+            wsExpoNovo.type = 'button';
+            wsExpoNovo.className = 'ws-expo-novo';
+            wsExpoNovo.textContent = '+';
+            wsExpoNovo.title = 'Nova workspace — ou arraste uma janela até aqui';
+            wsExpoNovo.setAttribute('aria-label', 'Criar nova workspace');
+            wsExpoNovo.addEventListener('click', () => { if (wsCriarEspaco()) wsExpoRender(); });
+
+            const dica = document.createElement('div');
+            dica.className = 'ws-expo-dica';
+            dica.textContent = 'arraste as janelas entre as workspaces · clique para ir · + cria uma nova · Esc sai';
+
+            wsExpoEl.appendChild(wsExpoGrade);
+            wsExpoEl.appendChild(wsExpoNovo);
+            wsExpoEl.appendChild(dica);
+            wsExpoEl.addEventListener('click', (e) => {
+                if (e.target === wsExpoEl || e.target === wsExpoGrade || e.target.classList.contains('ws-expo-item')) wsExpoFechar();
+            });
+            document.body.appendChild(wsExpoEl);
+        }
+
+        /* tamanho das miniaturas: escolhe o nº de colunas que deixa as telas maiores */
+        function wsExpoLayout() {
+            const vw = window.innerWidth, vh = window.innerHeight;
+            const tb = voceWM ? voceWM.getTaskbarH() : 0;
+            const waW = vw, waH = Math.max(120, vh - tb);
+            const estreito = vw < 600;
+            const gap = estreito ? 14 : 28, padX = estreito ? 14 : 56, rotuloH = 44;
+            const dispW = vw - padX * 2 - (estreito ? 28 : 44);
+            const dispH = vh - 28 - 56;
+            let melhor = null;
+            for (let c = 1; c <= wsTotal; c++) {
+                const linhas = Math.ceil(wsTotal / c);
+                let tw = (dispW - gap * (c - 1)) / c;
+                let th = tw * waH / waW;
+                const maxTh = (dispH - linhas * rotuloH - gap * (linhas - 1)) / linhas;
+                if (th > maxTh) { th = maxTh; tw = th * waW / waH; }
+                if (!melhor || tw > melhor.tw) melhor = { c, tw };
+            }
+            const tw = Math.max(70, Math.floor(melhor.tw));
+            const th = Math.max(44, Math.round(tw * waH / waW));
+            return { cols: melhor.c, tw, th, waW, waH, k: tw / waW, gap };
+        }
+
+        function wsExpoMarcarFlash(id) {
+            wsExpoFlash = id;
+            clearTimeout(wsExpoFlashTimer);
+            wsExpoFlashTimer = setTimeout(() => { wsExpoFlash = null; }, 900);
+        }
+
+        function wsExpoRender() {
+            if (!wsExpoEl || !wsExpoAberto) return;
+            const L = wsExpoLayout();
+            const ativo = document.activeElement;
+            const tinhaFoco = !!(ativo && wsExpoEl.contains(ativo));
+            const focoJanela = tinhaFoco && ativo.classList.contains('ws-expo-janela') ? ativo.dataset.winId : null;
+            const focoRotulo = tinhaFoco && ativo.classList.contains('ws-expo-rotulo');
+            const focoItem = tinhaFoco && ativo.closest('.ws-expo-item') ? ativo.closest('.ws-expo-item').dataset.ws : null;
+
+            wsExpoGrade.textContent = '';
+            wsExpoGrade.style.width = (L.cols * L.tw + (L.cols - 1) * L.gap) + 'px';
+            wsExpoGrade.style.gap = L.gap + 'px';
+            let refocar = null;
+
+            for (let n = 1; n <= wsTotal; n++) {
+                const lista = voceWM ? voceWM.windowsOf(n) : [];
+                const item = document.createElement('div');
+                item.className = 'ws-expo-item' + (n === wsAtual ? ' atual' : '');
+                item.dataset.ws = String(n);
+                item.style.width = L.tw + 'px';
+
+                const thumb = document.createElement('div');
+                thumb.className = 'ws-expo-thumb ' + (n === 1 ? 'tipo-site' : 'tipo-desktop') + (n === wsAtual ? ' atual' : '');
+                thumb.dataset.ws = String(n);
+                thumb.tabIndex = 0;
+                thumb.setAttribute('role', 'button');
+                thumb.setAttribute('aria-label', 'Ir para a Workspace ' + n + (n === 1 ? ' (site)' : '') + ' — ' + lista.length + (lista.length === 1 ? ' janela' : ' janelas'));
+                thumb.style.width = L.tw + 'px';
+                thumb.style.height = L.th + 'px';
+
+                if (n === 1) {
+                    const site = document.createElement('div');
+                    site.className = 'ws-expo-site';
+                    const barra = document.createElement('div');
+                    barra.className = 'ws-expo-site-barra';
+                    barra.style.height = Math.max(3, 42 * L.k) + 'px';
+                    const rot = document.createElement('div');
+                    rot.className = 'ws-expo-site-rotulo';
+                    rot.textContent = 'voceimporta · site';
+                    site.appendChild(barra);
+                    site.appendChild(rot);
+                    thumb.appendChild(site);
+                } else {
+                    wsAtalhos.forEach(a => {
+                        const ic = document.createElement('div');
+                        ic.className = 'ws-expo-atalho';
+                        ic.textContent = a.icone || '📄︎';
+                        ic.style.left = ((WS_X0 + a.c * WS_CEL_W + (WS_CEL_W - WS_ICONE_W) / 2) / L.waW * 100) + '%';
+                        ic.style.top = ((WS_Y0 + a.r * WS_CEL_H) / L.waH * 100) + '%';
+                        ic.style.width = (WS_ICONE_W * L.k) + 'px';
+                        ic.style.fontSize = Math.max(6, 34 * L.k) + 'px';
+                        thumb.appendChild(ic);
+                    });
+                }
+
+                lista.forEach((info, i) => thumb.appendChild(wsExpoCriarJanela(info, L, n, i + 2)));
+
+                if (n >= 3) {
+                    const fx = document.createElement('button');
+                    fx.type = 'button';
+                    fx.className = 'ws-expo-fechar';
+                    fx.textContent = '×';
+                    fx.title = 'Remover a Workspace ' + n + ' (as janelas vão para a ' + (n - 1) + ')';
+                    fx.setAttribute('aria-label', fx.title);
+                    fx.addEventListener('click', (e) => { e.stopPropagation(); wsExcluirEspaco(n); });
+                    thumb.appendChild(fx);
+                }
+
+                thumb.addEventListener('click', (e) => { if (e.target.closest('.ws-expo-fechar')) return; wsExpoIr(n); });
+                thumb.addEventListener('keydown', (e) => {
+                    if (e.target !== thumb) return;
+                    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') { e.preventDefault(); wsExpoIr(n); }
+                    else if (e.key === 'Delete' && n >= 3) { e.preventDefault(); wsExcluirEspaco(n); }
+                });
+
+                const rotulo = document.createElement('button');
+                rotulo.type = 'button';
+                rotulo.className = 'ws-expo-rotulo';
+                rotulo.textContent = 'Workspace ' + n;
+                rotulo.addEventListener('click', () => wsExpoIr(n));
+
+                item.appendChild(thumb);
+                item.appendChild(rotulo);
+                wsExpoGrade.appendChild(item);
+
+                if (focoItem === String(n) && !focoJanela) refocar = focoRotulo ? rotulo : thumb;
+            }
+
+            wsExpoNovo.hidden = wsTotal >= WS_MAX;
+
+            const alvoJanela = wsExpoRefocar || focoJanela;
+            wsExpoRefocar = null;
+            let el = null;
+            if (alvoJanela) el = wsExpoGrade.querySelector('.ws-expo-janela[data-win-id="' + alvoJanela + '"]');
+            if (!el) el = refocar;
+            if (el) { try { el.focus({ preventScroll: true }); } catch (_) {} }
+        }
+
+        function wsExpoCriarJanela(info, L, n, z) {
+            const g = document.createElement('div');
+            g.className = 'ws-expo-janela' + (info.focused ? ' focada' : '') + (info.state === 'minimized' ? ' minimizada' : '') + (wsExpoFlash === info.id ? ' chegou' : '');
+            g.dataset.winId = info.id;
+            g.tabIndex = 0;
+            g.setAttribute('role', 'button');
+            const desc = info.title + (info.state === 'minimized' ? ' (minimizada)' : '');
+            g.title = desc + ' — arraste para outra workspace · clique para abrir';
+            g.setAttribute('aria-label', desc + ' — Enter abre; setas ← → movem para outra workspace');
+            g.style.left = (info.rect.left / L.waW * 100) + '%';
+            g.style.top = (info.rect.top / L.waH * 100) + '%';
+            g.style.width = (info.rect.width / L.waW * 100) + '%';
+            g.style.height = (info.rect.height / L.waH * 100) + '%';
+            g.style.zIndex = String(z);
+            const barra = document.createElement('div');
+            barra.className = 'ws-expo-janela-barra';
+            barra.textContent = info.title;
+            const corpo = document.createElement('div');
+            corpo.className = 'ws-expo-janela-corpo';
+            g.appendChild(barra);
+            g.appendChild(corpo);
+            wsExpoLigarJanela(g, info.id, n);
+            return g;
+        }
+
+        function wsExpoMarcarAlvo(d, el) {
+            if (d.alvo === el) return;
+            if (d.alvo) d.alvo.classList.remove('alvo');
+            d.alvo = el;
+            if (el) el.classList.add('alvo');
+        }
+
+        function wsExpoLigarJanela(g, id, nOrigem) {
+            g.addEventListener('pointerdown', (e) => {
+                if (e.pointerType === 'mouse' && e.button !== 0) return;
+                e.preventDefault();
+                e.stopPropagation();
+                const r = g.getBoundingClientRect();
+                wsExpoArrasto = {
+                    pid: e.pointerId, g, win: id, from: nOrigem,
+                    sx: e.clientX, sy: e.clientY, ox: e.clientX - r.left, oy: e.clientY - r.top,
+                    w: r.width, h: r.height, ativo: false, proxy: null, alvo: null
+                };
+                try { g.setPointerCapture(e.pointerId); } catch (_) {}
+            });
+            g.addEventListener('pointermove', (e) => {
+                const d = wsExpoArrasto;
+                if (!d || d.g !== g || e.pointerId !== d.pid) return;
+                if (!d.ativo) {
+                    if (Math.hypot(e.clientX - d.sx, e.clientY - d.sy) < 5) return;
+                    d.ativo = true;
+                    const p = g.cloneNode(true);
+                    p.classList.remove('arrastando', 'chegou');
+                    p.classList.add('ws-expo-proxy');
+                    p.removeAttribute('title');
+                    p.removeAttribute('tabindex');
+                    p.style.cssText = 'left:0;top:0;width:' + d.w + 'px;height:' + d.h + 'px;';
+                    wsExpoEl.appendChild(p);
+                    d.proxy = p;
+                    g.classList.add('arrastando');
+                    wsExpoEl.classList.add('arrastando-janela');
+                }
+                d.proxy.style.transform = 'translate(' + (e.clientX - d.ox) + 'px,' + (e.clientY - d.oy) + 'px)';
+                const sob = document.elementFromPoint(e.clientX, e.clientY);
+                let alvo = sob && sob.closest ? sob.closest('.ws-expo-item, .ws-expo-novo') : null;
+                if (alvo && alvo.classList.contains('ws-expo-item') && Number(alvo.dataset.ws) === d.from) alvo = null;
+                wsExpoMarcarAlvo(d, alvo);
+            });
+            const fim = (e, cancelar) => {
+                const d = wsExpoArrasto;
+                if (!d || d.g !== g || e.pointerId !== d.pid) return;
+                wsExpoArrasto = null;
+                try { g.releasePointerCapture(e.pointerId); } catch (_) {}
+                if (d.proxy) d.proxy.remove();
+                if (d.alvo) d.alvo.classList.remove('alvo');
+                wsExpoEl.classList.remove('arrastando-janela');
+                g.classList.remove('arrastando');
+                if (!d.ativo) { if (!cancelar) wsExpoIr(d.from, d.win); return; }
+                if (!cancelar && d.alvo) {
+                    let destino = 0;
+                    if (d.alvo.classList.contains('ws-expo-novo')) destino = wsCriarEspaco();
+                    else destino = parseInt(d.alvo.dataset.ws, 10);
+                    if (destino && destino !== d.from && voceWM.moveToWorkspace(d.win, destino)) wsExpoMarcarFlash(d.win);
+                }
+                wsExpoRender();
+            };
+            g.addEventListener('pointerup', (e) => fim(e, false));
+            g.addEventListener('pointercancel', (e) => fim(e, true));
+            g.addEventListener('click', (e) => e.stopPropagation());
+            g.addEventListener('dragstart', (e) => e.preventDefault());
+            g.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+                    e.preventDefault(); e.stopPropagation();
+                    wsExpoIr(nOrigem, id);
+                } else if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') {
+                    e.preventDefault(); e.stopPropagation();
+                    const destino = nOrigem + (e.key === 'ArrowRight' ? 1 : -1);
+                    if (destino >= 1 && destino <= wsTotal && voceWM.moveToWorkspace(id, destino)) {
+                        wsExpoMarcarFlash(id);
+                        wsExpoRefocar = id;
+                        wsExpoRender();
+                    }
+                }
+            });
+        }
+
+        function wsExpoAbrir() {
+            if (wsExpoAberto) return;
+            wsFecharMenu();
+            wsExpoCriar();
+            wsExpoFocoAnterior = document.activeElement;
+            wsExpoAberto = true;
+            wsExpoInert(true);
+            wsExpoEl.removeAttribute('aria-hidden');
+            wsExpoRender();
+            requestAnimationFrame(() => wsExpoEl.classList.add('aberto'));
+            const atual = wsExpoGrade.querySelector('.ws-expo-thumb.atual');
+            if (atual) { try { atual.focus({ preventScroll: true }); } catch (_) {} }
+        }
+
+        function wsExpoFechar() {
+            if (!wsExpoAberto) return;
+            wsExpoAberto = false;
+            const d = wsExpoArrasto;
+            wsExpoArrasto = null;
+            if (d) {
+                if (d.proxy) d.proxy.remove();
+                try { d.g.releasePointerCapture(d.pid); } catch (_) {}
+            }
+            wsExpoEl.classList.remove('aberto', 'arrastando-janela');
+            wsExpoEl.setAttribute('aria-hidden', 'true');
+            wsExpoInert(false);
+            wsSync();
+            try {
+                if (wsExpoFocoAnterior && document.contains(wsExpoFocoAnterior) && wsExpoFocoAnterior.focus) wsExpoFocoAnterior.focus({ preventScroll: true });
+            } catch (_) {}
+        }
+
+        function wsExpoAlternar() { if (wsExpoAberto) wsExpoFechar(); else wsExpoAbrir(); }
+
+        function wsExpoIr(n, winId) {
+            wsExpoFechar();
+            wsIr(n);
+            if (winId) { try { voceWM.focus(winId); } catch (_) {} }
+        }
+
+        /* chamado pelo gerenciador de janelas quando algo muda (abrir/fechar/mover/focar) */
+        function wsExpoAtualizar() {
+            if (!wsExpoAberto || wsExpoArrasto) return;
+            cancelAnimationFrame(wsExpoRaf);
+            wsExpoRaf = requestAnimationFrame(wsExpoRender);
+        }
+
+        window.addEventListener('resize', () => {
+            if (!wsExpoAberto) return;
+            clearTimeout(wsExpoResizeT);
+            wsExpoResizeT = setTimeout(() => { if (!wsExpoArrasto) wsExpoRender(); }, 120);
+        });
+
+        /* teclado dentro da visão geral (captura: roda antes dos atalhos das janelas) */
+        document.addEventListener('keydown', (e) => {
+            if (!wsExpoAberto) return;
+            if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); wsExpoFechar(); return; }
+            if (e.ctrlKey || e.metaKey || e.altKey) return;
+            const ativo = document.activeElement;
+            if (/^[1-8]$/.test(e.key)) {
+                const n = Number(e.key);
+                if (n <= wsTotal) { e.preventDefault(); e.stopPropagation(); wsExpoIr(n); }
+                return;
+            }
+            if (e.key === '+') { e.preventDefault(); e.stopPropagation(); if (wsCriarEspaco()) wsExpoRender(); return; }
+            if (ativo && ativo.classList && ativo.classList.contains('ws-expo-janela')) return;
+            const dir = { ArrowLeft: -1, ArrowUp: -1, ArrowRight: 1, ArrowDown: 1 }[e.key];
+            if (!dir) return;
+            const thumbs = Array.prototype.slice.call(wsExpoGrade.querySelectorAll('.ws-expo-thumb'));
+            if (!thumbs.length) return;
+            e.preventDefault(); e.stopPropagation();
+            let i = thumbs.indexOf(ativo.closest ? ativo.closest('.ws-expo-thumb') : null);
+            if (i < 0) i = Math.max(0, wsAtual - 1);
+            thumbs[(i + dir + thumbs.length) % thumbs.length].focus({ preventScroll: true });
+        }, true);
+
+        wsRender();
+        wsSync();
+
         function copiarLink() {
             const url = window.location.href;
             navigator.clipboard.writeText(url).then(() => { alert('Link copiado para a área de transferência!'); }).catch(() => { prompt('Copie o link:', url); });
@@ -4477,10 +5487,9 @@
 
             const isMobile = () => window.innerWidth <= 1024;
 
-            function getStickyH() {
-                const el = document.getElementById('stickyBar');
-                return el ? (el.offsetHeight || 42) : 42;
-            }
+            function stickyBarH() { const el = document.getElementById('stickyBar'); return el ? el.offsetHeight : 0; }
+            /* na Workspace 1 (o site) existe a barra fixa; nas áreas de trabalho (2+) não */
+            function getStickyH() { return wsAtual < 2 ? stickyBarH() : 0; }
             function getTaskbarH() {
                 return document.body.classList.contains('window-taskbar-visible') ? TASKBAR_H : 0;
             }
@@ -4507,7 +5516,7 @@
             let showDesktopBtn = null;
             let menuEl = null;
 
-            const visibleIds = () => stack.filter(id => windows[id] && windows[id].state !== 'minimized' && !windows[id].closing);
+            const visibleIds = () => stack.filter(id => windows[id] && windows[id].ws === wsAtual && windows[id].state !== 'minimized' && !windows[id].closing);
             function pickNext(excludeId) {
                 const ids = visibleIds().filter(i => i !== excludeId);
                 return ids.length ? ids[ids.length - 1] : null;
@@ -4525,11 +5534,11 @@
             }
 
             function updateTaskbarVisibility() {
-                const hasAny = Object.keys(windows).length > 0;
+                const hasAny = Object.keys(windows).length > 0 || wsContagem() > 0 || wsEstaNoDesktop() || wsTotal > 2;
                 if (taskbar) taskbar.classList.toggle('visivel', hasAny);
                 document.body.classList.toggle('window-taskbar-visible', hasAny);
                 document.documentElement.style.setProperty('--window-taskbar-h', hasAny ? (TASKBAR_H + 'px') : '0px');
-                const anyMax = Object.keys(windows).some(id => windows[id].state === 'maximized');
+                const anyMax = Object.keys(windows).some(id => windows[id].ws === wsAtual && windows[id].state === 'maximized');
                 document.body.classList.toggle('has-maximized-window', anyMax);
             }
 
@@ -4552,7 +5561,8 @@
             }
 
             /* atualiza a taskbar "no lugar" (sem recriar os botões): mantém ordem, scroll e hover */
-            function syncTaskbar() {
+            function syncTaskbarBase() {
+                syncShortcutButtons();
                 if (!taskbarItemsEl) return;
                 tbButtons.forEach((btn, id) => { if (!windows[id]) { btn.remove(); tbButtons.delete(id); } });
                 Object.keys(windows).forEach(id => {
@@ -4563,6 +5573,7 @@
                     btn.classList.toggle('ativo', id === focusedId && !min);
                     btn.classList.toggle('minimizada', min);
                     btn.setAttribute('aria-pressed', String(id === focusedId && !min));
+                    btn.style.display = (w.ws === wsAtual) ? '' : 'none';
                 });
                 if (showDesktopBtn) showDesktopBtn.setAttribute('aria-pressed', String(visibleIds().length === 0 && stack.length > 0));
                 const act = taskbarItemsEl.querySelector('.ativo');
@@ -4572,6 +5583,7 @@
                     else if (ar.right > cr.right) taskbarItemsEl.scrollLeft += (ar.right - cr.right) + 4;
                 }
             }
+            function syncTaskbar() { syncTaskbarBase(); try { wsExpoAtualizar(); } catch (e) {} }
             function renderTaskbar() { syncTaskbar(); }
 
             function applyZ() {
@@ -4582,6 +5594,7 @@
             function focusWindow(id) {
                 const w = windows[id];
                 if (!w) return;
+                if (w.ws !== wsAtual) wsIr(w.ws);
                 if (w.state === 'minimized') { unminimizeWindow(id); return; }
                 if (focusedId === id && stack[stack.length - 1] === id) { w.el.classList.add('focused'); return; }
                 const i = stack.indexOf(id);
@@ -4598,7 +5611,7 @@
                 if (isMobile()) return { top: wa.top, left: 0, width: wa.width, height: wa.height };
                 const w = Math.min(760, wa.width - 80);
                 const h = Math.min(600, wa.height - 40);
-                const sidebarOffset = document.body.classList.contains('sidebar-oculta-body') ? 20 : 300;
+                const sidebarOffset = 20;
                 const off = (cascade % 8) * 28;
                 cascade++;
                 let left = sidebarOffset + off;
@@ -4613,7 +5626,7 @@
                 if (isMobile()) return { top: wa.top, left: 0, width: wa.width, height: wa.height };
                 const w = Math.min(520, wa.width - 80);
                 const h = Math.min(620, wa.height - 60);
-                const sidebarOffset = document.body.classList.contains('sidebar-oculta-body') ? 20 : 300;
+                const sidebarOffset = 20;
                 let left = wa.right - w - 40;
                 if (left < sidebarOffset) left = sidebarOffset;
                 let top = wa.top + 20;
@@ -4626,7 +5639,7 @@
                 if (isMobile()) return { top: wa.top, left: 0, width: wa.width, height: wa.height };
                 const w = Math.min(480, wa.width - 80);
                 const h = Math.min(760, wa.height - 60);
-                const sidebarOffset = document.body.classList.contains('sidebar-oculta-body') ? 20 : 300;
+                const sidebarOffset = 20;
                 let left = sidebarOffset + 40;
                 let top = wa.top + 20;
                 if (left + w > wa.right - 40) left = Math.max(20, wa.right - w - 40);
@@ -4649,6 +5662,7 @@
                     <div class="os-window-titlebar">
                         <span class="os-window-title"></span>
                         <div class="os-window-controls">
+                            <button type="button" class="os-window-ctrl" data-action="shortcut" title="Criar atalho na área de trabalho" aria-label="Criar atalho na área de trabalho">☆</button>
                             <button type="button" class="os-window-ctrl" data-action="minimize" title="Minimizar (Ctrl+M)" aria-label="Minimizar">_</button>
                             <button type="button" class="os-window-ctrl" data-action="maximize" title="Maximizar (Ctrl+Shift+M)" aria-label="Maximizar">□</button>
                             <button type="button" class="os-window-ctrl" data-action="close" title="Fechar (Esc)" aria-label="Fechar">×</button>
@@ -4680,6 +5694,7 @@
                         if (action === 'close') closeWindowAnimated(id);
                         else if (action === 'minimize') minimizeWindow(id);
                         else if (action === 'maximize') toggleMaximizeWindow(id);
+                        else if (action === 'shortcut') alternarAtalho(id);
                     });
                 });
                 win.addEventListener('pointerdown', () => { if (windows[id]) focusWindow(id); }, true);
@@ -4690,6 +5705,27 @@
                 });
                 makeDraggable(win, titlebar, id);
                 win.querySelectorAll('.os-window-resize').forEach(h => makeResizable(win, h, id));
+            }
+
+            function alternarAtalho(id) {
+                const w = windows[id];
+                if (!w || !w.atalhoInfo) return;
+                if (wsTemAtalho(w.atalhoInfo.key)) wsRemover(w.atalhoInfo.key);
+                else wsRegistrarAtalho(w.atalhoInfo);
+            }
+            function syncShortcutButtons() {
+                Object.keys(windows).forEach(id => {
+                    const w = windows[id];
+                    const b = w.el.querySelector('[data-action="shortcut"]');
+                    if (!b) return;
+                    if (!w.atalhoInfo) { b.style.display = 'none'; return; }
+                    const tem = wsTemAtalho(w.atalhoInfo.key);
+                    const t = tem ? 'Remover atalho da área de trabalho' : 'Criar atalho na área de trabalho';
+                    b.textContent = tem ? '★' : '☆';
+                    b.title = t;
+                    b.setAttribute('aria-label', t);
+                    b.setAttribute('aria-pressed', String(tem));
+                });
             }
 
             function openWindow(sectionId) {
@@ -4711,7 +5747,7 @@
                 const body = win.querySelector('.os-window-body');
                 body.appendChild(section);
                 layer.appendChild(win);
-                windows[id] = { id, sectionId, title, el: win, section, placeholder, state: 'normal', prevRect: null, prevState: null, isTerminal: false };
+                windows[id] = { ws: wsAtual, id, sectionId, title, el: win, section, placeholder, state: 'normal', prevRect: null, prevState: null, isTerminal: false, atalhoInfo: { key: 'sec:' + sectionId, tipo: 'sec', alvo: sectionId, titulo: title, icone: '📄︎' } };
                 wireWindowChrome(win, id);
                 updateTaskbarVisibility();
                 renderTaskbar();
@@ -4748,11 +5784,13 @@
                     state: 'normal',
                     prevRect: null,
                     prevState: null,
+                    ws: wsAtual,
                     isTerminal: false,
                     isCustom: true,
                     isHelp: !!opts.isHelp,
                     isFx: !!opts.isFx,
-                    customKey: uniqueKey || null
+                    customKey: uniqueKey || null,
+                    atalhoInfo: opts.atalho || null
                 };
                 wireWindowChrome(win, id);
                 updateTaskbarVisibility();
@@ -4798,6 +5836,7 @@
                     extraClass: 'help-window',
                     bodyExtraClass: 'help-window-body-wrapper',
                     geometry: computeHelpGeometry,
+                    atalho: { key: 'ajuda', tipo: 'ajuda', titulo: 'Ajuda urgente', icone: '⚠' },
                     isHelp: true
                 });
             }
@@ -4963,6 +6002,7 @@
                     extraClass: 'effects-window',
                     bodyExtraClass: 'effects-window-body-wrapper',
                     geometry: computeFxGeometry,
+                    atalho: { key: 'fx', tipo: 'fx', titulo: 'Efeitos', icone: '⚙' },
                     isFx: true
                 });
             }
@@ -5034,7 +6074,9 @@
                     state: 'normal',
                     prevRect: null,
                     prevState: null,
+                    ws: wsAtual,
                     isTerminal: true,
+                    atalhoInfo: { key: 'terminal', tipo: 'terminal', titulo: 'Terminal', icone: '>_' },
                     onClose: () => {
                         clearInterval(clockIntervalId);
                         if (activeTerminalBody === terminalBody) {
@@ -5392,13 +6434,13 @@
                     desktopHidden = vis.slice();
                     vis.slice().reverse().forEach(minimizeWindow);
                 } else {
-                    const list = (desktopHidden.length ? desktopHidden : stack.slice()).filter(i => windows[i]);
+                    const list = (desktopHidden.length ? desktopHidden : stack.slice()).filter(i => windows[i] && windows[i].ws === wsAtual);
                     desktopHidden = [];
                     list.forEach(unminimizeWindow);
                 }
             }
             function cycleWindows(dir) {
-                const ids = Object.keys(windows);
+                const ids = Object.keys(windows).filter(i => windows[i].ws === wsAtual);
                 if (!ids.length) return;
                 const i = ids.indexOf(focusedId);
                 focusWindow(ids[(i + dir + ids.length) % ids.length]);
@@ -5415,10 +6457,12 @@
                 const entries = [
                     [w.state === 'minimized' ? 'Restaurar' : 'Minimizar', () => (w.state === 'minimized' ? unminimizeWindow(id) : minimizeWindow(id))],
                     [w.state === 'maximized' ? 'Restaurar tamanho' : 'Maximizar', () => toggleMaximizeWindow(id)],
+                    ...(w.atalhoInfo ? [[wsTemAtalho(w.atalhoInfo.key) ? 'Remover atalho da área de trabalho' : 'Criar atalho na área de trabalho', () => alternarAtalho(id)]] : []),
+                    ...moverEntradas(id),
                     ['Fechar', () => closeWindowAnimated(id)],
                     null,
-                    ['Fechar as outras', () => Object.keys(windows).filter(i => i !== id).forEach(closeWindowAnimated)],
-                    ['Fechar todas', () => Object.keys(windows).forEach(closeWindowAnimated)]
+                    ['Fechar as outras', () => Object.keys(windows).filter(i => i !== id && windows[i].ws === wsAtual).forEach(closeWindowAnimated)],
+                    ['Fechar todas', () => Object.keys(windows).filter(i => windows[i].ws === wsAtual).forEach(closeWindowAnimated)]
                 ];
                 entries.forEach(en => {
                     if (!en) { const sep = document.createElement('div'); sep.className = 'tb-menu-sep'; m.appendChild(sep); return; }
@@ -5456,6 +6500,12 @@
                     const id = item && item.dataset.winId;
                     const w = id && windows[id];
                     if (!w) return;
+                    /* janela de outra workspace: vai até ela e traz a janela escolhida */
+                    if (w.ws !== wsAtual) {
+                        wsIr(w.ws);
+                        if (w.state === 'minimized') unminimizeWindow(id); else focusWindow(id);
+                        return;
+                    }
                     if (w.state === 'minimized') unminimizeWindow(id);
                     else if (id === focusedId) minimizeWindow(id);   // clicar na ativa minimiza
                     else focusWindow(id);
@@ -5475,6 +6525,101 @@
                 taskbarItemsEl.addEventListener('wheel', (e) => {
                     if (Math.abs(e.deltaY) > Math.abs(e.deltaX)) { taskbarItemsEl.scrollLeft += e.deltaY; e.preventDefault(); }
                 }, { passive: false });
+            }
+
+            /* ---- workspaces: mover janelas, aplicar a workspace ativa, geometria para a visão geral ---- */
+            function ghostRect(w) {
+                const top = w.ws < 2 ? stickyBarH() : 0;
+                const full = { left: 0, top, width: window.innerWidth, height: Math.max(40, window.innerHeight - getTaskbarH() - top) };
+                if (isMobile() || w.state === 'maximized' || (w.state === 'minimized' && w.restoreState === 'maximized')) return full;
+                return rectFromStyle(w.el);
+            }
+            /* janelas de uma workspace, da mais ao fundo para a mais à frente (para a visão geral) */
+            function windowsOf(n) {
+                const ordem = stack.filter(id => windows[id]).concat(Object.keys(windows).filter(id => stack.indexOf(id) < 0));
+                return ordem
+                    .filter(id => windows[id].ws === n && !windows[id].closing)
+                    .map(id => {
+                        const w = windows[id];
+                        return { id, title: w.title, state: w.state, focused: id === focusedId, isHelp: !!w.isHelp, isFx: !!w.isFx, rect: ghostRect(w) };
+                    });
+            }
+            /* mostra só as janelas da workspace ativa e escolhe a que fica em foco */
+            function applyWorkspace() {
+                Object.keys(windows).forEach(id => {
+                    const w = windows[id];
+                    const fora = w.ws !== wsAtual;
+                    const eraFora = w.el.classList.contains('ws-fora');
+                    w.el.classList.toggle('ws-fora', fora);
+                    if (fora) { w.el.classList.remove('focused'); return; }
+                    if (eraFora && w.state !== 'minimized' && !reduceMotion()) {
+                        w.el.classList.remove('opening');
+                        void w.el.offsetWidth;
+                        w.el.classList.add('opening');
+                        setTimeout(() => w.el.classList.remove('opening'), 450);
+                    }
+                });
+                const f = focusedId && windows[focusedId];
+                if (!f || f.ws !== wsAtual || f.state === 'minimized') {
+                    focusedId = null;
+                    const n = pickNext(null);
+                    if (n) focusWindow(n);
+                } else {
+                    f.el.classList.add('focused');
+                }
+                closeMenu();
+                hideSnapPreview();
+                updateTaskbarVisibility();
+                syncTaskbar();
+            }
+            /* move uma janela para outra workspace (a janela mantém tamanho, posição e estado) */
+            function moveToWorkspace(id, n) {
+                const w = windows[id];
+                if (!w || w.closing) return false;
+                n = Math.max(1, Math.min(wsTotal, parseInt(n, 10) || 1));
+                if (w.ws === n) return false;
+                w.ws = n;
+                w.el.classList.toggle('ws-fora', n !== wsAtual);
+                if (n !== wsAtual) {
+                    w.el.classList.remove('focused');
+                    if (focusedId === id) {
+                        focusedId = null;
+                        const nx = pickNext(id);
+                        if (nx) focusWindow(nx);
+                    }
+                } else if (w.state !== 'minimized') {
+                    focusWindow(id);
+                }
+                updateTaskbarVisibility();
+                syncTaskbar();
+                return true;
+            }
+            /* move a janela ativa para a workspace anterior/seguinte e vai junto com ela */
+            function moveFocusedBy(dir) {
+                const id = focusedId;
+                const w = id && windows[id];
+                if (!w) return;
+                const n = w.ws + dir;
+                if (n < 1 || n > wsTotal) return;
+                moveToWorkspace(id, n);
+                wsIr(n);
+                focusWindow(id);
+            }
+            /* renumera as workspaces de todas as janelas (usado ao remover uma workspace) */
+            function remapWorkspaces(fn) {
+                Object.keys(windows).forEach(id => { windows[id].ws = Math.max(1, Math.min(wsTotal, fn(windows[id].ws))); });
+                applyWorkspace();
+            }
+            function moverEntradas(id) {
+                const w = windows[id];
+                const out = [];
+                if (!w) return out;
+                for (let n = 1; n <= wsTotal; n++) {
+                    if (n === w.ws) continue;
+                    out.push(['Mover para a Workspace ' + n + (n === 1 ? ' (site)' : ''), () => { moveToWorkspace(id, n); }]);
+                }
+                if (wsTotal < WS_MAX) out.push(['Mover para uma nova workspace', () => { const nn = wsCriarEspaco(); if (nn) moveToWorkspace(id, nn); }]);
+                return out.length ? [null, ...out, null] : out;
             }
 
             const POP_OUT_SVG = '<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="miter"><rect x="1" y="1" width="7" height="7"/><rect x="5" y="5" width="7" height="7"/></svg>';
@@ -5550,6 +6695,13 @@
             renderTaskbar();
 
             return {
+                refreshTaskbar: () => { updateTaskbarVisibility(); syncTaskbar(); },
+                applyWorkspace: applyWorkspace,
+                moveToWorkspace: moveToWorkspace,
+                moveFocusedBy: moveFocusedBy,
+                remapWorkspaces: remapWorkspaces,
+                windowsOf: windowsOf,
+                getTaskbarH: getTaskbarH,
                 open: openWindow,
                 openTerminal: openTerminal,
                 openAjuda: openAjuda,
@@ -5566,6 +6718,7 @@
                     id: w.id,
                     title: w.title,
                     sectionId: w.sectionId,
+                    ws: w.ws,
                     state: w.state,
                     z: parseInt(w.el.style.zIndex, 10) || 0,
                     focused: w.id === focusedId,
@@ -5819,7 +6972,7 @@
         function cmdCd(args) {
             const alvo = (args[0] || '~').toLowerCase();
             if (alvo === '~' || alvo === '/' || alvo === 'inicio' || alvo === 'top') {
-                fecharTerminal();
+                fecharTerminal(); wsIr(1);
                 setTimeout(() => {
                     try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch (e) {}
                 }, 100);
@@ -5831,7 +6984,7 @@
                 appendTerminalLinha("cd: " + id + ": diretório inexistente", "t-err");
                 return;
             }
-            fecharTerminal();
+            fecharTerminal(); wsIr(1);
             setTimeout(() => {
                 try { sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); } catch (e) {}
             }, 100);
@@ -6094,6 +7247,8 @@
             appendTerminalLinha("       efeitos: crt, scanlines, flicker, noise, marquee,", "t-dim");
             appendTerminalLinha("                hero-glow, hero-aura", "t-dim");
             appendTerminalLinha("");
+            appendTerminalLinha("  ws [N|expo|+]              — troca de workspace · expo = visão geral (mover janelas) · + = nova", "t-info");
+            appendTerminalLinha("  ws-clear                   — remove todos os atalhos da área de trabalho", "t-info");
             appendTerminalLinha("  help-window                — abre a janela de ajuda urgente", "t-info");
             appendTerminalLinha("  debug | debug off          — monitor completo: runtime, hero, CRT e tema", "t-info");
             appendTerminalLinha("  crt | crt on | crt off     — controla o efeito CRT", "t-info");
@@ -6146,6 +7301,25 @@
                     } else {
                         cmdToggleEffect(args[0]);
                     }
+                    break;
+                case 'ws': case 'workspace': {
+                    const a0 = String(args[0] || '').toLowerCase();
+                    if (a0 === 'expo' || a0 === 'overview' || a0 === 'visao') {
+                        wsExpoAbrir();
+                        appendTerminalLinha("visão geral das workspaces aberta (Esc para sair)", 't-ok');
+                    } else if (a0 === '+' || a0 === 'novo' || a0 === 'new' || a0 === 'add') {
+                        const nn = wsCriarEspaco();
+                        appendTerminalLinha(nn ? "workspace criada: " + nn : "limite de " + WS_MAX + " workspaces atingido", nn ? 't-ok' : 't-err');
+                    } else if (/^\d+$/.test(a0) && Number(a0) >= 1 && Number(a0) <= wsTotal) {
+                        wsIr(Number(a0));
+                        appendTerminalLinha("workspace: " + a0, 't-ok');
+                    } else {
+                        appendTerminalLinha("workspace atual: " + wsAtual + " de " + wsTotal + " (use 'ws 1'…'ws " + wsTotal + "', 'ws expo' ou 'ws +')", 't-info');
+                    }
+                    break;
+                }
+                case 'ws-clear':
+                    wsLimparTudo();
                     break;
                 case 'help-window': case 'ajuda':
                     if (voceWM) voceWM.openAjuda();
@@ -6529,7 +7703,7 @@
 
         /* ESC global fecha sidebar */
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && !sidebar.classList.contains('escondida')) esconderSidebar();
+            if (e.key === 'Escape' && !wsEstaNoDesktop() && !sidebar.classList.contains('escondida')) esconderSidebar();
         });
 
         /* Aplica estado dos efeitos na carga inicial */
