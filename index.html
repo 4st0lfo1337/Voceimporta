@@ -9,6 +9,27 @@
     <meta name="color-scheme" content="dark">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%231c1b1a'/%3E%3Crect x='4' y='6' width='24' height='17' fill='none' stroke='%23c8b090' stroke-width='2'/%3E%3Crect x='7' y='9' width='7' height='2' fill='%23c8b090'/%3E%3Crect x='11' y='26' width='10' height='2' fill='%23c8b090'/%3E%3C/svg%3E">
 
+    <!-- DETECÇÃO DE CELULAR — roda antes do CSS para não haver "flash" de efeitos.
+         Teste no PC: adicione ?mobile=1 na URL (força modo celular) ou ?desktop=1 (força modo PC). -->
+    <script>
+    (function () {
+        function mq(q) { try { return !!(window.matchMedia && window.matchMedia(q).matches); } catch (e) { return false; } }
+        var nav = navigator, ua = nav.userAgent || '', forcar = '';
+        try {
+            var m = /[?&](mobile|desktop)=(1|true)(&|$)/i.exec(location.search);
+            if (m) forcar = m[1].toLowerCase();
+        } catch (e) {}
+        var uaCelular = (nav.userAgentData && nav.userAgentData.mobile === true) ||
+            /Android|iPhone|iPod|iPad|Mobile|Opera Mini|IEMobile|BlackBerry|webOS|Windows Phone/i.test(ua) ||
+            (nav.platform === 'MacIntel' && nav.maxTouchPoints > 1);          /* iPad com Safari "desktop" */
+        var toquePrincipal = mq('(hover: none) and (pointer: coarse)');       /* tela de toque sem mouse */
+        var telaEstreita = (window.innerWidth || 9999) <= 768;
+        var celular = forcar === 'mobile' ? true : (forcar === 'desktop' ? false : (uaCelular || toquePrincipal || telaEstreita));
+        window.VI_MOBILE = celular;
+        document.documentElement.classList.add(celular ? 'is-mobile' : 'is-desktop');
+    })();
+    </script>
+
     <style>
         :root {
             --noise-opacity: 0.8;
@@ -2993,6 +3014,144 @@
             * { text-shadow: none !important; box-shadow: none !important; animation: none !important; }
             a { color: #000; text-decoration: underline; }
         }
+
+        /* ===================================================================== */
+        /* MODO CELULAR  (html.is-mobile — definido pelo script no <head>)        */
+        /*  1) sem efeitos visuais   2) sem janelas/workspaces/terminal           */
+        /*  3) layout, fontes e sidebar ajustados para toque                      */
+        /* ===================================================================== */
+
+        /* ---------- 1) EFEITOS VISUAIS: tudo desligado ---------- */
+        html.is-mobile *, html.is-mobile *::before, html.is-mobile *::after {
+            animation: none !important;
+            transition: none !important;
+            text-shadow: none !important;
+            box-shadow: none !important;
+            filter: none !important;
+            -webkit-backdrop-filter: none !important;
+            backdrop-filter: none !important;
+            mix-blend-mode: normal !important;
+            will-change: auto !important;
+            scroll-behavior: auto !important;
+        }
+        html.is-mobile { scroll-behavior: auto !important; }   /* o seletor acima não alcança o próprio <html> */
+        html.is-mobile .crt-overlay, html.is-mobile .crt-flicker, html.is-mobile .crt-noise,
+        html.is-mobile #noise-overlay, html.is-mobile .hero::before, html.is-mobile .hero h1::before { display: none !important; }
+        html.is-mobile body { background-image: none; }
+        html.is-mobile .hero {
+            background-image: linear-gradient(180deg, #252422 0%, #1c1b1a 100%) !important;
+            background-attachment: scroll !important;
+        }
+        /* letreiro: vira uma faixa estática (sem rolagem animada) */
+        html.is-mobile .sticky-bar { left: 0 !important; right: 0; justify-content: center; font-size: 0.72rem; letter-spacing: 2px; padding: 0 12px 0 64px; }
+        html.is-mobile .sticky-bar-marquee { display: block; max-width: 100%; overflow: hidden; }
+        html.is-mobile .sticky-bar-marquee > span { display: block; padding: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        html.is-mobile .sticky-bar-marquee > span + span { display: none; }
+
+        /* ---------- 2) SEM JANELAS / WORKSPACES / TERMINAL / PAINÉIS DE PC ---------- */
+        html.is-mobile .window-layer, html.is-mobile .snap-preview, html.is-mobile .window-taskbar,
+        html.is-mobile .workspace-desktop, html.is-mobile .ws-expo, html.is-mobile .ws-pager, html.is-mobile .tb-menu,
+        html.is-mobile .debug-overlay, html.is-mobile .pop-out-btn,
+        html.is-mobile .sidebar-desktop-icon, html.is-mobile .sidebar-show-btn, html.is-mobile .sidebar-hide-btn,
+        html.is-mobile .sidebar-dock-btn, html.is-mobile .sidebar-dock-preview, html.is-mobile .sidebar-resize,
+        html.is-mobile .sidebar-tools-label, html.is-mobile #crtToggleBtn, html.is-mobile #heroFxToggleBtn { display: none !important; }
+        html.is-mobile { --window-taskbar-h: 0px; --sticky-bar-h: 38px; }
+
+        /* ---------- 3) SIDEBAR NO CELULAR (menu lateral que abre pelo botão ☰) ---------- */
+        html.is-mobile .sidebar {
+            transform: translateX(-100%);
+            visibility: hidden;
+            width: min(320px, 86vw);
+            height: 100vh; height: 100dvh;
+            z-index: 10004;                      /* ACIMA do overlay (10002) — era a causa de nada ser clicável */
+            border-right: 2px solid #3f3a36;
+            padding-bottom: env(safe-area-inset-bottom, 0px);
+        }
+        html.is-mobile .sidebar.ativo { transform: translateX(0); visibility: visible; }
+        html.is-mobile .sidebar-overlay { z-index: 10002; background: rgba(0, 0, 0, 0.6); }
+        html.is-mobile .sidebar-overlay.ativo { display: block; }
+        html.is-mobile .main-content { margin-left: 0 !important; width: 100% !important; }
+        html.is-mobile .hero h1 { z-index: 1; }   /* o título do hero (10001) ficava por cima do menu */
+
+        html.is-mobile .menu-toggle {
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+            width: 44px; height: 44px; padding: 0;
+            top: 5px; left: max(8px, env(safe-area-inset-left, 0px));
+            z-index: 10007;                      /* continua visível sobre o menu aberto e vira "X" */
+        }
+        html.is-mobile .menu-toggle span { width: 22px; height: 3px; margin: 0; }
+        html.is-mobile body.menu-aberto .menu-toggle span:nth-child(1) { transform: translateY(8px) rotate(45deg); }
+        html.is-mobile body.menu-aberto .menu-toggle span:nth-child(2) { opacity: 0; }
+        html.is-mobile body.menu-aberto .menu-toggle span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
+        html.is-mobile body.menu-aberto { overflow: hidden; }
+        html.is-mobile body.menu-aberto .botao-ajuda-flutuante { display: none; }
+
+        html.is-mobile { --tree-row-h: 42px; }
+        html.is-mobile .sidebar-header { padding-left: 62px; min-height: 54px; }
+        html.is-mobile .explorer-title { font-size: 0.9rem; }
+        html.is-mobile .sidebar-path { font-size: 0.8rem; }
+        html.is-mobile .tree-container { overscroll-behavior: contain; touch-action: pan-y; padding-bottom: 16px; }
+        html.is-mobile .tree-row, html.is-mobile .tree-item {
+            min-height: var(--tree-row-h); font-size: 0.95rem; padding-top: 6px; padding-bottom: 6px; white-space: normal;
+        }
+        html.is-mobile .tree-root > .tree-group > .tree-folder { min-height: 46px; }
+        html.is-mobile .tree-label { white-space: normal; overflow-wrap: anywhere; line-height: 1.3; }
+        html.is-mobile .tree-icon { font-size: 1rem; }
+        html.is-mobile .sidebar-footer { padding: 10px 12px calc(12px + env(safe-area-inset-bottom, 0px)); }
+        html.is-mobile .crt-toggle-btn { min-height: 44px; font-size: 0.78rem; padding: 8px 10px; }
+        html.is-mobile .sidebar-footer-text { font-size: 0.8rem; }
+
+        /* ---------- 4) FONTES / RESOLUÇÃO / LAYOUT ---------- */
+        html.is-mobile {
+            font-size: 16px;
+            -webkit-text-size-adjust: 100%; text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+            --tamanho-h1: clamp(1.75rem, 8.2vw, 2.4rem);
+            --tamanho-h2: clamp(1.4rem, 6vw, 1.85rem);
+            --tamanho-h3: clamp(1.1rem, 4.6vw, 1.3rem);
+            --tamanho-texto: 1rem;
+        }
+        @media (max-width: 360px) { html.is-mobile { font-size: 15px; } }
+        @media (min-width: 600px) { html.is-mobile { font-size: 17px; } }
+
+        html.is-mobile body { line-height: 1.7; overflow-wrap: break-word; min-height: 100vh; min-height: 100dvh; }
+        html.is-mobile .container { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+        html.is-mobile section { padding: 2.6rem 0; }
+        /* content-visibility usa altura estimada (800px) e faz os links do menu/âncoras caírem fora do lugar no celular */
+        html.is-mobile section:not(#inicio) { content-visibility: visible; contain-intrinsic-size: auto; }
+        html.is-mobile img, html.is-mobile iframe, html.is-mobile video { max-width: 100%; }
+        html.is-mobile .imagem-ilustrativa { margin: 1.2rem auto; }
+
+        html.is-mobile .hero { padding: 3rem 0 3.2rem; }
+        html.is-mobile .hero h1 { font-size: var(--tamanho-h1); letter-spacing: 0; line-height: 1.2; overflow-wrap: anywhere; }
+        html.is-mobile .hero p { font-size: 1.05rem; }
+        html.is-mobile .btn-hero { display: block; width: 100%; max-width: 360px; margin: 0 auto; text-align: center; min-height: 48px; padding: 0.95rem 1rem; font-size: 0.95rem; letter-spacing: 1px; }
+
+        html.is-mobile .section-titulo { margin-bottom: 1.6rem; }
+        html.is-mobile .section-titulo h2 { font-size: var(--tamanho-h2); line-height: 1.25; }
+        html.is-mobile .section-titulo p { font-size: 1rem; }
+        html.is-mobile .texto-corrido { font-size: 1rem; line-height: 1.75; text-align: left; -webkit-hyphens: auto; hyphens: auto; }
+        html.is-mobile .destaque-teorico, html.is-mobile .caixa-citacao, html.is-mobile .citacao-marx { font-size: 0.95rem; line-height: 1.7; }
+        html.is-mobile .ref, html.is-mobile cite, html.is-mobile .stat-rotulo { font-size: 0.85rem; }
+        html.is-mobile .card-teorico h4, html.is-mobile .card h3 { font-size: 1.1rem; }
+
+        html.is-mobile .stats-grid, html.is-mobile .grid-teorico, html.is-mobile .card-grid { grid-template-columns: 1fr; gap: 1rem; }
+        html.is-mobile .stat-numero { font-size: 2.1rem; }
+
+        html.is-mobile .quiz-opcao { font-size: 0.98rem; min-height: 48px; padding: 0.8rem 1rem; }
+        html.is-mobile .compartilhar-container { flex-direction: column; align-items: stretch; }
+        html.is-mobile .btn-compartilhar { justify-content: center; width: 100%; min-height: 48px; font-size: 1rem; }
+        html.is-mobile .form-grupo input, html.is-mobile .form-grupo select, html.is-mobile .form-grupo textarea { font-size: 16px; min-height: 46px; } /* 16px evita o zoom automático do iOS */
+        html.is-mobile .btn-enviar { width: 100%; min-height: 48px; font-size: 1rem; }
+        html.is-mobile .mapa-container iframe { height: 300px; }
+
+        html.is-mobile .fontes-lista { font-size: 0.85rem; line-height: 1.65; }
+        html.is-mobile .fontes-lista li { overflow-wrap: anywhere; }
+        html.is-mobile .fontes-lista a { word-break: break-all; }
+        html.is-mobile .links-footer a { display: inline-block; padding: 0.45rem 0.6rem; }
+
+        html.is-mobile .botao-ajuda-flutuante { right: max(14px, env(safe-area-inset-right, 0px)); bottom: max(14px, env(safe-area-inset-bottom, 0px)); }
+        html.is-mobile .botao-ajuda-flutuante button { min-height: 46px; font-size: 0.78rem; letter-spacing: 1px; padding: 9px 14px 9px 12px; }
     </style>
 </head>
 <body>
@@ -3818,11 +3977,14 @@
         /* ===================================================================== */
         const WORKSPACE_WALLPAPER_URL = 'https://i.pinimg.com/1200x/f1/58/26/f15826b186924e595d81f193d0e6cb04.jpg';
 
+        /* MODO CELULAR — definido no <head> (window.VI_MOBILE). No celular: sem efeitos, sem janelas/workspaces/terminal. */
+        const IS_MOBILE = window.VI_MOBILE === true;
+
         /* ===================================================================== */
         /* ESTADO GLOBAL DOS EFEITOS (CRT + Hero)                                */
         /* ===================================================================== */
-        const FX_STORAGE_KEY = 'voceimporta_fx_v1';
-        const FX_CALM_BACKUP_KEY = 'voceimporta_fx_calm_backup_v1';
+        const FX_STORAGE_KEY = IS_MOBILE ? 'voceimporta_fx_v1_mobile' : 'voceimporta_fx_v1';
+        const FX_CALM_BACKUP_KEY = IS_MOBILE ? 'voceimporta_fx_calm_backup_v1_mobile' : 'voceimporta_fx_calm_backup_v1';
         const FX_CONFIG_KEYS = [
             'crt', 'scanlines', 'flicker', 'noiseCrt', 'marquee',
             'noiseMax', 'flickerIntensity', 'scanlinesIntensity',
@@ -3942,7 +4104,15 @@
             });
         }
 
+        /* celular: todos os efeitos visuais ficam sempre desligados */
+        function forcarEfeitosDesligadosNoCelular() {
+            fxState.crt = false; fxState.scanlines = false; fxState.flicker = false; fxState.noiseCrt = false; fxState.marquee = false;
+            fxState.noiseMax = 0; fxState.flickerIntensity = 0; fxState.scanlinesIntensity = 0;
+            fxState.heroGlow = false; fxState.heroAura = false;
+        }
+
         function applyFxState() {
+            if (IS_MOBILE) forcarEfeitosDesligadosNoCelular();
             document.body.classList.toggle('crt-off', !fxState.crt);
             document.body.classList.toggle('fx-scanlines-off', !fxState.scanlines);
             document.body.classList.toggle('fx-flicker-off', !fxState.flicker);
@@ -3987,6 +4157,14 @@
             iniciarBootLoader();
 
             function iniciarBootLoader() {
+            if (IS_MOBILE) {
+                /* celular: sem animação de boot — vai direto ao conteúdo */
+                try { sessionStorage.setItem('voceimporta_booted', '1'); } catch (e) {}
+                try { if (bootScreen.parentNode) bootScreen.parentNode.removeChild(bootScreen); } catch (e) {}
+                document.documentElement.classList.remove('boot-lock');
+                document.body.classList.remove('boot-lock');
+                return;
+            }
 
             const isMobile = (window.matchMedia && window.matchMedia('(hover: none) and (pointer: coarse)').matches) || window.innerWidth <= 768;
             const prefereSemAnimacao = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -4280,6 +4458,7 @@
             scheduleStickyUpdate();
         }
         function esconderSidebar() {
+            if (IS_MOBILE) { fecharSidebar(); return; }   /* celular: só abre/fecha pelo botão ☰ */
             sidebar.classList.add('escondida');
             if (sidebarDesktopIcon) { sidebarDesktopIcon.classList.add('visivel'); atalhoReajustar(); }
             sbLayout();
@@ -4458,7 +4637,7 @@
         const sbHeader = sidebar.querySelector('.sidebar-header');
         const sbDockBtn = document.getElementById('sidebarDockBtn');
         const sbPreview = document.getElementById('sidebarDockPreview');
-        const sbDesktop = window.matchMedia('(min-width: 1025px)');
+        const sbDesktop = IS_MOBILE ? { matches: false, addEventListener: function () {}, addListener: function () {} } : window.matchMedia('(min-width: 1025px)');
         const SB_MIN_W = 230, SB_MIN_H = 260;   // tamanho mínimo da janela
         const SB_LIMIAR = 6;                    // px de movimento para destacar
         const SB_ZONA = 36;                     // px da borda esquerda que re-encaixa
@@ -4643,7 +4822,7 @@
         } catch (e) {}
 
         try {
-            if (localStorage.getItem('voceimporta_sidebar_oculta') === '1' && window.matchMedia('(min-width: 1025px)').matches) {
+            if (localStorage.getItem('voceimporta_sidebar_oculta') === '1' && !IS_MOBILE && window.matchMedia('(min-width: 1025px)').matches) {
                 esconderSidebar();
             }
         } catch (e) {}
@@ -4653,7 +4832,7 @@
         const crtNoise = document.getElementById('crtNoise');
         const transitionEffectSection = document.querySelector('.mensagem-com-fundo-gradiente');
 
-        const desktopMedia = window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 1025px)');
+        const desktopMedia = IS_MOBILE ? { matches: false, addEventListener: function () {}, addListener: function () {} } : window.matchMedia('(hover: hover) and (pointer: fine) and (min-width: 1025px)');
         function updateCRTEffect() {
             if (!desktopMedia.matches) return;
             if (!transitionEffectSection) return;
@@ -4691,16 +4870,35 @@
             const currentOpacity = maxOpacity * (1 - scrollFraction);
             document.documentElement.style.setProperty('--noise-opacity', currentOpacity.toFixed(3));
         }
-        window.addEventListener('scroll', updateNoiseOpacity, { passive: true });
-        window.addEventListener('resize', updateNoiseOpacity);
+        if (!IS_MOBILE) {
+            window.addEventListener('scroll', updateNoiseOpacity, { passive: true });
+            window.addEventListener('resize', updateNoiseOpacity);
+        }
         updateNoiseOpacity();
 
         const menuToggle = document.getElementById('menuToggle');
         const sidebarOverlay = document.getElementById('sidebarOverlay');
-        function abrirSidebar() { sidebar.classList.add('ativo'); sidebarOverlay.classList.add('ativo'); }
-        function fecharSidebar() { sidebar.classList.remove('ativo'); sidebarOverlay.classList.remove('ativo'); }
+        function abrirSidebar() {
+            sidebar.classList.add('ativo'); sidebarOverlay.classList.add('ativo');
+            document.body.classList.add('menu-aberto'); menuToggle.setAttribute('aria-expanded', 'true');
+        }
+        function fecharSidebar() {
+            sidebar.classList.remove('ativo'); sidebarOverlay.classList.remove('ativo');
+            document.body.classList.remove('menu-aberto'); menuToggle.setAttribute('aria-expanded', 'false');
+        }
         menuToggle.addEventListener('click', () => { if (sidebar.classList.contains('ativo')) fecharSidebar(); else abrirSidebar(); });
         sidebarOverlay.addEventListener('click', fecharSidebar);
+        /* celular: deslizar o menu para a esquerda fecha */
+        if (IS_MOBILE) {
+            let sx = null, sy = null;
+            sidebar.addEventListener('touchstart', (e) => { const t = e.touches[0]; sx = t.clientX; sy = t.clientY; }, { passive: true });
+            sidebar.addEventListener('touchend', (e) => {
+                if (sx === null) return;
+                const t = e.changedTouches[0], dx = t.clientX - sx, dy = t.clientY - sy;
+                sx = sy = null;
+                if (dx < -60 && Math.abs(dy) < 50) fecharSidebar();
+            }, { passive: true });
+        }
         document.querySelectorAll('.sidebar-nav a').forEach(link => { link.addEventListener('click', fecharSidebar); });
 
         document.querySelectorAll('.tree-folder').forEach(folder => {
@@ -4844,6 +5042,7 @@
         }
 
         function wsIr(n) {
+            if (IS_MOBILE) n = 1;   /* celular: só existe a Workspace 1 (o site) */
             n = Math.max(1, Math.min(wsTotal, parseInt(n, 10) || 1));
             if (n === wsAtual) { wsSync(); return; }
             wsAtual = n;
@@ -5597,7 +5796,7 @@
         }
 
         function wsExpoAbrir() {
-            if (wsExpoAberto) return;
+            if (IS_MOBILE || wsExpoAberto) return;
             wsFecharMenu();
             wsExpoCriar();
             wsExpoFocoAnterior = document.activeElement;
@@ -5992,6 +6191,7 @@
             }
 
             function openWindow(sectionId) {
+                if (IS_MOBILE) return null;   /* celular: sem janelas */
                 const section = document.getElementById(sectionId);
                 if (!section) return null;
                 for (const id in windows) {
@@ -6019,6 +6219,7 @@
             }
 
             function openCustomWindow(title, uniqueKey, contentBuilder, opts) {
+                if (IS_MOBILE) return null;   /* celular: sem janelas */
                 opts = opts || {};
                 if (uniqueKey) {
                     for (const id in windows) {
@@ -6275,6 +6476,7 @@
             }
 
             function openTerminal() {
+                if (IS_MOBILE) return null;   /* celular: sem terminal */
                 for (const id in windows) {
                     if (windows[id].isTerminal) {
                         focusWindow(id);
@@ -6891,6 +7093,7 @@
 
             const POP_OUT_SVG = '<svg width="13" height="13" viewBox="0 0 13 13" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="miter"><rect x="1" y="1" width="7" height="7"/><rect x="5" y="5" width="7" height="7"/></svg>';
             function injectPopOutButtons() {
+                if (IS_MOBILE) return;   /* celular: sem botão "abrir em janela" */
                 document.querySelectorAll('section[id]').forEach(section => {
                     if (section.id === 'inicio') return;
                     const titulo = section.querySelector('.section-titulo');
@@ -7014,6 +7217,14 @@
         const btnAjudaAgora = document.getElementById('btnAjudaAgora');
         if (btnAjudaAgora) {
             btnAjudaAgora.addEventListener('click', () => {
+                if (IS_MOBILE) {
+                    const alvo = document.getElementById('ajuda');
+                    if (alvo) {
+                        alvo.scrollIntoView({ block: 'start' });
+                        try { history.replaceState(null, '', '#ajuda'); } catch (e) {}
+                    }
+                    return;
+                }
                 if (voceWM && typeof voceWM.openAjuda === 'function') voceWM.openAjuda();
             });
         }
@@ -7022,7 +7233,7 @@
         /* ABRIR / FECHAR TERMINAL                                               */
         /* ===================================================================== */
         function abrirTerminal() {
-            if (!voceWM) return;
+            if (IS_MOBILE || !voceWM) return;   /* celular: sem terminal */
             terminalWindowId = voceWM.openTerminal();
         }
         function fecharTerminal() {
