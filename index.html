@@ -1605,6 +1605,52 @@
         }
 
         /* ===================================================================== */
+        /* JANELA DO DOOM */
+        /* ===================================================================== */
+        .os-window.doom-window {
+            border-color: #7a3a2a #1a0503 #1a0503 #7a3a2a;
+            min-width: 360px;
+        }
+        .os-window.doom-window .os-window-titlebar {
+            background: linear-gradient(180deg, #4a2a1a 0%, #2e1a10 50%, #1a0e08 100%);
+            color: #e8b090;
+        }
+        .os-window.doom-window .os-window-titlebar::before { content: '\2620'; color: #e07a5a; }
+        .os-window.doom-window.focused .os-window-titlebar {
+            background: linear-gradient(180deg, #6a3a22 0%, #3e2214 50%, #1a0e08 100%);
+        }
+        .os-window-body.doom-window-body-wrapper {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: 0 !important;
+            background: #000 !important;
+        }
+        .doom-frame {
+            flex: 1 1 auto;
+            min-height: 0;
+            width: 100%;
+            border: 0;
+            background: #000;
+            display: block;
+        }
+        .doom-rodape {
+            flex: 0 0 auto;
+            padding: 3px 10px;
+            background: #161515;
+            border-top: 1px solid #312d2a;
+            color: #8a7a6a;
+            font-size: 0.68rem;
+            letter-spacing: 0.5px;
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .doom-rodape a { color: #c8b090; text-decoration: underline; }
+        .doom-rodape a:hover { color: #e8d5a3; }
+
+        /* ===================================================================== */
         /* PAINEL DE EFEITOS */
         /* ===================================================================== */
         .os-window.effects-window {
@@ -3977,6 +4023,9 @@
         /* ===================================================================== */
         const WORKSPACE_WALLPAPER_URL = 'https://i.pinimg.com/1200x/f1/58/26/f15826b186924e595d81f193d0e6cb04.jpg';
 
+        /* >>> LINK DO DOOM — troque aqui se a página sair do ar ou bloquear iframe <<< */
+        const DOOM_URL = 'https://dos.zone/doom-dec-1993/';
+
         /* MODO CELULAR — definido no <head> (window.VI_MOBILE). No celular: sem efeitos, sem janelas/workspaces/terminal. */
         const IS_MOBILE = window.VI_MOBILE === true;
 
@@ -5164,6 +5213,7 @@
                 else if (a.tipo === 'ajuda') voceWM.openAjuda();
                 else if (a.tipo === 'fx') voceWM.openEffects();
                 else if (a.tipo === 'terminal') abrirTerminal();
+                else if (a.tipo === 'doom') abrirDoom();
             } catch (e) {}
         }
 
@@ -5480,6 +5530,7 @@
         /* atalhos de teclado: Ctrl+Alt+1…8 (ir para a workspace), Ctrl+Alt+↑ (visão geral),
            Ctrl+Alt+Shift+←/→ (move a janela ativa para a workspace anterior/seguinte e vai junto) */
         document.addEventListener('keydown', (e) => {
+            if (doomTelaCheia()) return;   /* Doom em tela cheia: atalhos do site desligados */
             if (wsMenuEl && e.key === 'Escape') { e.preventDefault(); wsFecharMenu(); return; }
             if (!(e.ctrlKey || e.metaKey) || !e.altKey) return;
             const dig = /^Digit([1-8])$/.exec(e.code);
@@ -5850,6 +5901,7 @@
 
         /* teclado dentro da visão geral (captura: roda antes dos atalhos das janelas) */
         document.addEventListener('keydown', (e) => {
+            if (doomTelaCheia()) return;   /* Doom em tela cheia: atalhos do site desligados */
             if (!wsExpoAberto) return;
             if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); wsExpoFechar(); return; }
             if (e.ctrlKey || e.metaKey || e.altKey) return;
@@ -7115,6 +7167,7 @@
             });
 
             document.addEventListener('keydown', (e) => {
+                if (doomTelaCheiaWM()) return;   /* Doom em tela cheia: atalhos do site desligados */
                 if (menuEl && e.key === 'Escape') { e.preventDefault(); closeMenu(); return; }
                 const mod = e.ctrlKey || e.metaKey;
                 if (mod && e.altKey && e.key.toLowerCase() === 'd') { e.preventDefault(); toggleShowDesktop(); return; }
@@ -7164,7 +7217,19 @@
             updateTaskbarVisibility();
             renderTaskbar();
 
+            function doomTelaCheiaWM() {
+                const fs = document.fullscreenElement || document.webkitFullscreenElement || null;
+                for (const id in windows) {
+                    const w = windows[id];
+                    if (w.customKey !== 'doom' || w.closing) continue;
+                    if (w.state === 'maximized' && w.ws === wsAtual) return true;
+                    if (fs && w.el.contains(fs)) return true;
+                }
+                return false;
+            }
+
             return {
+                doomTelaCheia: doomTelaCheiaWM,
                 refreshTaskbar: () => { updateTaskbarVisibility(); syncTaskbar(); },
                 applyWorkspace: applyWorkspace,
                 moveToWorkspace: moveToWorkspace,
@@ -7239,6 +7304,49 @@
         function fecharTerminal() {
             if (terminalWindowId && voceWM) voceWM.close(terminalWindowId);
             terminalWindowId = null;
+        }
+
+        /* ===================================================================== */
+        /* DOOM — janela com o jogo embutido (iframe)                            */
+        /* ===================================================================== */
+        function abrirDoom() {
+            if (IS_MOBILE || !voceWM) return null;   /* celular: sem janelas */
+            return voceWM.openCustom('doom — shareware', 'doom', (body) => {
+                const iframe = document.createElement('iframe');
+                iframe.className = 'doom-frame';
+                iframe.src = DOOM_URL;
+                iframe.title = 'Doom';
+                iframe.setAttribute('allow', 'autoplay; fullscreen; gamepad');
+                iframe.setAttribute('allowfullscreen', '');
+                iframe.setAttribute('referrerpolicy', 'no-referrer');
+                const rodape = document.createElement('div');
+                rodape.className = 'doom-rodape';
+                const dica = document.createElement('span');
+                dica.textContent = 'clique no jogo para jogar · maximizada = atalhos do site desligados';
+                const link = document.createElement('a');
+                link.href = DOOM_URL;
+                link.target = '_blank';
+                link.rel = 'noopener';
+                link.textContent = 'não carregou? abrir em nova aba';
+                rodape.appendChild(dica);
+                rodape.appendChild(link);
+                body.appendChild(iframe);
+                body.appendChild(rodape);
+            }, {
+                extraClass: 'doom-window',
+                bodyExtraClass: 'doom-window-body-wrapper',
+                geometry: () => {
+                    const w = Math.min(820, Math.max(360, window.innerWidth - 120));
+                    const h = Math.min(580, Math.max(260, window.innerHeight - 140));
+                    return { top: 60, left: 80, width: w, height: h };
+                },
+                atalho: { key: 'doom', tipo: 'doom', titulo: 'Doom', icone: '☠' }
+            });
+        }
+
+        /* true quando o Doom está em tela cheia (janela maximizada na workspace atual, ou fullscreen do navegador) */
+        function doomTelaCheia() {
+            try { return !!(voceWM && voceWM.doomTelaCheia()); } catch (e) { return false; }
         }
 
         /* ===================================================================== */
@@ -7707,6 +7815,13 @@
             appendTerminalLinha("rm: operação bloqueada — este terminal é apenas simbólico.", 't-dim');
         }
 
+        function cmdDoom() {
+            if (IS_MOBILE || !voceWM) { appendTerminalLinha("doom: indisponível neste dispositivo", 't-err'); return; }
+            abrirDoom();
+            appendTerminalLinha("carregando doom... rip and tear.", 't-ok');
+            appendTerminalLinha("dica: maximize a janela para jogar sem atalhos do site.", 't-dim');
+        }
+
         function cmdHelp() {
             appendTerminalLinha("comandos disponíveis:", "t-accent");
             appendTerminalLinha("  uptime                     — há quanto tempo a sessão está aberta", "t-info");
@@ -7737,6 +7852,7 @@
             appendTerminalLinha("  disable <efeito>           — desliga um efeito visual (legacy)", "t-info");
             appendTerminalLinha("       efeitos legacy: scanlines, flicker, noise, marquee", "t-dim");
             appendTerminalLinha("");
+            appendTerminalLinha("  doom                       — abre o Doom (1993) em uma janela", "t-info");
             appendTerminalLinha("  rm -rf /                   — não faça isso. só dizendo.", "t-dim");
             appendTerminalLinha("  clear                      — limpa a tela", "t-dim");
             appendTerminalLinha("  exit                       — fecha o terminal", "t-dim");
@@ -7805,6 +7921,7 @@
                     if (voceWM) voceWM.openAjuda();
                     appendTerminalLinha("abrir janela de ajuda urgente...", 't-ok');
                     break;
+                case 'doom':                     cmdDoom(); break;
                 case 'debug':                    cmdDebug(args); break;
                 case 'crt':                      cmdCrt(args); break;
                 case 'noise':                    cmdNoise(args); break;
@@ -7829,6 +7946,7 @@
         }
 
         document.addEventListener('keydown', (e) => {
+            if (doomTelaCheia()) return;   /* Doom em tela cheia: atalhos do site desligados */
             if (document.getElementById('bootScreen')) return;
             if (terminalWindowId && voceWM) {
                 const list = voceWM.list();
@@ -8183,6 +8301,7 @@
 
         /* ESC global fecha sidebar */
         document.addEventListener('keydown', (e) => {
+            if (doomTelaCheia()) return;   /* Doom em tela cheia: atalhos do site desligados */
             if (e.key === 'Escape' && !wsEstaNoDesktop() && !sidebar.classList.contains('escondida')) esconderSidebar();
         });
 
